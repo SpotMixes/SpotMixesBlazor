@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html class="loading dark-layout" lang="es" data-layout="dark-layout" data-textdirection="ltr">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimal-ui">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500;1,600"
+          rel="stylesheet">
+    <!-- End Fonts -->
+
+    <!-- Vendor CSS -->
+    <link rel="stylesheet" type="text/css" href="src/css/vendors/vendors.min.css">
+    <link rel="stylesheet" type="text/css" href="src/css/vendors/animate/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="src/css/vendors/extensions/sweetalert2.min.css">
+    <link rel="stylesheet" type="text/css" href="src/css/plugins/extensions/toastr.min.css">
+    <!-- End Vendor CSS -->
+
+    <!-- Theme CSS -->
+    <link rel="stylesheet" type="text/css" href="src/css/theme/bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="src/css/theme/bootstrap-extended.css">
+    <link rel="stylesheet" type="text/css" href="src/css/theme/colors.css">
+    <link rel="stylesheet" type="text/css" href="src/css/theme/components.css">
+    <link rel="stylesheet" type="text/css" href="src/css/theme/dark-layout.css">
+    <link rel="stylesheet" type="text/css" href="src/css/theme/bordered-layout.css">
+    <link rel="stylesheet" type="text/css" href="src/css/theme/semi-dark-layout.css">
+    <!-- End Theme CSS -->
+    
+    <!-- Page CSS -->
+    <link rel="stylesheet" type="text/css" href="src/css/core/menu/vertical-menu.css">
+    <link rel="stylesheet" type="text/css" href="src/css/pages/authentication.css">
+    <link rel="stylesheet" type="text/css" href="src/css/plugins/extensions/ext-component-sliders.min.css">
+    <link rel="stylesheet" type="text/css" href="src/css/plugins/extensions/ext-component-sweet-alerts.min.css">
+    <link rel="stylesheet" type="text/css" href="src/css/plugins/extensions/ext-component-toastr.css">
+    <link rel="stylesheet" type="text/css" href="src/css/pages/app-ecommerce.css">
+    <link rel="stylesheet" type="text/css" href="src/css/player/APlayer.min.css">
+    <link rel="stylesheet" type="text/css" href="src/css/player/customPlayer.css">
+    <!-- End Page CSS -->
+
+    <!-- Custom CSS-->
+    <link rel="stylesheet" type="text/css" href="src/css/custom/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+    <!-- End Custom CSS -->
+
+    <title>SpotMixes</title>
+</head>
+
+<body id="body" class="vertical-layout vertical-menu-modern navbar-floating footer-static" data-open="click" data-menu="vertical-menu-modern" data-col="">
+
+<!-- Main Menu-->
+<div id="sidenav" class="main-menu menu-fixed menu-dark menu-accordion menu-shadow" data-scroll-to-active="true">
+    <div class="navbar-header">
+        <ul class="nav navbar-nav flex-row">
+            <li class="nav-item me-auto">
+                <a class="navbar-brand" href="#">
+                        <span class="brand-logo">
+                            <img src="public/brand/spotmixes-logo.svg" alt="Logo SpotMixes" style="height: 24px;">
+                        </span>
+                    <h2 class="brand-text">SpotMixes</h2>
+                </a>
+            </li>
+            <li class="nav-item nav-toggle">
+                <a class="nav-link modern-nav-toggle pe-0" data-bs-toggle="collapse">
+                    <i class="d-block d-xl-none text-primary toggle-icon font-medium-4" data-feather="x"></i>
+                    <i class="d-none d-xl-block collapse-toggle-icon font-medium-4 text-primary" data-feather="disc" data-ticon="disc"></i>
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="shadow-bottom"></div>
+    <div class="main-menu-content">
+        <ul class="navigation navigation-main" id="main-menu-navigation" data-menu="menu-navigation">
+            <li class=" navigation-header">
+                <span data-i18n="Apps &amp; Pages">Apps &amp; Pages</span>
+                <i data-feather="more-horizontal"></i>
+            </li>
+            <li class="nav-item">
+                <a class="d-flex align-items-center" href="/">
+                    <i class="ri-music-line"></i>
+                    <span class="menu-title text-truncate">
+                            Publicaciones
+                    </span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="d-flex align-items-center" href="/djs">
+                    <i class="ri-disc-line"></i>
+                    <span class="menu-title text-truncate">
+                            DJ's
+                    </span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="d-flex align-items-center" href="">
+                    <i class="ri-radio-line"></i>
+                    <span class="menu-title text-truncate" data-i18n="Email">
+                            En vivo
+                    </span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="d-flex align-items-center" href="">
+                    <i class="ri-file-2-line"></i>
+                    <span class="menu-title text-truncate" data-i18n="Email">
+                            Contratos
+                    </span>
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
+<!-- End Main Menu-->
+
+<kiul></kiul>
+
+<div class="sidenav-overlay"></div>
+<div class="drag-target"></div>
+<div class="player-floating">
+    <div id="aplayer"></div>
+</div>
+
+<!-- Footer -->
+<button class="btn btn-primary btn-icon scroll-top" type="button">
+    <i data-feather="arrow-up"></i>
+</button>
+<!-- End Footer -->
+
+<!-- Vendor JS -->
+<script src="src/js/vendors/vendors.min.js"></script>
+<!-- End Vendor JS -->
+
+<!-- Page Vendor JS -->
+<script src="src/js/player/APlayer.min.js"></script>
+<script src="src/js/extensions/sweetalert2.all.min.js"></script>
+<script src="src/js/extensions/toastr.min.js"></script>
+<!-- End Page Vendor JS -->
+
+<!-- Theme JS-->
+<script src="src/js/theme/app-menu.js"></script>
+<script src="src/js/theme/app.js"></script>
+<!-- End Theme JS-->
+
+<!-- Page JS -->
+<script src="src/js/shared-methods.js"></script>
+<!-- End Page JS -->
+
+<script src="_framework/blazor.webassembly.js"></script>
+</body>
+
+</html>

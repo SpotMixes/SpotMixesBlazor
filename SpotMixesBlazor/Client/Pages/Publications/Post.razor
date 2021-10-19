@@ -1,0 +1,63 @@
+﻿@inject HttpClient _httpClient
+@inject IJSRuntime _jsRuntime
+
+<div class="card ecommerce-card">
+    <div class="item-img d-flex justify-content-center p-0">
+        <a @onclick="PlayMusic">
+            <img class="img-fluid card-img-top width-500" src="@Audio.UrlCover" alt=""/>
+        </a>
+    </div>
+    <div class="card-body">
+        <div class="item-wrapper">
+            <a href="">
+                <div class="avatar avatar-sm">
+                    <img src="@Audio.UrlProfilePicture" alt="@Audio.Dj">
+                </div>
+                @Audio.Dj
+            </a>
+            <div>
+                <p class="h6">
+                    <i class="ri-headphone-line"></i>
+                    @Audio.NumReproduction
+                </p>
+            </div>
+        </div>
+        <h6 class="item-name">
+            <a class="text-body" href="">@Audio.Title</a>
+        </h6>
+        <div class="card-text item-wrapper mt-1">
+            <p>@Audio.DatePublication.ToString("MMMM dd, yyyy")</p>
+            <span class="badge bg-dark">@Audio.Genres</span>
+        </div>
+    </div>
+    <AuthorizeView>
+        <Authorized>
+            <div class="item-options text-center">
+                <a href="#" class="btn btn-primary btn-cart">
+                    <i class="ri-heart-line"></i>
+                    <span>500</span>
+                </a>
+                <a href="#" class="btn btn-warning btn-cart">
+                    <i class="ri-discuss-fill"></i>
+                    <span class="add-to-cart">100</span>
+                </a>
+                <a href="#" class="btn btn-info btn-cart">
+                    <i class="ri-share-fill"></i>
+                    <span class="add-to-cart">100</span>
+                </a>
+            </div>
+        </Authorized>
+    </AuthorizeView>
+</div>
+
+@code
+{
+    [Parameter]
+    public Audio Audio { get; set; }
+
+    private async Task PlayMusic()
+    {
+        await _jsRuntime.InvokeVoidAsync("playMusic", Audio.Title, Audio.Dj, Audio.UrlAudio, Audio.UrlCover, true);
+    }
+    
+}

@@ -1,0 +1,155 @@
+﻿@using System.Net.Http.Headers
+@inject HttpClient _httpClient
+
+<!-- Modal -->
+<div class="modal fade text-start" id="InsertAudio" tabindex="-1" aria-labelledby="InsertAudio" aria-hidden="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Publicar audio</h4>
+                @if (!_fileUpload)
+                {
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                }
+            </div>
+            <EditForm Model="_audio" OnValidSubmit="SaveAudio">
+                <DataAnnotationsValidator></DataAnnotationsValidator>
+                <div class="modal-body">
+                    <div class="mb-1">
+                        <label class="form-label">Título:</label>
+                        <InputText type="text" class="form-control" @bind-Value="_audio.Title"/>
+                        <div class="text-danger form-label">
+                            <ValidationMessage For="() => _audio.Title"></ValidationMessage>
+                        </div>
+                    </div>
+                    <div class="mb-1">
+                        <label class="form-label">Genero:</label>
+                        <InputSelect class="form-select" @bind-Value="_audio.Genres">
+                            <option selected></option>
+                            <option Value="Ambiente">Ambiente</option>
+                            <option Value="Clásica">Clásica</option>
+                            <option Value="Country">Country</option>
+                            <option Value="Dance y EDM">Dance y EDM</option>
+                            <option Value="Dancehall">Dancehall</option>
+                            <option Value="Deep house">Deep house</option>
+                            <option Value="Disco">Disco</option>
+                            <option Value="Dubstep">Dubstep</option>
+                            <option Value="Electrónica">Electrónica</option>
+                            <option Value="Hip hop y Rap">Hip hop y Rap</option>
+                            <option Value="House">House</option>
+                            <option Value="Latina">Latina</option>
+                            <option Value="Metal">Metal</option>
+                            <option Value="Reggae">Reggae</option>
+                            <option Value="Reguetón">Reguetón</option>
+                            <option Value="Rock">Rock</option>
+                            <option Value="Techno">Techno</option>
+                            <option Value="Trap">Trap</option>
+                            <option Value="Triphop">Triphop</option>
+                        </InputSelect>
+                        <div class="text-danger form-label">
+                            <ValidationMessage For="() => _audio.Genres"></ValidationMessage>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="form-label">Audio: </label>
+                        <InputFile type="file" class="form-control" accept=".mp3" OnChange="OnAudioChange"/>
+                    </div>
+                    <div>
+                        <label class="form-label">Imagen: </label>
+                        <InputFile type="file" class="form-control" accept="image/*" OnChange="OnCoverChange"/>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    @if (_fileUpload)
+                    {
+                        <button class="btn btn-outline-primary" type="button" disabled>
+                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            <span class="ms-25 align-middle">Subiendo...</span>
+                        </button>
+                    }
+                    else
+                    {
+                        <button type="submit" class="btn btn-primary">Publicar</button>
+                    }
+                </div>
+            </EditForm>
+        </div>
+    </div>
+</div>
+
+@code
+{
+    private readonly Audio _audio = new();
+    private IBrowserFile AudioFile { get; set; }
+        private const long MaxAudioUploadSize = 20 * 1000000;
+    private IBrowserFile ImageFile { get; set; }
+        private const long MaxImageUploadSize = 5 * 1000000;
+    private bool _fileUpload = false;
+
+    private void OnAudioChange(InputFileChangeEventArgs e)
+    {
+        if (e?.File is null) return;
+
+        if (e.File.Size > MaxAudioUploadSize)
+        {
+            Console.WriteLine("Tamaño pasado");
+            return;
+        }
+
+        AudioFile = e.File;
+    }
+
+    private void OnCoverChange(InputFileChangeEventArgs e)
+    {
+        if (e?.File is null) return;
+
+        if (e.File.Size > MaxImageUploadSize)
+        {
+            Console.WriteLine("Tamaño pasado");
+            return;
+        }
+
+        ImageFile = e.File;
+    }
+
+    private async Task SaveAudio()
+    {
+        _fileUpload = true;
+        using var audioContent = new MultipartFormDataContent();
+        using var imageContent = new MultipartFormDataContent();
+
+        try
+        {
+            var fileContent = new StreamContent(AudioFile.OpenReadStream(MaxAudioUploadSize));
+            fileContent.Headers.ContentType = new MediaTypeHeaderValue(AudioFile.ContentType);
+            audioContent.Add(fileContent, "\"files\"", AudioFile.Name);
+
+            var responseAudio = await _httpClient.PostAsync("api/upload/audios-mp3", audioContent);
+            _audio.UrlAudio = await responseAudio.Content.ReadAsStringAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            throw;
+        }
+
+        try
+        {
+            var fileContent = new StreamContent(ImageFile.OpenReadStream(MaxImageUploadSize));
+            fileContent.Headers.ContentType = new MediaTypeHeaderValue(ImageFile.ContentType);
+            imageContent.Add(fileContent, "\"files\"", ImageFile.Name);
+
+            var responseImage = await _httpClient.PostAsync("api/upload/audios-cover", imageContent);
+            _audio.UrlCover = await responseImage.Content.ReadAsStringAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            throw;
+        }
+
+        await _httpClient.PostAsJsonAsync("api/audio", _audio);
+       
+        _fileUpload = false;
+    }
+}
