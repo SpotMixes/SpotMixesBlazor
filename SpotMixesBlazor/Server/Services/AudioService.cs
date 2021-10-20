@@ -22,6 +22,12 @@ namespace SpotMixesBlazor.Server.Services
             await _audiosCollection.InsertOneAsync(audio);
         }
 
+        public async Task<int> GetQuantityAudios()
+        {
+            var audios = await _audiosCollection.Find(audio => audio.IsActive == true).ToListAsync();
+            return audios.Count;
+        }
+
         public async Task<IReadOnlyList<Audio>> GetAllAudios(int audioPerPage, int page)
         {
             var skip = audioPerPage * page;

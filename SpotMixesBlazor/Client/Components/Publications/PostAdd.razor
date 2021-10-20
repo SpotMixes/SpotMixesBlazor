@@ -1,8 +1,11 @@
 ﻿@using System.Net.Http.Headers
+@using System.Net
 @inject HttpClient _httpClient
+@inject IJSRuntime _jsRuntime
 
 <!-- Modal -->
-<div class="modal fade text-start" id="InsertAudio" tabindex="-1" aria-labelledby="InsertAudio" aria-hidden="false">
+<div class="modal fade text-start" id="InsertAudio" data-bs-backdrop="static"
+     data-bs-keyboard="false" tabindex="-1" aria-labelledby="InsertAudio" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
@@ -52,11 +55,19 @@
                     </div>
                     <div>
                         <label class="form-label">Audio: </label>
-                        <InputFile type="file" class="form-control" accept=".mp3" OnChange="OnAudioChange"/>
+                        <InputFile type="file" class="form-control" accept=".mp3" OnChange="OnAudioChange"
+                                   @bind-Value="_audio.UrlAudio"/>
+                        <div class="text-danger form-label">
+                            <ValidationMessage For="() => _audio.UrlAudio"></ValidationMessage>
+                        </div>
                     </div>
                     <div>
                         <label class="form-label">Imagen: </label>
-                        <InputFile type="file" class="form-control" accept="image/*" OnChange="OnCoverChange"/>
+                        <InputFile type="file" class="form-control" accept="image/*" OnChange="OnCoverChange"
+                                   @bind-Value="_audio.UrlCover"/>
+                        <div class="text-danger form-label">
+                            <ValidationMessage For="() => _audio.UrlAudio"></ValidationMessage>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -79,45 +90,89 @@
 
 @code
 {
-    private readonly Audio _audio = new();
+    [Parameter]
+    public EventCallback<string> GetAudios { get; set; }
+
+    private Audio _audio = new();
     private IBrowserFile AudioFile { get; set; }
         private const long MaxAudioUploadSize = 20 * 1000000;
     private IBrowserFile ImageFile { get; set; }
-        private const long MaxImageUploadSize = 5 * 1000000;
+        private const long MaxImageUploadSize = 1 * 1000000;
     private bool _fileUpload = false;
 
-    private void OnAudioChange(InputFileChangeEventArgs e)
+    // Selecting a file in the audio input
+    private async void OnAudioChange(InputFileChangeEventArgs e)
     {
         if (e?.File is null) return;
 
         if (e.File.Size > MaxAudioUploadSize)
         {
-            Console.WriteLine("Tamaño pasado");
+            await _jsRuntime.InvokeVoidAsync("showToast", "info",
+                "Audio", $"🙄 El archivo debe ser menor a 100 MB");
             return;
         }
 
+        _audio.UrlAudio = "temporaryUrl";
         AudioFile = e.File;
     }
 
-    private void OnCoverChange(InputFileChangeEventArgs e)
+    // Selecting a file in the audio cover input
+    private async void OnCoverChange(InputFileChangeEventArgs e)
     {
         if (e?.File is null) return;
 
         if (e.File.Size > MaxImageUploadSize)
         {
-            Console.WriteLine("Tamaño pasado");
+            await _jsRuntime.InvokeVoidAsync("showToast", "info",
+                "Cover", $"🙄 El archivo debe ser menor a 2 MB");
             return;
         }
 
+        _audio.UrlCover = "temporaryUrl";
         ImageFile = e.File;
     }
 
+    // Method to save audio information in the database and in the cloud storage
     private async Task SaveAudio()
     {
         _fileUpload = true;
-        using var audioContent = new MultipartFormDataContent();
-        using var imageContent = new MultipartFormDataContent();
 
+        await LoadExternalUserData();
+        
+        if (string.IsNullOrEmpty(_audio.UserNickname) ||
+            string.IsNullOrEmpty(_audio.UserUrlProfilePicture) || 
+            string.IsNullOrEmpty(_audio.UserId))
+        {
+            await _jsRuntime.InvokeVoidAsync("showToast", "error",
+                "Guardar", "😪 Error al subir el audio, inténtelo mas tarde.");
+        }
+        else
+        {
+            await SaveAudioInTheCloud();
+            await SaveAudioCoverInTheCloud();
+            
+            if (_audio.UrlAudio == "temporaryUrl" || _audio.UrlCover == "temporaryUrl")
+            {
+                await _jsRuntime.InvokeVoidAsync("showToast", "error",
+                    "Guardar", "😪 Servidor en mantenimiento, intente más tarde.");
+                _fileUpload = false;
+            }
+            else
+            {
+                await _httpClient.PostAsJsonAsync("api/audio", _audio);
+                await GetAudios.InvokeAsync("api/audio/all/0");
+                // Clear model information
+                _audio = new Audio();
+                _fileUpload = false;
+                await _jsRuntime.InvokeVoidAsync("showToast", "success",
+                    "Guardar", "🥳 ¡Genial! Tú publicación se ha subido correctamente.");
+            }
+        }
+    }
+
+    private async Task SaveAudioInTheCloud()
+    {
+        using var audioContent = new MultipartFormDataContent();
         try
         {
             var fileContent = new StreamContent(AudioFile.OpenReadStream(MaxAudioUploadSize));
@@ -125,14 +180,26 @@
             audioContent.Add(fileContent, "\"files\"", AudioFile.Name);
 
             var responseAudio = await _httpClient.PostAsync("api/upload/audios-mp3", audioContent);
-            _audio.UrlAudio = await responseAudio.Content.ReadAsStringAsync();
+
+            if (responseAudio.StatusCode == HttpStatusCode.OK)
+            {
+                _audio.UrlAudio = await responseAudio.Content.ReadAsStringAsync();
+            }
+            else
+            {
+                Console.WriteLine(responseAudio.StatusCode);
+            }
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex);
             throw;
         }
+    }
 
+    private async Task SaveAudioCoverInTheCloud()
+    {
+        using var imageContent = new MultipartFormDataContent();
         try
         {
             var fileContent = new StreamContent(ImageFile.OpenReadStream(MaxImageUploadSize));
@@ -140,16 +207,25 @@
             imageContent.Add(fileContent, "\"files\"", ImageFile.Name);
 
             var responseImage = await _httpClient.PostAsync("api/upload/audios-cover", imageContent);
-            _audio.UrlCover = await responseImage.Content.ReadAsStringAsync();
+
+            if (responseImage.StatusCode == HttpStatusCode.OK)
+            {
+                _audio.UrlCover = await responseImage.Content.ReadAsStringAsync();
+            }
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex);
             throw;
         }
+    }
 
-        await _httpClient.PostAsJsonAsync("api/audio", _audio);
-       
-        _fileUpload = false;
+    private async Task LoadExternalUserData()
+    {
+        _audio.UserNickname = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "Nickname");
+        _audio.UserUrlProfilePicture = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "Profile");
+        var email = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "Email");
+        var responseUserId = await _httpClient.GetAsync($"api/User/getUserId/{email}");
+        _audio.UserId = await responseUserId.Content.ReadAsStringAsync();
     }
 }

@@ -83,5 +83,25 @@ namespace SpotMixesBlazor.Server.Controllers
 
             return Ok(_userClaims);
         }
+
+        [HttpGet("getUserId/{email}")]
+        public async Task<ActionResult> GetUserId(string email)
+        {
+            _userList = await _userService.SearchUserByEmail(email);
+
+            var userId = "";
+
+            foreach (var user in _userList)
+            {
+                userId = user.Id;
+            }
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return BadRequest("El usuario no existe");
+            }
+
+            return Ok(userId);
+        }
     }
 }

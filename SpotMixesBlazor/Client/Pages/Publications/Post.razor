@@ -11,9 +11,9 @@
         <div class="item-wrapper">
             <a href="">
                 <div class="avatar avatar-sm">
-                    <img src="@Audio.UrlProfilePicture" alt="@Audio.Dj">
+                    <img src="@Audio.UserUrlProfilePicture" alt="@Audio.UserNickname"/>
                 </div>
-                @Audio.Dj
+                @Audio.UserNickname
             </a>
             <div>
                 <p class="h6">
@@ -57,7 +57,6 @@
 
     private async Task PlayMusic()
     {
-        await _jsRuntime.InvokeVoidAsync("playMusic", Audio.Title, Audio.Dj, Audio.UrlAudio, Audio.UrlCover, true);
+        await _jsRuntime.InvokeVoidAsync("playMusic", Audio.Title, Audio.UserNickname, Audio.UrlAudio, Audio.UrlCover, true);
     }
-    
 }

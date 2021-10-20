@@ -22,6 +22,12 @@ namespace SpotMixesBlazor.Server.Controllers
         public async Task<IActionResult> UploadFile(string blobContainer)
         {
             var response = await MethodUpload(blobContainer);
+
+            if (string.IsNullOrEmpty(response))
+            {
+                return BadRequest("Servidor en mantenimiento, intente más tarde.");
+            }
+            
             return Ok(response);
         }
         
@@ -54,7 +60,8 @@ namespace SpotMixesBlazor.Server.Controllers
             }
             catch (Exception ex)
             {
-                return $"Internal server error: {ex}";
+                Console.WriteLine(ex.Message);
+                return "";
             }
         }
     }

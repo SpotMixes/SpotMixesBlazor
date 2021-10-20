@@ -22,15 +22,18 @@ namespace SpotMixesBlazor.Shared
 
         public string Description { get; set; }
 
+        [Required(ErrorMessage = "Campo requerido")]
         public string UrlAudio { get; set; }
 
+        [Required(ErrorMessage = "Campo requerido")]
         public string UrlCover { get; set; }
 
-        public string Dj { get; set; }
-        public string UrlProfilePicture { get; set; }
+        public string UserNickname { get; set; }
+        
+        public string UserUrlProfilePicture { get; set; }
         
         public DateTime DatePublication { get; set; } = DateTime.Now;
-        public int NumReproduction { get; set; }
+        public int NumReproduction { get; set; } = 0;
         public bool IsActive { get; set; } = true;
     }
 }
