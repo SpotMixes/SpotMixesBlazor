@@ -1,35 +1,36 @@
-﻿<!-- Post Pagination Starts -->
+﻿@inject PageService _pageService
+ 
+<!-- Post Pagination Starts -->
 <section id="ecommerce-pagination">
     <div class="row">
         <div class="col-sm-12">
             <nav aria-label="Page navigation example">
                 <ul class="pagination justify-content-center mt-2">
                     <li class="page-item prev-item">
-                        <a class="page-link" href="#"></a>
+                        <a class="page-link" @onclick="PreviousPage"></a>
                     </li>
                     <li class="page-item active">
-                        <a class="page-link" href="#">1</a>
-                    </li>
-                    <li class="page-item">
-                        <a class="page-link" href="#">2</a>
-                    </li>
-                    <li class="page-item">
-                        <a class="page-link" href="#">3</a>
-                    </li>
-                    <li class="page-item" aria-current="page">
-                        <a class="page-link" href="#">4</a>
-                    </li>
-                    <li class="page-item">
-                        <a class="page-link" href="#">5</a>
-                    </li>
-                    <li class="page-item">
-                        <a class="page-link" href="#">6</a>
-                    </li>
-                    <li class="page-item">
-                        <a class="page-link" href="#">7</a>
+                        <a class="page-link" href="#">
+                            @{
+                                var realValue = 0;
+                                if (_pageService.ViewAll)
+                                {
+                                    realValue = _pageService.ValueAll + 1;
+                                }
+                                else if (_pageService.ViewRecent)
+                                {
+                                    realValue = _pageService.ValueRecent + 1;
+                                }
+                                else
+                                {
+                                    realValue = _pageService.ValueMostListened + 1;
+                                }
+                            }
+                            @realValue
+                        </a>
                     </li>
                     <li class="page-item next-item">
-                        <a class="page-link" href="#"></a>
+                        <a class="page-link" @onclick="NextPage"></a>
                     </li>
                 </ul>
             </nav>
@@ -37,3 +38,54 @@
     </div>
 </section>
 <!-- Post Pagination Ends -->
+
+@code
+{
+    [Parameter]
+    public EventCallback<string> GetAudios { get; set; }
+
+    private async Task NextPage()
+    {
+        if (_pageService.ViewAll)
+        {
+            _pageService.ValueAll++;
+            await GetAudios.InvokeAsync($"api/audio/all/{_pageService.ValueAll}");
+            Console.WriteLine($"Allaudios {_pageService.ValueAll}");
+        }
+        else if (_pageService.ViewRecent)
+        {
+            _pageService.ValueRecent++;
+            await GetAudios.InvokeAsync($"api/audio/recent/{_pageService.ValueRecent}");
+            Console.WriteLine($"Allaudios {_pageService.ValueRecent}");
+        }
+        else if (_pageService.ViewMostListened)
+        {
+            _pageService.ValueMostListened++;
+            await GetAudios.InvokeAsync($"api/audio/mostListened/{_pageService.ValueMostListened}");
+            Console.WriteLine($"Allaudios {_pageService.ValueRecent}");
+        }
+        else
+        {
+            
+        }
+    }
+
+    private async Task PreviousPage()
+    {
+        if (_pageService.ViewAll)
+        {
+            _pageService.ValueAll--;
+            await GetAudios.InvokeAsync($"api/audio/all/{_pageService.ValueAll}");    
+        }
+        else if (_pageService.ViewRecent)
+        {
+            _pageService.ValueRecent--;
+            await GetAudios.InvokeAsync($"api/audio/recent/{_pageService.ValueRecent}");    
+        }
+        else
+        {
+            _pageService.ValueMostListened--;
+            await GetAudios.InvokeAsync($"api/audio/mostListened/{_pageService.ValueMostListened}");    
+        }
+    }
+}

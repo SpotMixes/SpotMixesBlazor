@@ -1,5 +1,7 @@
 ﻿@page "/"
 @inject HttpClient _httpClient
+@inject QuantityData _quantityData
+@inject IJSRuntime _jsRuntime
 
 <!-- BEGIN: Content-->
 <div class="app-content content ecommerce-application">
@@ -24,7 +26,7 @@
                                     </button>
                                     @if (_audios != null)
                                     {
-                                        <div class="search-results">@_quantityAudios resultados</div>
+                                        <div class="search-results">@_quantityData.QuantityAudios resultados</div>
                                     }
                                 </div>
                                 <AuthorizeView>
@@ -53,10 +55,11 @@
                     <div class="row mt-1">
                         <div class="col-sm-12">
                             <div class="input-group input-group-merge">
-                                <input type="text" class="form-control search-product" id="shop-search" placeholder="Search Product"
-                                       aria-label="Buscar..." aria-describedby="shop-search"/>
+                                <input type="text" class="form-control search-product" 
+                                       placeholder="Buscar por título, género y descripción." aria-label="Buscar..."
+                                       @oninput="SearchAudios"/>
                                 <span class="input-group-text">
-                                    <i data-feather="search" class="text-muted"></i>
+                                    <i class="ri-search-line"></i>
                                 </span>
                             </div>
                         </div>
@@ -65,21 +68,27 @@
                 <!-- Post Search Bar Ends -->
 
                 <!-- Post List Starts -->
-                <section id="ecommerce-products" class="grid-view">
+                <section class="row match-height mt-2">
                     @if (_audios == null)
                     {
                         <p>Cargando Audio..</p>
                     }
                     else
                     {
-                        @foreach (var audio in _audios)
-                        {
+                        @*<div style="height:500px;overflow-y:scroll">
+                            @foreach (var audio in _audios)
+                            {
+                                <Post Audio="audio"></Post>
+                            }
+                        </div>*@
+                        <Virtualize Items="_audios" Context="audio">
                             <Post Audio="audio"></Post>
-                        }
+                        </Virtualize>
                     }
                 </section>
                 <!-- Post List Ends -->
-                <Pagination></Pagination>
+                <Pagination GetAudios="GetAudios"></Pagination>
+                <br><br><br><br><br><br><br>
             </div>
         </div>
         <div class="sidebar-detached sidebar-left">
@@ -106,18 +115,27 @@
 
 @code
 {
-    private IReadOnlyList<Audio> _audios;
-    private string _quantityAudios; 
+    private ICollection<Audio> _audios;
+    private string _valueSearch;
     
     protected override async Task OnInitializedAsync()
     {
-        await GetAudios("api/audio/all/0");
+        await GetAudios($"api/audio/all/0");
         var responseQuantity = await _httpClient.GetAsync("api/audio/quantity");
-        _quantityAudios = await responseQuantity.Content.ReadAsStringAsync();
+        _quantityData.QuantityAudios = await responseQuantity.Content.ReadAsStringAsync();
     }
 
     private async Task GetAudios(string url)
     {
-        _audios = await _httpClient.GetFromJsonAsync<IReadOnlyList<Audio>>(url);
+        _audios = await _httpClient.GetFromJsonAsync<ICollection<Audio>>(url);
+    }
+
+    private async Task SearchAudios(ChangeEventArgs e)
+    {
+        if (!string.IsNullOrEmpty(e.Value?.ToString()))
+        {
+            var valueSearch = e.Value.ToString();
+            _audios = await _httpClient.GetFromJsonAsync<ICollection<Audio>>($"api/audio/search/{valueSearch}/0");
+        }
     }
 }

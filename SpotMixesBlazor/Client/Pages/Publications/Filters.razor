@@ -1,4 +1,6 @@
-﻿<div class="card">
+﻿@inject PageService _pageService
+
+<div class="card" style="height: 100%">
     <div class="card-body">
         <!-- Filter starts -->
         <div class="multi-range-price">
@@ -28,26 +30,6 @@
             </ul>
         </div>
         <!-- Filter ends -->
-
-        <!-- Genres starts -->
-        <div class="brands">
-            <h6 class="filter-title">Genero</h6>
-            <ul class="list-unstyled brand-list">
-                <li>
-                    <div class="form-check">
-                        <input type="checkbox" class="form-check-input" id="productBrand1"/>
-                        <label class="form-check-label" for="productBrand1">Reggaeton</label>
-                    </div>
-                </li>
-                <li>
-                    <div class="form-check">
-                        <input type="checkbox" class="form-check-input" id="productBrand2" checked/>
-                        <label class="form-check-label" for="productBrand2">Salsa</label>
-                    </div>
-                </li>
-            </ul>
-        </div>
-        <!-- Genres ends -->
     </div>
 </div>
 
@@ -55,10 +37,28 @@
 {
     [Parameter]
     public EventCallback<string> GetAudios { get; set; }
-    
-    private async Task GetAllAudios() => await GetAudios.InvokeAsync("api/audio/all/0");
 
-    private async Task GetRecentAudios() => await GetAudios.InvokeAsync("api/audio/recent/0");
-    
-    private async Task GetMostListenedAudios() => await GetAudios.InvokeAsync("api/audio/mostListened/0");
+    private async Task GetAllAudios()
+    {
+        _pageService.ViewAll = true;
+        _pageService.ViewRecent = false;
+        _pageService.ViewMostListened = false;
+        await GetAudios.InvokeAsync($"api/audio/all/{_pageService.ValueAll}");
+    }
+
+    private async Task GetRecentAudios()
+    {
+        _pageService.ViewAll = false;
+        _pageService.ViewRecent = true;
+        _pageService.ViewMostListened = false;
+        await GetAudios.InvokeAsync($"api/audio/recent/{_pageService.ValueRecent}");
+    }
+
+    private async Task GetMostListenedAudios()
+    {
+        _pageService.ViewAll = false;
+        _pageService.ViewRecent = false;
+        _pageService.ViewMostListened = true;
+        await GetAudios.InvokeAsync($"api/audio/mostListened/{_pageService.ValueMostListened}");
+    }
 }

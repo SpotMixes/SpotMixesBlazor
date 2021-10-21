@@ -35,7 +35,7 @@ namespace SpotMixesBlazor.Server.Controllers
             return BadRequest("Not found");
         }
         
-        [HttpGet("all/{page}")]
+        [HttpGet("all/{page:int}")]
         public async Task<ActionResult> GetAllAudios(int page)
         {
             var audios = await _audioService.GetAllAudios(21, page);
@@ -62,6 +62,17 @@ namespace SpotMixesBlazor.Server.Controllers
         {
             var audios = await _audioService.GetMostListenedAudios(21, page);
             if (audios == null)
+            {
+                return BadRequest("Not found");
+            }
+            return Ok(audios);
+        }
+        
+        [HttpGet("search/{textSearch}/{page}")]
+        public async Task<ActionResult> SearchAudios(int page, string textSearch)
+        {
+            var audios = await _audioService.SearchAudios(20, page, textSearch);
+            if (audios.Equals(null))
             {
                 return BadRequest("Not found");
             }

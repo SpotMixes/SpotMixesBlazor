@@ -34,6 +34,11 @@ namespace SpotMixesBlazor.Client
             
             services.AddScoped<ILoginService, AuthenticationProviderJwt>(
                 provider => provider.GetRequiredService<AuthenticationProviderJwt>());
+            
+            // Pagination value
+            services.AddSingleton<PageService>();
+            // Quantity data
+            services.AddSingleton<QuantityData>();
         }
     }
 }

@@ -1,53 +1,55 @@
 ﻿@inject HttpClient _httpClient
 @inject IJSRuntime _jsRuntime
 
-<div class="card ecommerce-card">
-    <div class="item-img d-flex justify-content-center p-0">
-        <a @onclick="PlayMusic">
-            <img class="img-fluid card-img-top width-500" src="@Audio.UrlCover" alt=""/>
-        </a>
-    </div>
-    <div class="card-body">
-        <div class="item-wrapper">
-            <a href="">
-                <div class="avatar avatar-sm">
-                    <img src="@Audio.UserUrlProfilePicture" alt="@Audio.UserNickname"/>
-                </div>
-                @Audio.UserNickname
+<div class="col-4">
+    <div class="card">
+        <div class="card-img">
+            <a @onclick="PlayMusic">
+                <img class="img-fluid card-img-top width-500" src="@Audio.UrlCover" alt=""/>
             </a>
-            <div>
-                <p class="h6">
-                    <i class="ri-headphone-line"></i>
-                    @Audio.NumReproduction
-                </p>
+        </div>
+        <div class="card-body">
+            <div class="d-flex justify-content-between mb-1">
+                <a href="">
+                    <div class="avatar avatar-sm">
+                        <img src="@Audio.UserUrlProfilePicture" alt="@Audio.UserNickname"/>
+                    </div>
+                    @Audio.UserNickname
+                </a>
+                <div>
+                    <p class="h6">
+                        <i class="ri-headphone-line"></i>
+                        @Audio.NumReproduction
+                    </p>
+                </div>
+            </div>
+            <p class="card-title mb-0">
+                <a href="">@Audio.Title</a>
+            </p>
+            <div class="d-flex justify-content-between">
+                <p>@Audio.DatePublication.ToString("MMMM dd, yyyy")</p>
+                <span class="badge bg-dark h-50">@Audio.Genres</span>
             </div>
         </div>
-        <h6 class="item-name">
-            <a class="text-body" href="">@Audio.Title</a>
-        </h6>
-        <div class="card-text item-wrapper mt-1">
-            <p>@Audio.DatePublication.ToString("MMMM dd, yyyy")</p>
-            <span class="badge bg-dark">@Audio.Genres</span>
-        </div>
+        <AuthorizeView>
+            <Authorized>
+                <div class="d-flex justify-content-between">
+                    <a href="#" class="btn btn-primary btn-post btn-like">
+                        <i class="ri-heart-line"></i>
+                        <span>500</span>
+                    </a>
+                    <a href="#" class="btn btn-warning btn-post btn-comment">
+                        <i class="ri-discuss-fill"></i>
+                        <span class="add-to-cart">100</span>
+                    </a>
+                    <a href="#" class="btn btn-info btn-post btn-share">
+                        <i class="ri-share-fill"></i>
+                        <span class="add-to-cart">100</span>
+                    </a>
+                </div>
+            </Authorized>
+        </AuthorizeView>
     </div>
-    <AuthorizeView>
-        <Authorized>
-            <div class="item-options text-center">
-                <a href="#" class="btn btn-primary btn-cart">
-                    <i class="ri-heart-line"></i>
-                    <span>500</span>
-                </a>
-                <a href="#" class="btn btn-warning btn-cart">
-                    <i class="ri-discuss-fill"></i>
-                    <span class="add-to-cart">100</span>
-                </a>
-                <a href="#" class="btn btn-info btn-cart">
-                    <i class="ri-share-fill"></i>
-                    <span class="add-to-cart">100</span>
-                </a>
-            </div>
-        </Authorized>
-    </AuthorizeView>
 </div>
 
 @code
