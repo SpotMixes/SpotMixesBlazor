@@ -71,7 +71,7 @@ namespace SpotMixesBlazor.Server.Controllers
         [HttpGet("search/{textSearch}/{page}")]
         public async Task<ActionResult> SearchAudios(int page, string textSearch)
         {
-            var audios = await _audioService.SearchAudios(20, page, textSearch);
+            var audios = await _audioService.SearchAudios(21, page, textSearch);
             if (audios.Equals(null))
             {
                 return BadRequest("Not found");

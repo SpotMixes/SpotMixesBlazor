@@ -75,15 +75,11 @@
                     }
                     else
                     {
-                        @*<div style="height:500px;overflow-y:scroll">
-                            @foreach (var audio in _audios)
-                            {
-                                <Post Audio="audio"></Post>
-                            }
-                        </div>*@
-                        <Virtualize Items="_audios" Context="audio">
-                            <Post Audio="audio"></Post>
-                        </Virtualize>
+                        @foreach (var audio in _audios)
+                                                    {
+                                                        <Post Audio="audio"></Post>
+                                                    }
+                        
                     }
                 </section>
                 <!-- Post List Ends -->
@@ -116,7 +112,6 @@
 @code
 {
     private ICollection<Audio> _audios;
-    private string _valueSearch;
     
     protected override async Task OnInitializedAsync()
     {
