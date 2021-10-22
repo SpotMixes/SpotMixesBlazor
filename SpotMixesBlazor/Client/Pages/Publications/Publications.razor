@@ -55,7 +55,7 @@
                     <div class="row mt-1">
                         <div class="col-sm-12">
                             <div class="input-group input-group-merge">
-                                <input type="text" class="form-control search-product" 
+                                <input type="text" class="form-control search-product"
                                        placeholder="Buscar por título, género y descripción." aria-label="Buscar..."
                                        @oninput="SearchAudios"/>
                                 <span class="input-group-text">
@@ -68,7 +68,7 @@
                 <!-- Post Search Bar Ends -->
 
                 <!-- Post List Starts -->
-                <section class="row match-height mt-2">
+                <section class="grid-view">
                     @if (_audios == null)
                     {
                         <p>Cargando Audio..</p>
@@ -76,10 +76,9 @@
                     else
                     {
                         @foreach (var audio in _audios)
-                                                    {
-                                                        <Post Audio="audio"></Post>
-                                                    }
-                        
+                        {
+                            <Post Audio="audio"></Post>
+                        }
                     }
                 </section>
                 <!-- Post List Ends -->
@@ -112,7 +111,7 @@
 @code
 {
     private ICollection<Audio> _audios;
-    
+
     protected override async Task OnInitializedAsync()
     {
         await GetAudios($"api/audio/all/0");
