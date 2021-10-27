@@ -34,6 +34,12 @@ namespace SpotMixesBlazor.Server.Services
             return user;
         }
 
+        public async Task<IReadOnlyList<User>> SearchUserByUserName(string email)
+        {
+            var user = await _usersCollection.Find(user => user.Email == email).ToListAsync();
+            return user;
+        }
+        
         public async Task<FirebaseAuthLink> CreateUserWithEmailAndPassword(string email, string password)
         {
             try

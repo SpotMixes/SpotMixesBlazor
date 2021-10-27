@@ -40,7 +40,7 @@
                             </span>
                         </a>
                         <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown-user">
-                            <a class="dropdown-item" href="/">
+                            <a class="dropdown-item" @onclick="Profile">
                                 <i class="ri-user-line"></i>
                                 Profile
                             </a>
@@ -79,4 +79,6 @@
 
     private void Login() => _navigationManager.NavigateTo("/login");
     private void Register() => _navigationManager.NavigateTo("/register");
+    
+    private void Profile() => _navigationManager.NavigateTo($"/profile/{_nickName.Replace(" ", "-")}");
 }

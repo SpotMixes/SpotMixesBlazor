@@ -11,10 +11,17 @@ namespace SpotMixesBlazor.Shared
         public string Id { get; set; }
 
         public string Nickname { get; set; }
+
+        public string UserName { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
-        public string UrlProfilePicture { get; set; } = "https://i.ibb.co/vV6Sj7c/user.png";
-        public string UrlCoverPicture { get; set; }
+
+        public string UrlProfilePicture { get; set; } =
+            "https://res.cloudinary.com/kiulcode/image/upload/v1635369340/SpotMixes/UserData/ProfilePicture_kedk6f.svg";
+
+        public string UrlCoverPicture { get; set; } =
+            "https://res.cloudinary.com/kiulcode/image/upload/v1635287295/SpotMixes/UserData/CoverPhoto_vmzbci.svg";
+
         public string Biography { get; set; }
         public bool IsDj { get; set; } = false;
         public bool PoliciesConditions { get; set; }
