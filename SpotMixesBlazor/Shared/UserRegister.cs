@@ -6,10 +6,7 @@ namespace SpotMixesBlazor.Shared
     {
         [Required(ErrorMessage = "⚠️ Campo requerido")]
         public string Nickname { get; set; }
-        
-        [Required(ErrorMessage = "⚠️ Campo requerido")]
-        public string UserName { get; set; }
-        
+
         [Required(ErrorMessage = "⚠️Campo requerido")]
         [EmailAddress(ErrorMessage = "No es un email valido")]
         public string Email { get; set; }

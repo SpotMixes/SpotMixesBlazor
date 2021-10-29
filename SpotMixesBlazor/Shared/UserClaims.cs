@@ -10,5 +10,7 @@ namespace SpotMixesBlazor.Shared
 
         public string Nickname { get; set; }
         public string UrlProfilePicture { get; set; }
+
+        public string UrlProfile { get; set; }
     }
 }

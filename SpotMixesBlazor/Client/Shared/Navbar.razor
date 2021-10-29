@@ -1,5 +1,6 @@
 ﻿@inject NavigationManager _navigationManager
 @inject IJSRuntime _jsRuntime
+@inject ILoginService _loginService
 
 <!-- Header -->
 <nav class="header-navbar navbar navbar-expand-lg align-items-center floating-nav navbar-dark navbar-shadow container-xxl">
@@ -35,7 +36,7 @@
                                 <span class="user-status">@_email</span>
                             </div>
                             <span class="avatar">
-                                <img class="round" src="@_profile" alt="Foto de perfil de @_nickName" height="40" width="40"/>
+                                <img class="round" src="@_urlProfilePicture" alt="Foto de perfil de @_nickName" height="40" width="40"/>
                                 <span class="avatar-status-online"></span>
                             </span>
                         </a>
@@ -49,9 +50,9 @@
                                 <i class="ri-question-line"></i>
                                 FAQ
                             </a>
-                            <a class="dropdown-item" href="/">
+                            <a class="dropdown-item" @onclick="Logout">
                                 <i class="ri-logout-box-line"></i>
-                                Logout
+                                Salir
                             </a>
                         </div>
                     </li>
@@ -68,17 +69,18 @@
 
 @code
 {
-    string _email, _nickName, _profile;
+    string _email, _nickName, _urlProfilePicture, _urlProfile;
 
     protected override async Task OnInitializedAsync()
     {
         _email = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "Email");
         _nickName = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "Nickname");
-        _profile = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "Profile");
+        _urlProfilePicture = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "UrlProfilePicture");
+        _urlProfile = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "UrlProfile");
     }
 
+    private async Task Logout() => await _loginService.Logout();
     private void Login() => _navigationManager.NavigateTo("/login");
     private void Register() => _navigationManager.NavigateTo("/register");
-    
-    private void Profile() => _navigationManager.NavigateTo($"/profile/{_nickName.Replace(" ", "-")}");
+    private void Profile() => _navigationManager.NavigateTo($"/profile/{_urlProfile}");
 }

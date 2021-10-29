@@ -14,6 +14,7 @@ namespace SpotMixesBlazor.Server.Services
         private readonly IMongoCollection<User> _usersCollection;
         private const string ApiKey = "AIzaSyC21tr06NlSPv8GoI4Hkz4ZTIsr6xoOHFQ";
         private FirebaseAuthLink FirebaseEmpty { get; set; }
+        private User _user = new();
 
 
         public UserService(ISpotMixesDatabaseSettings settings)
@@ -27,19 +28,33 @@ namespace SpotMixesBlazor.Server.Services
         {
             await _usersCollection.InsertOneAsync(user);
         }
-
-        public async Task<IReadOnlyList<User>> SearchUserByEmail(string email)
-        {
-            var user = await _usersCollection.Find(user => user.Email == email).ToListAsync();
-            return user;
-        }
-
-        public async Task<IReadOnlyList<User>> SearchUserByUserName(string email)
-        {
-            var user = await _usersCollection.Find(user => user.Email == email).ToListAsync();
-            return user;
-        }
         
+        public async Task UpdateUser(User user)
+        {
+            await _usersCollection.ReplaceOneAsync(u => u.Id == user.Id,  user); 
+        }
+
+        public async Task<User> SearchUserByEmail(string email)
+        {
+            var userList = await _usersCollection.Find(user => user.Email == email).ToListAsync();
+            foreach (var userData in userList)
+            {
+                _user = userData;
+            }
+            return _user;
+        }
+
+        public async Task<User> GetUserByUrlProfile(string urlProfile)
+        {
+            var userList = await _usersCollection.Find(user => user.UrlProfile == urlProfile).ToListAsync();
+            User user = new();
+            foreach (var userData in userList)
+            {
+                user = userData;
+            }
+            return user;
+        }
+
         public async Task<FirebaseAuthLink> CreateUserWithEmailAndPassword(string email, string password)
         {
             try

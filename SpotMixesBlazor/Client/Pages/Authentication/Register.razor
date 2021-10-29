@@ -111,7 +111,8 @@
                     await _loginService.Login(_claims.Token);
                     await _jsRuntime.InvokeAsync<string>("localStorage.setItem", "Email", _claims.Email);
                     await _jsRuntime.InvokeAsync<string>("localStorage.setItem", "Nickname", _claims.Nickname);
-                    await _jsRuntime.InvokeAsync<string>("localStorage.setItem", "Profile", _claims.UrlProfilePicture);
+                    await _jsRuntime.InvokeAsync<string>("localStorage.setItem", "UrlProfilePicture", _claims.UrlProfilePicture);
+                    await _jsRuntime.InvokeAsync<string>("localStorage.setItem", "UrlProfile", _claims.UrlProfile);
                     await _jsRuntime.InvokeAsync<string>("window.location.replace", "/");
                 }
                 break;

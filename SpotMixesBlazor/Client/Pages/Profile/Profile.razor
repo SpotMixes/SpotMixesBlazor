@@ -1,120 +1,159 @@
-﻿@page "/Profile/{Nickname}"
+﻿@page "/Profile/{UrlProfile}"
+@using System.Text.Json
+@using System.Net
+@inject HttpClient _httpClient
 @inject IJSRuntime _jsRuntime
 
-<!-- BEGIN: Content-->
-<div class="app-content content ">
-    <div class="content-overlay"></div>
-    <div class="header-navbar-shadow"></div>
-    <div class="content-wrapper container-xxl p-0">
-        <div class="content-body">
-            <div id="user-profile">
-                <!-- Profile Header -->
-                <div class="row">
-                    <div class="col-12">
-                        <div class="card profile-header mb-2">
-                            <img class="card-img-top" src="https://i.pinimg.com/originals/63/b0/e2/63b0e2f99407065a838782915c6b6d8e.jpg" alt=""/>
-                            <div class="position-relative">
-                                <div class="profile-img-container d-flex align-items-center">
-                                    <div class="profile-img">
-                                        <img src="https://i.pinimg.com/550x/72/df/30/72df30b8b200848e492625ef95dd2e50.jpg" class="rounded img-fluid" alt=""/>
-                                    </div>
-                                    <div class="profile-title ms-3">
-                                        <h2 class="text-white">Dj Manbo</h2>
-                                        <p class="text-white">Categoria</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="profile-header-nav">
-                                <nav class="navbar navbar-expand-md navbar-light justify-content-end justify-content-md-between w-100">
-                                    <button class="btn btn-icon navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                                        <i class="ri-more-line"></i>
-                                    </button>
-
-                                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                                        <div class="profile-tabs d-flex justify-content-between flex-wrap mt-1 mt-md-0">
-                                            <ul class="nav nav-pills mb-0">
-                                                <li class="nav-item">
-                                                    <a class="nav-link fw-bold" href="#">
-                                                        <span class="d-none d-md-block">Todo</span>
-                                                        <i class="ri-home-6-line d-block d-md-none"></i>
-                                                    </a>
-                                                </li>
-                                                <li class="nav-item">
-                                                    <a class="nav-link fw-bold" href="#">
-                                                        <span class="d-none d-md-block">Pupulares</span>
-                                                        <i class="ri-headphone-line d-block d-md-none"></i>
-                                                    </a>
-                                                </li>
-                                            </ul>
-                                            @if (_userNickname == Nickname.Replace("-", " "))
+@if (_user != null)
+{
+    <!-- BEGIN: Content-->
+    <div class="app-content content ">
+        <div class="content-overlay"></div>
+        <div class="header-navbar-shadow"></div>
+        <div class="content-wrapper container-xxl p-0">
+            <div class="content-body">
+                <div id="user-profile">
+                    <!-- Profile Header -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card profile-header mb-2">
+                                <img class="card-img-top" src="@_user.UrlCoverPicture" alt="@_user.Nickname"/>
+                                <div class="position-relative">
+                                    <div class="profile-img-container d-flex align-items-center">
+                                        <div class="profile-img">
+                                            <img class="rounded img-fluid" src="@_user.UrlProfilePicture" alt="@_user.Nickname"/>
+                                        </div>
+                                        <div class="profile-title ms-3">
+                                            <h2 class="text-white">@_user.Nickname.ToUpper()</h2>
+                                            @if (_user.IsDj)
                                             {
-                                                <button class="btn btn-primary">
-                                                    <i class="ri-edit-box-line d-block d-md-none"></i>
-                                                    <span class="fw-bold d-none d-md-block">Editar</span>
-                                                </button>
+                                                <p class="text-white">Dj</p>
                                             }
                                             else
                                             {
-                                                <button class="btn btn-primary">
-                                                    <i class="ri-bank-card-line d-block d-md-none"></i>
-                                                    <span class="fw-bold d-none d-md-block">Contratar</span>
-                                                </button>
+                                                <p class="text-white">Ollente</p>
                                             }
+
                                         </div>
                                     </div>
-                                </nav>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- End Profile Header -->
+                                </div>
+                                <div class="profile-header-nav">
+                                    <nav class="navbar navbar-expand-md navbar-light justify-content-end justify-content-md-between w-100">
+                                        <button class="btn btn-icon navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                                            <i class="ri-more-line"></i>
+                                        </button>
 
-                <!-- Profile Info Section -->
-                <section id="profile-info">
-                    <div class="row">
-                        <!-- Left profile info section -->
-                        <div class="col-lg-9 col-12 order-1">
-                            <div class="row">
-                                @if (_userNickname == Nickname.Replace("-", " "))
-                                {
-                                    <PersonalPost></PersonalPost>
-                                }
-                                else
-                                {
-                                    <GeneralPost></GeneralPost>
-                                }
-                            </div>
-                        </div>
-                        <!-- End left profile info section -->
-
-                        <!-- Right profile info section -->
-                        <div class="col-lg-3 col-12 order-2">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="mb-0">Latest Photos</h5>
+                                        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                                            <div class="profile-tabs d-flex justify-content-between flex-wrap mt-1 mt-md-0">
+                                                <ul class="nav nav-pills mb-0">
+                                                    <li class="nav-item">
+                                                        <a class="nav-link fw-bold" href="#">
+                                                            <span class="d-none d-md-block">Todo</span>
+                                                            <i class="ri-home-6-line d-block d-md-none"></i>
+                                                        </a>
+                                                    </li>
+                                                    <li class="nav-item">
+                                                        <a class="nav-link fw-bold" href="#">
+                                                            <span class="d-none d-md-block">Pupulares</span>
+                                                            <i class="ri-headphone-line d-block d-md-none"></i>
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                                @if (_urlProfile == UrlProfile)
+                                                {
+                                                    <button class="btn btn-primary">
+                                                        <i class="ri-edit-box-line d-block d-md-none"></i>
+                                                        <span class="fw-bold d-none d-md-block">Editar</span>
+                                                    </button>
+                                                }
+                                                else
+                                                {
+                                                    <button class="btn btn-primary">
+                                                        <i class="ri-bank-card-line d-block d-md-none"></i>
+                                                        <span class="fw-bold d-none d-md-block">Contratar</span>
+                                                    </button>
+                                                }
+                                            </div>
+                                        </div>
+                                    </nav>
                                 </div>
                             </div>
                         </div>
-                        <!-- End right profile info section -->
                     </div>
-                </section>
+                    <!-- End Profile Header -->
+
+                    <!-- Profile Info Section -->
+                    <section id="profile-info">
+                        <div class="row">
+                            <!-- Left profile info section -->
+                            <div class="col-lg-9 col-12 order-1">
+                                <div class="row">
+                                    @if (_urlProfile == UrlProfile)
+                                    {
+                                        <PersonalPost></PersonalPost>
+                                    }
+                                    else
+                                    {
+                                        <GeneralPost></GeneralPost>
+                                    }
+                                </div>
+                            </div>
+                            <!-- End left profile info section -->
+
+                            <!-- Right profile info section -->
+                            <div class="col-lg-3 col-12 order-2">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="mb-0">Latest Photos</h5>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- End right profile info section -->
+                        </div>
+                    </section>
+                </div>
             </div>
         </div>
     </div>
-</div>
-<!-- END: Content-->
+    <!-- END: Content-->
+}
 
 @code {
 
     [Parameter]
-    public string Nickname { get; set; }
+    public string UrlProfile { get; set; }
 
-    private string _userNickname;
+    private User _user = new();
+    private string _urlProfile;
 
     protected override async Task OnInitializedAsync()
     {
-        _userNickname = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "Nickname");
+        _urlProfile = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "UrlProfile");
+        await SearchUserByEmail();
     }
 
-    
+    private async Task SearchUserByEmail()
+    {
+        var httpResponse = await _httpClient.GetAsync($"api/user/GetUserByUrlProfile/{UrlProfile}");
+
+        switch (httpResponse.StatusCode)
+        {
+            case HttpStatusCode.OK:
+            {
+                _user = await httpResponse.Content.ReadFromJsonAsync<User>();
+                break;
+            }
+            case HttpStatusCode.BadRequest:
+            {
+                Console.WriteLine("El usuario no existe");
+                break;
+            }
+            default:
+            {
+                Console.WriteLine("El servidor esta en mantenimiento");
+                break;
+            }
+        }
+    }
+
 }

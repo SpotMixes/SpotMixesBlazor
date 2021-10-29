@@ -11,10 +11,10 @@ namespace SpotMixesBlazor.Shared
         public string Id { get; set; }
 
         public string Nickname { get; set; }
-
-        public string UserName { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
+
+        public string UrlProfile { get; set; }
 
         public string UrlProfilePicture { get; set; } =
             "https://res.cloudinary.com/kiulcode/image/upload/v1635369340/SpotMixes/UserData/ProfilePicture_kedk6f.svg";

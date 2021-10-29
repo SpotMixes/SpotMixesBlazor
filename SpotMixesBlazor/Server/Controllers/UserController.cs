@@ -13,8 +13,7 @@ namespace SpotMixesBlazor.Server.Controllers
     public class UserController : Controller
     {
         private readonly UserService _userService;
-        private UserClaims _userClaims;
-        private IReadOnlyList<User> _userList;
+        private UserClaims _userClaims = new();
 
         public UserController(UserService userService)
         {
@@ -24,13 +23,13 @@ namespace SpotMixesBlazor.Server.Controllers
         [HttpPost("register")]
         public async Task<ActionResult> RegisterUser(User user)
         {
-            var userEmail = await _userService.SearchUserByEmail(user.Email);
+            var userExist = await _userService.SearchUserByEmail(user.Email);
 
-            if (userEmail.Count > 0)
+            if (!string.IsNullOrEmpty(userExist.Email))
             {
                 return BadRequest("El correo proporcionado ya está asociada a una cuenta.");
             }
-
+            
             var firebase = await _userService.CreateUserWithEmailAndPassword(user.Email, user.Password);
 
             if (firebase == null)
@@ -40,6 +39,14 @@ namespace SpotMixesBlazor.Server.Controllers
             
             user.Password = BCryptNet.HashPassword(user.Password);
             await _userService.CreateUser(user);
+            
+            var userRegister = await _userService.SearchUserByEmail(user.Email);
+
+            if (string.IsNullOrEmpty(userExist.Id))
+            {
+                userRegister.UrlProfile = userRegister.Id;
+                await _userService.UpdateUser(userRegister);
+            }
 
             _userClaims = new UserClaims()
             {
@@ -62,46 +69,44 @@ namespace SpotMixesBlazor.Server.Controllers
                 return BadRequest("El correo electronico o contraseña son incorrectos.");
             }
 
-            _userList = await _userService.SearchUserByEmail(firebase.User.Email);
-
-            var nickname = "";
-            var urlProfilePicture = "";
-            
-            foreach (var user in _userList)
-            {
-                nickname = user.Nickname;
-                urlProfilePicture = user.UrlProfilePicture;
-            }
+            var user = await _userService.SearchUserByEmail(firebase.User.Email);
 
             _userClaims = new UserClaims()
             {
                 Token = firebase.FirebaseToken,
                 Email = firebase.User.Email,
-                Nickname = nickname,
-                UrlProfilePicture = urlProfilePicture
+                Nickname = user.Nickname,
+                UrlProfilePicture = user.UrlProfilePicture,
+                UrlProfile = user.UrlProfile
             };
 
             return Ok(_userClaims);
         }
 
-        [HttpGet("getUserId/{email}")]
-        public async Task<ActionResult> GetUserId(string email)
+        [HttpGet("searchUserByEmail/{email}")]
+        public async Task<ActionResult> SearchUserByEmail(string email)
         {
-            _userList = await _userService.SearchUserByEmail(email);
+            var user = await _userService.SearchUserByEmail(email);
 
-            var userId = "";
-
-            foreach (var user in _userList)
-            {
-                userId = user.Id;
-            }
-
-            if (string.IsNullOrEmpty(userId))
+            if (string.IsNullOrEmpty(user.Id))
             {
                 return BadRequest("El usuario no existe");
             }
 
-            return Ok(userId);
+            return Ok(user);
+        }
+
+        [HttpGet("getUserByUrlProfile/{urlProfile}")]
+        public async Task<ActionResult> GetUserByUrlProfile(string urlProfile)
+        {
+            var user = await _userService.GetUserByUrlProfile(urlProfile);
+
+            if (string.IsNullOrEmpty(user.Id))
+            {
+                return BadRequest("El usuario no existe");
+            }
+
+            return Ok(user);
         }
     }
 }
