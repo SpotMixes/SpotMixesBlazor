@@ -17,23 +17,22 @@
                     <div class="row">
                         <div class="col-12">
                             <div class="card profile-header mb-2">
-                                <img class="card-img-top" src="@_user.UrlCoverPicture" alt="@_user.Nickname"/>
+                                <img class="card-img-top" src="@_user.UrlCoverPicture" alt="Foto de portada @_user.Nickname"/>
                                 <div class="position-relative">
                                     <div class="profile-img-container d-flex align-items-center">
                                         <div class="profile-img">
-                                            <img class="rounded img-fluid" src="@_user.UrlProfilePicture" alt="@_user.Nickname"/>
+                                            <img class="rounded img-fluid" src="@_user.UrlProfilePicture"/>
                                         </div>
                                         <div class="profile-title ms-3">
-                                            <h2 class="text-white">@_user.Nickname.ToUpper()</h2>
+                                            <h2 class="text-white">@_user.Nickname</h2>
                                             @if (_user.IsDj)
                                             {
                                                 <p class="text-white">Dj</p>
                                             }
                                             else
                                             {
-                                                <p class="text-white">Ollente</p>
+                                                <p class="text-white">Oyente</p>
                                             }
-
                                         </div>
                                     </div>
                                 </div>
@@ -90,7 +89,7 @@
                                 <div class="row">
                                     @if (_urlProfile == UrlProfile)
                                     {
-                                        <PersonalPost></PersonalPost>
+                                        <PersonalPost AudioList="_user.ListAudios"></PersonalPost>
                                     }
                                     else
                                     {
@@ -129,18 +128,19 @@
     protected override async Task OnInitializedAsync()
     {
         _urlProfile = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "UrlProfile");
-        await SearchUserByEmail();
+        await GetUserByUrlProfile();
     }
 
-    private async Task SearchUserByEmail()
+    private async Task GetUserByUrlProfile()
     {
-        var httpResponse = await _httpClient.GetAsync($"api/user/GetUserByUrlProfile/{UrlProfile}");
+        var httpResponse = await _httpClient.GetAsync($"api/user/GetAudiosByUrlProfile/{UrlProfile}");
 
         switch (httpResponse.StatusCode)
         {
             case HttpStatusCode.OK:
             {
                 _user = await httpResponse.Content.ReadFromJsonAsync<User>();
+                if (_user != null) Console.WriteLine(_user.Email);
                 break;
             }
             case HttpStatusCode.BadRequest:

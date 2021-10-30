@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using SpotMixesBlazor.Server.Services;
@@ -106,6 +107,19 @@ namespace SpotMixesBlazor.Server.Controllers
                 return BadRequest("El usuario no existe");
             }
 
+            return Ok(user);
+        }
+
+        [HttpGet("GetAudiosByUrlProfile/{urlProfile}")]
+        public async Task<ActionResult> GetAudioByUserId(string urlProfile)
+        {
+            var user = await _userService.GetAudiosByUrlProfile(urlProfile);
+
+            if (string.IsNullOrEmpty(user.Id))
+            {
+                return BadRequest("El usuario no existe");
+            }
+            
             return Ok(user);
         }
     }

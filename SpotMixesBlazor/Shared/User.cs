@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
@@ -27,5 +28,7 @@ namespace SpotMixesBlazor.Shared
         public bool PoliciesConditions { get; set; }
         public DateTime Created { get; set; } = DateTime.Now;
         public bool IsActive { get; set; } = true;
+
+        public List<Audio> ListAudios { get; set; }
     }
 }

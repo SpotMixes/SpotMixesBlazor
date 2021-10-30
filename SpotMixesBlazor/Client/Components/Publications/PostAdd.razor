@@ -132,6 +132,21 @@
         ImageFile = e.File;
     }
 
+    private async Task LoadExternalUserData()
+    {
+        _audio.UserNickname = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "Nickname");
+        _audio.UserUrlProfilePicture = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "UrlProfilePicture");
+        
+        var email = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "Email");
+        var httpResponse = await _httpClient.GetAsync($"api/User/searchUserByEmail/{email}");
+
+        if (httpResponse.StatusCode == HttpStatusCode.OK)
+        {
+            var user = await httpResponse.Content.ReadFromJsonAsync<User>();
+            if (user != null) _audio.UserId = user.Id;
+        }
+    }
+    
     // Method to save audio information in the database and in the cloud storage
     private async Task SaveAudio()
     {
@@ -145,6 +160,8 @@
         {
             await _jsRuntime.InvokeVoidAsync("showToast", "error",
                 "Guardar", "😪 Error al subir el audio, inténtelo mas tarde.");
+
+            _fileUpload = false;
         }
         else
         {
@@ -220,12 +237,5 @@
         }
     }
 
-    private async Task LoadExternalUserData()
-    {
-        _audio.UserNickname = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "Nickname");
-        _audio.UserUrlProfilePicture = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "Profile");
-        var email = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "Email");
-        var responseUserId = await _httpClient.GetAsync($"api/User/getUserId/{email}");
-        _audio.UserId = await responseUserId.Content.ReadAsStringAsync();
-    }
+    
 }
