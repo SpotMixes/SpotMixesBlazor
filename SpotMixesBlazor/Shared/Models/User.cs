@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace SpotMixesBlazor.Shared
+namespace SpotMixesBlazor.Shared.Models
 {
     public class User
     {
@@ -11,8 +11,10 @@ namespace SpotMixesBlazor.Shared
         [BsonRepresentation((BsonType.ObjectId))]
         public string Id { get; set; }
 
-        public string Nickname { get; set; }
+        public string DisplayName { get; set; }
+
         public string Email { get; set; }
+
         public string Password { get; set; }
 
         public string UrlProfile { get; set; }
@@ -23,11 +25,19 @@ namespace SpotMixesBlazor.Shared
         public string UrlCoverPicture { get; set; } =
             "https://res.cloudinary.com/kiulcode/image/upload/v1635287295/SpotMixes/UserData/CoverPhoto_vmzbci.svg";
 
+        public string FirstName { get; set; }
+
+        public string LastName { get; set; }
+
+        public string City { get; set; }
+
+        public string Country { get; set; }
+
         public string Biography { get; set; }
-        public bool IsDj { get; set; } = false;
-        public bool PoliciesConditions { get; set; }
-        public DateTime Created { get; set; } = DateTime.Now;
-        public bool IsActive { get; set; } = true;
+
+        public bool IsDj { get; set; }
+
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
 
         public List<Audio> ListAudios { get; set; }
     }

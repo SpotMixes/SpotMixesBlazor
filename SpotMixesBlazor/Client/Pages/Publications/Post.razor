@@ -1,4 +1,4 @@
-﻿@inject HttpClient _httpClient
+﻿@*@inject HttpClient _httpClient
 @inject IJSRuntime _jsRuntime
 
 <div class="card ecommerce-card">
@@ -60,4 +60,4 @@
     {
         await _jsRuntime.InvokeVoidAsync("playMusic", Audio.Title, Audio.UserNickname, Audio.UrlAudio, Audio.UrlCover, true);
     }
-}
+}*@

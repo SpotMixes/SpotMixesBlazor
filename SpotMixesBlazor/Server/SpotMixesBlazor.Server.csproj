@@ -17,5 +17,9 @@
     <ProjectReference Include="..\Shared\SpotMixesBlazor.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Hubs" />
+  </ItemGroup>
+
 
 </Project>

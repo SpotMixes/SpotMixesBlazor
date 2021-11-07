@@ -1,4 +1,4 @@
-﻿@page "/"
+﻿@*@page "/"
 @inject HttpClient _httpClient
 @inject QuantityData _quantityData
 @inject IJSRuntime _jsRuntime
@@ -129,4 +129,4 @@
             _audios = await _httpClient.GetFromJsonAsync<ICollection<Audio>>($"api/audio/search/{valueSearch}/0");
         }
     }
-}
+}*@

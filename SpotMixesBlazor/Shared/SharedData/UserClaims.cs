@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace SpotMixesBlazor.Shared
+﻿namespace SpotMixesBlazor.Shared.SharedData
 {
     public class UserClaims
     {

@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using SpotMixesBlazor.Server.Services;
-using SpotMixesBlazor.Shared;
+using SpotMixesBlazor.Shared.Models;
 
 namespace SpotMixesBlazor.Server.Controllers
 {
@@ -23,60 +23,46 @@ namespace SpotMixesBlazor.Server.Controllers
             return Created("Created", true);
         }
 
-        [HttpGet("quantity")]
-        public async Task<IActionResult> GetQuantityAudios()
+        #region GetAudio
+        [HttpGet("all/{audioPerPage:int}/{page:int}")]
+        public async Task<ActionResult> GetAllAudios(int audioPerPage, int page)
         {
-            var quantity = await _audioService.GetQuantityAudios();
-            if (quantity > 0)
-            {
-                return Ok(quantity);
-            }
-
-            return BadRequest("Not found");
-        }
-        
-        [HttpGet("all/{page:int}")]
-        public async Task<ActionResult> GetAllAudios(int page)
-        {
-            var audios = await _audioService.GetAllAudios(21, page);
-            if (audios == null)
-            {
-                return BadRequest("Not found");
-            }
+            var audios = await _audioService.GetAllAudios(audioPerPage, page);
+            
+            if (audios == null) return BadRequest("Not found");
+            
             return Ok(audios);
         }
         
-        [HttpGet("recent/{page}")]
-        public async Task<ActionResult> GetRecentAudios(int page)
+        [HttpGet("recent/{audioPerPage:int}/{page}")]
+        public async Task<ActionResult> GetRecentAudios(int audioPerPage, int page)
         {
-            var audios = await _audioService.GetRecentAudios(21, page);
-            if (audios == null)
-            {
-                return BadRequest("Not found");
-            }
+            var audios = await _audioService.GetRecentAudios(audioPerPage, page);
+            
+            if (audios == null) return BadRequest("Not found");
+            
             return Ok(audios);
         }
         
-        [HttpGet("mostListened/{page}")]
-        public async Task<ActionResult> GetMostListenedAudios(int page)
+        [HttpGet("mostListened/{audioPerPage:int}/{page}")]
+        public async Task<ActionResult> GetMostListenedAudios(int audioPerPage, int page)
         {
             var audios = await _audioService.GetMostListenedAudios(21, page);
-            if (audios == null)
-            {
-                return BadRequest("Not found");
-            }
+            
+            if (audios == null) return BadRequest("Not found");
+            
             return Ok(audios);
         }
         
-        [HttpGet("search/{textSearch}/{page}")]
-        public async Task<ActionResult> SearchAudios(int page, string textSearch)
+        [HttpGet("search/{textSearch}/{audioPerPage:int}/{page}")]
+        public async Task<ActionResult> SearchAudios(int audioPerPage, int page, string textSearch)
         {
-            var audios = await _audioService.SearchAudios(21, page, textSearch);
-            if (audios.Equals(null))
-            {
-                return BadRequest("Not found");
-            }
+            var audios = await _audioService.SearchAudios(audioPerPage, page, textSearch);
+            
+            if (audios.Equals(null)) return BadRequest("Not found");
+            
             return Ok(audios);
         }
+        #endregion
     }
 }
