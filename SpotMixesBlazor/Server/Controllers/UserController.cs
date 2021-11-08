@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SpotMixesBlazor.Server.Services;
 using SpotMixesBlazor.Shared.SharedData;
+using SpotMixesBlazor.Shared.ViewModels;
 using BCryptNet = BCrypt.Net.BCrypt;
 using User = SpotMixesBlazor.Shared.Models.User;
 
@@ -12,7 +13,6 @@ namespace SpotMixesBlazor.Server.Controllers
     public class UserController : Controller
     {
         private readonly UserService _userService;
-        private UserClaims _userClaims = new();
 
         public UserController(UserService userService)
         {
@@ -30,16 +30,8 @@ namespace SpotMixesBlazor.Server.Controllers
             }
             
             var firebase = await _userService.CreateUserWithEmailAndPassword(user.Email, user.Password);
-
-            if (firebase == null)
-            {
-                return Conflict("Error al registrarse inténtelo más tarde por favor.");
-            }
-            
             user.Password = BCryptNet.HashPassword(user.Password);
-            
             await _userService.CreateUser(user);
-            
             var userRegister = await _userService.GetUserByEmail(user.Email);
 
             if (!string.IsNullOrEmpty(userRegister.Id))
@@ -48,21 +40,21 @@ namespace SpotMixesBlazor.Server.Controllers
                 await _userService.UpdateUser(userRegister);
             }
 
-            _userClaims = new UserClaims()
+            var userClaims = new UserClaims()
             {
                 Token = firebase.FirebaseToken,
                 Email = firebase.User.Email,
-                DisplayName = user.DisplayName,
-                UrlProfilePicture = user.UrlProfilePicture,
-                UrlProfile = user.UrlProfile
+                DisplayName = userRegister.DisplayName,
+                UrlProfilePicture = userRegister.UrlProfilePicture,
+                UrlProfile = userRegister.UrlProfile
             };
 
-            return Created("Created", _userClaims);
+            return Created("Created", userClaims);
         }
         
-        /*
+        
         [HttpPost("login")]
-        public async Task<ActionResult> LoginUser(UserLogin userLogin)
+        public async Task<ActionResult> LoginUser([FromBody] UserLogin userLogin)
         {
             var firebase = await _userService.SignInWithEmailAndPassword(userLogin.Email, userLogin.Password);
 
@@ -71,24 +63,24 @@ namespace SpotMixesBlazor.Server.Controllers
                 return BadRequest("El correo electronico o contraseña son incorrectos.");
             }
 
-            var user = await _userService.SearchUserByEmail(firebase.User.Email);
+            var user = await _userService.GetUserByEmail(firebase.User.Email);
 
-            _userClaims = new UserClaims()
+            var userClaims = new UserClaims()
             {
                 Token = firebase.FirebaseToken,
                 Email = firebase.User.Email,
-                Nickname = user.Nickname,
+                DisplayName = user.DisplayName,
                 UrlProfilePicture = user.UrlProfilePicture,
                 UrlProfile = user.UrlProfile
             };
 
-            return Ok(_userClaims);
+            return Ok(userClaims);
         }
-
-        [HttpGet("searchUserByEmail/{email}")]
+        
+        [HttpGet("getUserByEmail/{email}")]
         public async Task<ActionResult> SearchUserByEmail(string email)
         {
-            var user = await _userService.SearchUserByEmail(email);
+            var user = await _userService.GetUserByEmail(email);
 
             if (string.IsNullOrEmpty(user.Id))
             {
@@ -98,23 +90,10 @@ namespace SpotMixesBlazor.Server.Controllers
             return Ok(user);
         }
 
-        [HttpGet("getUserByUrlProfile/{urlProfile}")]
-        public async Task<ActionResult> GetUserByUrlProfile(string urlProfile)
+        [HttpGet("GetUserDataByUrlProfile/{urlProfile}")]
+        public async Task<ActionResult> GetUserDataByUrlProfile(string urlProfile)
         {
-            var user = await _userService.GetUserByUrlProfile(urlProfile);
-
-            if (string.IsNullOrEmpty(user.Id))
-            {
-                return BadRequest("El usuario no existe");
-            }
-
-            return Ok(user);
-        }
-
-        [HttpGet("GetAudiosByUrlProfile/{urlProfile}")]
-        public async Task<ActionResult> GetAudioByUserId(string urlProfile)
-        {
-            var user = await _userService.GetAudiosByUrlProfile(urlProfile);
+            var user = await _userService.GetUserDataByUrlProfile(urlProfile);
 
             if (string.IsNullOrEmpty(user.Id))
             {
@@ -123,6 +102,5 @@ namespace SpotMixesBlazor.Server.Controllers
             
             return Ok(user);
         }
-        */
     }
 }

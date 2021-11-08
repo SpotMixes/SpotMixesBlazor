@@ -14,8 +14,6 @@ namespace SpotMixesBlazor.Server.Services
         private readonly IMongoCollection<User> _usersCollection;
         private const string ApiKey = "AIzaSyC21tr06NlSPv8GoI4Hkz4ZTIsr6xoOHFQ";
         private FirebaseAuthLink FirebaseEmpty { get; set; }
-        private User _user = new();
-
 
         public UserService(ISpotMixesDatabaseSettings settings)
         {
@@ -53,7 +51,6 @@ namespace SpotMixesBlazor.Server.Services
                 return FirebaseEmpty;
             }
         }
-
         
         public async Task CreateUser(User user)
         {
@@ -70,21 +67,14 @@ namespace SpotMixesBlazor.Server.Services
         {
             var userList = await _usersCollection.Find(user => user.Email == email).ToListAsync();
             
-            foreach (var userData in userList) _user = userData;
-
-            return _user;
-        }
-
-        public async Task<User> GetUserByUrlProfile(string urlProfile)
-        {
-            var userList = await _usersCollection.Find(user => user.UrlProfile == urlProfile).ToListAsync();
+            User user = new();
             
-            foreach (var userData in userList) _user = userData;
+            foreach (var userData in userList) user = userData;
 
-            return _user;
+            return user;
         }
         
-        public async Task<UserLookup> GetAudiosByUrlProfile(string urlProfile)
+        public async Task<UserLookup> GetUserDataByUrlProfile(string urlProfile)
         {
             var userList = await _usersCollection
                 .Aggregate()
