@@ -38,7 +38,5 @@ namespace SpotMixesBlazor.Shared.Models
         public bool IsDj { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
-
-        public List<Audio> ListAudios { get; set; }
     }
 }

@@ -1,13 +1,9 @@
-﻿/*using System.Collections.Generic;
-using System.Text.Json;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using SpotMixesBlazor.Client.ViewModels;
 using SpotMixesBlazor.Server.Services;
-using SpotMixesBlazor.Shared;
 using SpotMixesBlazor.Shared.SharedData;
 using BCryptNet = BCrypt.Net.BCrypt;
-using User = SpotMixesBlazor.Shared.User;
+using User = SpotMixesBlazor.Shared.Models.User;
 
 namespace SpotMixesBlazor.Server.Controllers
 {
@@ -24,9 +20,9 @@ namespace SpotMixesBlazor.Server.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<ActionResult> RegisterUser(User user)
+        public async Task<ActionResult> RegisterUser([FromBody] User user)
         {
-            var userExist = await _userService.SearchUserByEmail(user.Email);
+            var userExist = await _userService.GetUserByEmail(user.Email);
 
             if (!string.IsNullOrEmpty(userExist.Email))
             {
@@ -41,11 +37,12 @@ namespace SpotMixesBlazor.Server.Controllers
             }
             
             user.Password = BCryptNet.HashPassword(user.Password);
+            
             await _userService.CreateUser(user);
             
-            var userRegister = await _userService.SearchUserByEmail(user.Email);
+            var userRegister = await _userService.GetUserByEmail(user.Email);
 
-            if (string.IsNullOrEmpty(userExist.Id))
+            if (!string.IsNullOrEmpty(userRegister.Id))
             {
                 userRegister.UrlProfile = userRegister.Id;
                 await _userService.UpdateUser(userRegister);
@@ -55,13 +52,15 @@ namespace SpotMixesBlazor.Server.Controllers
             {
                 Token = firebase.FirebaseToken,
                 Email = firebase.User.Email,
-                Nickname = user.Nickname,
-                UrlProfilePicture = user.UrlProfilePicture
+                DisplayName = user.DisplayName,
+                UrlProfilePicture = user.UrlProfilePicture,
+                UrlProfile = user.UrlProfile
             };
 
             return Created("Created", _userClaims);
         }
-
+        
+        /*
         [HttpPost("login")]
         public async Task<ActionResult> LoginUser(UserLogin userLogin)
         {
@@ -124,5 +123,6 @@ namespace SpotMixesBlazor.Server.Controllers
             
             return Ok(user);
         }
+        */
     }
-}*/
+}

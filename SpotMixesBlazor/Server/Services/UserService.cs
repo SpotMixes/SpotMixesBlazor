@@ -1,15 +1,11 @@
-﻿/*using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.Json;
+﻿using System;
 using System.Threading.Tasks;
 using Firebase.Auth;
-using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using SpotMixesBlazor.Server.DataAccess;
-using SpotMixesBlazor.Shared;
-using User = SpotMixesBlazor.Shared.User;
+using SpotMixesBlazor.Shared.ModelsLookup;
+using User = SpotMixesBlazor.Shared.Models.User;
 
 namespace SpotMixesBlazor.Server.Services
 {
@@ -26,40 +22,6 @@ namespace SpotMixesBlazor.Server.Services
             var client = new MongoClient(settings.ConnectionString);
             var database = client.GetDatabase(settings.DatabaseName);
             _usersCollection = database.GetCollection<User>("Users");
-        }
-
-        public async Task CreateUser(User user)
-        {
-            await _usersCollection.InsertOneAsync(user);
-        }
-
-        public async Task UpdateUser(User user)
-        {
-            await _usersCollection.ReplaceOneAsync(u => u.Id == user.Id, user);
-        }
-
-        public async Task<User> SearchUserByEmail(string email)
-        {
-            var userList = await _usersCollection.Find(user => user.Email == email).ToListAsync();
-            foreach (var userData in userList)
-            {
-                _user = userData;
-            }
-
-            return _user;
-        }
-
-        public async Task<User> GetUserByUrlProfile(string urlProfile)
-        {
-            var userList = await _usersCollection.Find(user => user.UrlProfile == urlProfile).ToListAsync();
-            
-            User user = new();
-            foreach (var userData in userList)
-            {
-                user = userData;
-            }
-
-            return user;
         }
 
         public async Task<FirebaseAuthLink> CreateUserWithEmailAndPassword(string email, string password)
@@ -92,21 +54,53 @@ namespace SpotMixesBlazor.Server.Services
             }
         }
 
-        public async Task<User> GetAudiosByUrlProfile(string urlProfile)
+        
+        public async Task CreateUser(User user)
         {
-            var users = await _usersCollection
+            await _usersCollection.InsertOneAsync(user);
+        }
+
+        public async Task UpdateUser(User user)
+        {
+            await _usersCollection.ReplaceOneAsync(u => u.Id == user.Id, user);
+        }
+
+        #region GetUser
+        public async Task<User> GetUserByEmail(string email)
+        {
+            var userList = await _usersCollection.Find(user => user.Email == email).ToListAsync();
+            
+            foreach (var userData in userList) _user = userData;
+
+            return _user;
+        }
+
+        public async Task<User> GetUserByUrlProfile(string urlProfile)
+        {
+            var userList = await _usersCollection.Find(user => user.UrlProfile == urlProfile).ToListAsync();
+            
+            foreach (var userData in userList) _user = userData;
+
+            return _user;
+        }
+        
+        public async Task<UserLookup> GetAudiosByUrlProfile(string urlProfile)
+        {
+            var userList = await _usersCollection
                 .Aggregate()
                 .Match(Builders<User>.Filter.Eq(u => u.UrlProfile, urlProfile))
-                .Lookup("Audios", "_id", "UserId", "ListAudios")
+                .Lookup("Audios", "_id", "UserId", "Audios")
                 .ToListAsync();
 
-            User user = new();
-            foreach (var userData in users)
-            {
-                user = BsonSerializer.Deserialize<User>(userData);
-            }
+            UserLookup userLookup = new();
             
-            return user;
+            foreach (var userData in userList)
+            {
+                userLookup = BsonSerializer.Deserialize<UserLookup>(userData);
+            }
+
+            return userLookup;
         }
+        #endregion
     }
-}*/
+}

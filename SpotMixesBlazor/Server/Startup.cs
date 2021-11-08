@@ -31,7 +31,7 @@ namespace SpotMixesBlazor.Server
             services.AddSingleton<ISpotMixesDatabaseSettings>(sp =>
                 sp.GetRequiredService<IOptions<SpotMixesDatabaseSettings>>().Value);
             // Injection dependencies
-            //services.AddSingleton<UserService>();
+            services.AddSingleton<UserService>();
             services.AddSingleton<AudioService>();
         }
 
