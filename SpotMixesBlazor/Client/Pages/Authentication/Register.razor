@@ -1,7 +1,6 @@
-﻿@*@page "/Register"
+﻿@page "/Register"
 @using System.Net
-@using SpotMixesBlazor.Client.ViewModels
-@using SpotMixesBlazor.Shared.SharedData
+@using SpotMixesBlazor.Shared.ModelsData
 @layout AuthenticationLayout
 @inject HttpClient _httpClient
 @inject NavigationManager _navigationManager
@@ -24,16 +23,16 @@
             <DataAnnotationsValidator></DataAnnotationsValidator>
             <div class="mb-1">
                 <label class="form-label" for="register-nickname">Nombre visible:</label>
-                <button type="button" class="btn btn-icon rounded-circle btn-flat-info waves-effect" 
-                        data-bs-toggle="popover" data-bs-placement="right" data-bs-container="body" title="Nombre visible" 
+                <button type="button" class="btn btn-icon rounded-circle btn-flat-info waves-effect"
+                        data-bs-toggle="popover" data-bs-placement="right" data-bs-container="body" title="Nombre visible"
                         data-bs-content="Tú nombre visible puede ser cualquier cosa que te guste. Tú nombre o nombre artístico son buenas opciones.">
                     <i class="ri-information-line"></i>
                 </button>
                 <InputText class="form-control" id="register-nickname" type="text"
                            placeholder="Escribe tú nombre visible" autofocus="" tabindex="1"
-                           @bind-Value="_userRegister.Nickname"/>
+                           @bind-Value="_userRegister.DisplayName"/>
                 <div class="text-danger form-label">
-                    <ValidationMessage For="() => _userRegister.Nickname"></ValidationMessage>
+                    <ValidationMessage For="() => _userRegister.DisplayName"></ValidationMessage>
                 </div>
             </div>
             <div class="mb-1">
@@ -55,17 +54,19 @@
                 </div>
             </div>
             <div class="mb-1">
-                <div class="form-check">
-                    <InputCheckbox class="form-check-input" id="register-privacy-policy"
+                <div class="form-check form-switch">
+                    <label class="form-check-label" for="register-is-dj">¿Eres DJ?</label>
+                    <InputCheckbox class="form-check-input" id="register-is-dj"
                                    type="checkbox" tabindex="4"
-                                   @bind-Value="_userRegister.PoliciesConditions"/>
-                    <label class="form-check-label" for="register-privacy-policy">
-                        Acepto las <a href="#">políticas de privacidad y condiciones</a>
-                    </label>
+                                   @bind-Value="_userRegister.IsDj"/>
                 </div>
-                <div class="text-danger form-label">
-                    <ValidationMessage For="() => _userRegister.PoliciesConditions"></ValidationMessage>
-                </div>
+            </div>
+            <div class="mb-1">
+                <p>
+                    Al registrarme, acepto las <a href="#">Condiciones de uso</a>. He leído y entendido 
+                    las <a href="#">Políticas de privacidad</a>.
+                </p>
+                
             </div>
             <button class="btn btn-primary w-100" tabindex="5">Regístrate ahora</button>
         </EditForm>
@@ -75,7 +76,7 @@
                 <span>Inicia sesión</span>
             </a>
         </p>
-        $1$<div class="divider my-2">
+        @*<div class="divider my-2">
             <div class="divider-text">Usa una de tus redes</div>
         </div>
         <div class="auth-footer-btn d-flex justify-content-center">
@@ -88,7 +89,7 @@
             <a class="btn btn-google" href="#">
                 <i class="ri-google-fill"></i>
             </a>
-        </div>#1#
+        </div>*@
     </div>
 </div>
 
@@ -112,7 +113,7 @@
                 {
                     await _loginService.Login(_claims.Token);
                     await _jsRuntime.InvokeAsync<string>("localStorage.setItem", "Email", _claims.Email);
-                    await _jsRuntime.InvokeAsync<string>("localStorage.setItem", "Nickname", _claims.Nickname);
+                    await _jsRuntime.InvokeAsync<string>("localStorage.setItem", "Nickname", _claims.DisplayName);
                     await _jsRuntime.InvokeAsync<string>("localStorage.setItem", "UrlProfilePicture", _claims.UrlProfilePicture);
                     await _jsRuntime.InvokeAsync<string>("localStorage.setItem", "UrlProfile", _claims.UrlProfile);
                     await _jsRuntime.InvokeAsync<string>("window.location.replace", "/");
@@ -130,10 +131,10 @@
                 var error = httpResponse.Content.ReadAsStringAsync().Result;
                 await _jsRuntime.InvokeVoidAsync("showToast", "error", "Error", $"😥 {error}");
                 break;
-            } 
+            }
             default:
                 await _jsRuntime.InvokeVoidAsync("showToast", "info", "Información", "😥 El servidor se encuentra en mantenimiento, disculpe las molestias.");
                 break;
         }
     }
-}*@
+}

@@ -6,6 +6,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using SpotMixesBlazor.Server.DataAccess;
 using SpotMixesBlazor.Server.Services;
+using SpotMixesBlazor.Server.Settings;
 
 namespace SpotMixesBlazor.Server
 {
@@ -30,9 +31,12 @@ namespace SpotMixesBlazor.Server
 
             services.AddSingleton<ISpotMixesDatabaseSettings>(sp =>
                 sp.GetRequiredService<IOptions<SpotMixesDatabaseSettings>>().Value);
+            // Mail settings
+            services.Configure<MailSettings>(Configuration.GetSection(nameof(MailSettings)));
             // Injection dependencies
             services.AddSingleton<UserService>();
             services.AddSingleton<AudioService>();
+            services.AddTransient<MailService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

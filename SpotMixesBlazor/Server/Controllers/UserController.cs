@@ -1,8 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using SpotMixesBlazor.Server.Services;
-using SpotMixesBlazor.Shared.SharedData;
-using SpotMixesBlazor.Shared.ViewModels;
+using SpotMixesBlazor.Shared.ModelsData;
 using BCryptNet = BCrypt.Net.BCrypt;
 using User = SpotMixesBlazor.Shared.Models.User;
 

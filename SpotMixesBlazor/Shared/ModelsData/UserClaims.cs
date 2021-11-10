@@ -1,4 +1,4 @@
-﻿namespace SpotMixesBlazor.Shared.SharedData
+﻿namespace SpotMixesBlazor.Shared.ModelsData
 {
     public class UserClaims
     {

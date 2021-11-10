@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
@@ -37,6 +38,21 @@ namespace SpotMixesBlazor.Shared.Models
 
         public bool IsDj { get; set; }
 
+        public string CodeVerifyEmail { get; set; } = GenerateCodeVerifyEmail();
+
+        public bool VerifiedEmail { get; set; } = false;
+        
+        public bool VerifiedProfile { get; set; } = false;
+
         public DateTime CreatedAt { get; set; } = DateTime.Now;
+        
+        private static string GenerateCodeVerifyEmail()
+        {
+            var random = new Random();
+
+            return new string(Enumerable
+                .Repeat("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", 6)
+                .Select(s => s[random.Next(s.Length)]).ToArray());
+        }
     }
 }

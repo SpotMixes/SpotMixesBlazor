@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace SpotMixesBlazor.Shared.ViewModels
+namespace SpotMixesBlazor.Client.ViewModels
 {
     public class UserLogin
     {

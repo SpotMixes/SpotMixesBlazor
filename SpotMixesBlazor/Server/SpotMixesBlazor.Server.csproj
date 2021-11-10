@@ -8,7 +8,9 @@
     <PackageReference Include="Azure.Storage.Blobs" Version="12.10.0" />
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.2" />
     <PackageReference Include="Firebase.Auth" Version="1.0.0" />
+    <PackageReference Include="MailKit" Version="2.15.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="5.0.10" />
+    <PackageReference Include="MimeKit" Version="2.15.1" />
     <PackageReference Include="MongoDB.Driver" Version="2.13.2" />
   </ItemGroup>
 
@@ -19,6 +21,7 @@
 
   <ItemGroup>
     <Folder Include="Hubs" />
+    <Folder Include="MailTemplates" />
   </ItemGroup>
 
 
