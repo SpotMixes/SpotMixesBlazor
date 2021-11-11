@@ -17,18 +17,18 @@ namespace SpotMixesBlazor.Server.Controllers
             _mailService = mailService;
         }
         
-        [HttpPost("send")]
-        public async Task<ActionResult> SendMail([FromForm] MailRequest request)
+        [HttpPost("SendEmailWithVerificationCode")]
+        public async Task<ActionResult> SendEmailWithVerificationCode([FromBody] VerifyEmail verifyEmail)
         {
             try
             {
-                await _mailService.SendEmail(request);
-                return Ok();
+                await _mailService.SendEmailWithVerificationCode(verifyEmail);
+                return Ok($"Se envió el código de verificación al correo {verifyEmail.ToEmail}");
             }
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
-                throw;
+                return BadRequest("No se ha podido enviar el código de verificación, por favor inténtelo más tarde.");
             }
         }
     }

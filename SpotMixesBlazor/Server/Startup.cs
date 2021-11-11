@@ -37,6 +37,7 @@ namespace SpotMixesBlazor.Server
             services.AddSingleton<UserService>();
             services.AddSingleton<AudioService>();
             services.AddTransient<MailService>();
+            services.AddTransient<SessionService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

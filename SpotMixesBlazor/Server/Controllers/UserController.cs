@@ -51,7 +51,6 @@ namespace SpotMixesBlazor.Server.Controllers
             return Created("Created", userClaims);
         }
         
-        
         [HttpPost("login")]
         public async Task<ActionResult> LoginUser([FromBody] UserLogin userLogin)
         {

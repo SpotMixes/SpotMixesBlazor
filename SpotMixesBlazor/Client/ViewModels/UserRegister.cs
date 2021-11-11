@@ -17,5 +17,7 @@ namespace SpotMixesBlazor.Client.ViewModels
         public string Password { get; set; }
 
         public bool IsDj { get; set; }
+        
+        public string CodeVerifyEmail { get; set; }
     }
 }
