@@ -23,5 +23,18 @@ namespace SpotMixesBlazor.Server.Controllers
             return Created("Created", true);
         }
         
+        [HttpGet("GetSessionByUserEmail/{userEmail}")]
+        public async Task<IActionResult> GetSessionByUserEmail(string userEmail)
+        {
+            var session = await _sessionService.GetSessionByUserEmail(userEmail);
+
+            if (session == null)
+            {
+                return BadRequest("El proceso de registro no está realizado correctamente, inténtelo de nuevo por favor.");
+            }
+
+            return Ok(session);
+        }
+        
     }
 }

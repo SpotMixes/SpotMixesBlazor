@@ -1,6 +1,19 @@
 ﻿@inherits LayoutComponentBase
+@inject IJSRuntime _jsRuntime
 
 <Navbar></Navbar>
 
 @Body
 
+@code
+{
+    protected override async Task OnInitializedAsync()
+    {
+        await _jsRuntime.InvokeVoidAsync("lottieLoaderPlay");
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await _jsRuntime.InvokeVoidAsync("lottieLoaderPause");
+    }
+}

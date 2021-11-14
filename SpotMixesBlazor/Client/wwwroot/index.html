@@ -7,44 +7,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimal-ui">
     <base href="/" />
     
-    <style>
-        ::-webkit-scrollbar {
-            width: 5px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: #283046;
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: #7367f0;
-        }
-
-        .btn-post {
-            width: 100%;
-        }
-        
-        .btn-like {
-            border-top-left-radius: 0 !important;
-            border-top-right-radius: 0 !important;
-            border-bottom-right-radius: 0 !important;
-        }
-        
-        .btn-comment {
-            border-radius: 0 !important;
-        }
-        
-        .btn-share {
-            border-top-left-radius: 0 !important;
-            border-top-right-radius: 0 !important;
-            border-bottom-left-radius: 0 !important;
-        }
-        .card-options {
-            position: absolute;
-            right: 0;
-        }
-    </style>
-    
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500;1,600"
           rel="stylesheet">
@@ -89,6 +51,10 @@
 
 <body id="body" class="vertical-layout vertical-menu-modern navbar-floating footer-static" data-open="click"
       data-menu="vertical-menu-modern" data-col="">
+
+<div id="preloader" class="loader-one">
+    <div id="lottie"></div>
+</div>
 
 <!-- Main Menu-->
 <div id="sidenav" class="main-menu menu-fixed menu-dark menu-accordion menu-shadow" data-scroll-to-active="true">
@@ -177,6 +143,7 @@
 <script src="src/js/player/APlayer.min.js"></script>
 <script src="src/js/extensions/sweetalert2.all.min.js"></script>
 <script src="src/js/extensions/toastr.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.8.1/lottie.min.js" type="text/javascript"></script>
 <!-- End Page Vendor JS -->
 
 <!-- Theme JS-->
@@ -186,6 +153,7 @@
 
 <!-- Page JS -->
 <script src="src/js/shared-methods.js"></script>
+<script src="src/js/custom/scripts.js"></script>
 <!-- End Page JS -->
 
 <script src="_framework/blazor.webassembly.js"></script>

@@ -1,4 +1,5 @@
-﻿using MongoDB.Bson;
+﻿using System;
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace SpotMixesBlazor.Shared.Models
@@ -14,5 +15,7 @@ namespace SpotMixesBlazor.Shared.Models
         public string UserJwt { get; set; }
 
         public SessionLocation SessionLocation { get; set; }
+
+        public DateTime SessionDate{ get; set; } = DateTime.Now; 
     }
 }

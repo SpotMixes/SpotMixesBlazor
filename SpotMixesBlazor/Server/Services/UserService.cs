@@ -63,15 +63,14 @@ namespace SpotMixesBlazor.Server.Services
         }
 
         #region GetUser
+        public async Task<User> GetUserById(string id)
+        {
+            return await _usersCollection.Find(user => user.Id == id).FirstOrDefaultAsync();
+        }
+        
         public async Task<User> GetUserByEmail(string email)
         {
-            var userList = await _usersCollection.Find(user => user.Email == email).ToListAsync();
-            
-            User user = new();
-            
-            foreach (var userData in userList) user = userData;
-
-            return user;
+            return await _usersCollection.Find(user => user.Email == email).FirstOrDefaultAsync();
         }
         
         public async Task<UserLookup> GetUserDataByUrlProfile(string urlProfile)

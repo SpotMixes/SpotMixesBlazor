@@ -21,14 +21,14 @@ namespace SpotMixesBlazor.Server.Services
             await _sessionCollection.InsertOneAsync(session);
         }
         
-        public async Task UpdateSession(string email)
+        public async Task UpdateSession(Session session)
         {
-            await _sessionCollection.UpdateOneAsync(s => s.UserEmail == email, email);
+            await _sessionCollection.ReplaceOneAsync(s => s.UserEmail == session.UserEmail, session);
         }
         
-        public async Task<Session> GetSession(string id)
+        public async Task<Session> GetSessionByUserEmail(string userEmail)
         {
-            return await _sessionCollection.Find(session => session.Id == id).FirstOrDefaultAsync();
+            return await _sessionCollection.Find(session => session.UserEmail == userEmail).FirstOrDefaultAsync();
         }
     }
 }

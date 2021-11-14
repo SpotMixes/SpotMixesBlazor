@@ -1,93 +1,101 @@
 ﻿@page "/Register"
 @using System.Net
 @using IpInfo
-@using SpotMixesBlazor.Shared.Models
 @using SpotMixesBlazor.Shared.ModelsData
 @layout AuthenticationLayout
 @inject HttpClient _httpClient
 @inject NavigationManager _navigationManager
-@inject ILoginService _loginService
 @inject IJSRuntime _jsRuntime
 
-<!-- Left Text-->
-<div class="d-none d-lg-flex col-lg-8 align-items-center p-5">
-    <div class="w-100 d-lg-flex align-items-center justify-content-center px-5">
-        <img class="img-fluid" src="public/page/register/cover-register.svg" alt="Imagen inicio de sesión SpotMixes"/>
-    </div>
-</div>
-<!-- /Left Text-->
-<!-- Register-->
-<div class="d-flex col-lg-4 align-items-center auth-bg px-2 p-lg-5">
-    <div class="col-12 col-sm-8 col-md-6 col-lg-12 px-xl-2 mx-auto">
-        <h2 class="card-title fw-bold mb-1">La aventura comienza aquí 🚀</h2>
-        <p class="card-text mb-2">Regístrate y comienza a disfrutar buena música 🎵</p>
-        <EditForm Model="_userRegister" OnValidSubmit="CreateUser" class="mt-2">
-            <DataAnnotationsValidator></DataAnnotationsValidator>
-            <div class="mb-1">
-                <label class="form-label" for="register-nickname">Nombre visible:</label>
-                <button type="button" class="btn btn-icon rounded-circle btn-flat-info waves-effect"
-                        data-bs-toggle="popover" data-bs-placement="right" data-bs-container="body" title="Nombre visible"
-                        data-bs-content="Tú nombre visible puede ser cualquier cosa que te guste. Tú nombre o nombre artístico son buenas opciones.">
-                    <i class="ri-information-line"></i>
-                </button>
-                <InputText class="form-control" id="register-nickname" type="text"
-                           placeholder="Escribe tú nombre visible" autofocus="" tabindex="1"
-                           @bind-Value="_userRegister.DisplayName"/>
-                <div class="text-danger form-label">
-                    <ValidationMessage For="() => _userRegister.DisplayName"></ValidationMessage>
-                </div>
+<div class="auth-wrapper auth-cover">
+    <div class="auth-inner row m-0">
+        <!-- Brand logo-->
+        <a class="brand-logo" href="index.html">
+            <img src="public/brand/spotmixes-logo.svg" alt="Logo SpotMixes" style="height: 28px;"/>
+            <h2 class="brand-text text-primary ms-1">SpotMixes</h2>
+        </a>
+        <!-- End Brand logo-->
+        <!-- Left Text-->
+        <div class="d-none d-lg-flex col-lg-8 align-items-center p-5">
+            <div class="w-100 d-lg-flex align-items-center justify-content-center px-5">
+                <img class="img-fluid" src="public/page/register/cover-register.svg" alt="Imagen inicio de sesión SpotMixes"/>
             </div>
-            <div class="mb-1">
-                <label class="form-label" for="register-email">Correo electrónico:</label>
-                <InputText class="form-control" id="register-email" type="email"
-                           placeholder="Escribe tú correo electrónico:" tabindex="2"
-                           @bind-Value="_userRegister.Email"/>
-                <div class="text-danger form-label">
-                    <ValidationMessage For="() => _userRegister.Email"></ValidationMessage>
-                </div>
-            </div>
-            <div class="mb-1">
-                <label class="form-label" for="register-password">Contraseña:</label>
-                <InputText class="form-control" id="register-password" type="password"
-                           placeholder="Escribe tú contraseña" tabindex="3"
-                           @bind-Value="_userRegister.Password"/>
-                <div class="text-danger form-label">
-                    <ValidationMessage For="() => _userRegister.Password"></ValidationMessage>
-                </div>
-            </div>
-            <div class="mb-1">
-                <div class="form-check form-switch">
-                    <label class="form-check-label" for="register-is-dj">¿Eres DJ?</label>
-                    <InputCheckbox class="form-check-input" id="register-is-dj"
-                                   type="checkbox" tabindex="4"
-                                   @bind-Value="_userRegister.IsDj"/>
-                </div>
-            </div>
-            <div class="mb-1">
-                <p>
-                    Al registrarme, acepto las <a href="#">Condiciones de uso</a>. He leído y entendido
-                    las <a href="#">Políticas de privacidad</a>.
-                </p>
+        </div>
+        <!-- /Left Text-->
+        <!-- Register-->
+        <div class="d-flex col-lg-4 align-items-center auth-bg px-2 p-lg-5">
+            <div class="col-12 col-sm-8 col-md-6 col-lg-12 px-xl-2 mx-auto">
+                <h2 class="card-title fw-bold mb-1">La aventura comienza aquí 🚀</h2>
+                <p class="card-text mb-2">Regístrate y comienza a disfrutar buena música 🎵</p>
+                <EditForm Model="_userRegister" OnValidSubmit="CreateUser" class="mt-2">
+                    <DataAnnotationsValidator></DataAnnotationsValidator>
+                    <div class="mb-1">
+                        <label class="form-label" for="register-nickname">Nombre visible:</label>
+                        <button type="button" class="btn btn-icon rounded-circle btn-flat-info waves-effect"
+                                data-bs-toggle="popover" data-bs-placement="right" data-bs-container="body" title="Nombre visible"
+                                data-bs-content="Tú nombre visible puede ser cualquier cosa que te guste. Tú nombre o nombre artístico son buenas opciones.">
+                            <i class="ri-information-line"></i>
+                        </button>
+                        <InputText class="form-control" id="register-nickname" type="text"
+                                   placeholder="Escribe tú nombre visible" autofocus="" tabindex="1"
+                                   @bind-Value="_userRegister.DisplayName"/>
+                        <div class="text-danger form-label">
+                            <ValidationMessage For="() => _userRegister.DisplayName"></ValidationMessage>
+                        </div>
+                    </div>
+                    <div class="mb-1">
+                        <label class="form-label" for="register-email">Correo electrónico:</label>
+                        <InputText class="form-control" id="register-email" type="email"
+                                   placeholder="Escribe tú correo electrónico:" tabindex="2"
+                                   @bind-Value="_userRegister.Email"/>
+                        <div class="text-danger form-label">
+                            <ValidationMessage For="() => _userRegister.Email"></ValidationMessage>
+                        </div>
+                    </div>
+                    <div class="mb-1">
+                        <label class="form-label" for="register-password">Contraseña:</label>
+                        <InputText class="form-control" id="register-password" type="password"
+                                   placeholder="Escribe tú contraseña" tabindex="3"
+                                   @bind-Value="_userRegister.Password"/>
+                        <div class="text-danger form-label">
+                            <ValidationMessage For="() => _userRegister.Password"></ValidationMessage>
+                        </div>
+                    </div>
+                    <div class="mb-1">
+                        <div class="form-check form-switch">
+                            <label class="form-check-label" for="register-is-dj">¿Eres DJ?</label>
+                            <InputCheckbox class="form-check-input" id="register-is-dj"
+                                           type="checkbox" tabindex="4"
+                                           @bind-Value="_userRegister.IsDj"/>
+                        </div>
+                    </div>
+                    <div class="mb-1">
+                        <p>
+                            Al registrarme, acepto las <a href="#">Condiciones de uso</a>. He leído y entendido
+                            las <a href="#">Políticas de privacidad</a>.
+                        </p>
 
+                    </div>
+                    @if (_registrationProcess)
+                    {
+                        <button class="btn btn-primary w-100" tabindex="5" disabled="">
+                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            Regístrando...
+                        </button>
+                    }
+                    else
+                    {
+                        <button class="btn btn-primary w-100" tabindex="5">Regístrate ahora</button>
+                    }
+                </EditForm>
+                <p class="text-center mt-2">
+                    <span>¿Ya tienes cuenta?</span>
+                    <a href="/login">
+                        <span>Inicia sesión</span>
+                    </a>
+                </p>
             </div>
-            @if (_registrationProcess)
-            {
-                <button class="btn btn-primary w-100" tabindex="5" disabled="">
-                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                    Regístrando...
-                </button>
-            }
-            else
-            {
-                <button class="btn btn-primary w-100" tabindex="5">Regístrate ahora</button>
-            }
-        </EditForm>
-        <p class="text-center mt-2">
-            <span>¿Ya tienes cuenta?</span>
-            <a href="/login">
-                <span>Inicia sesión</span>
-            </a>
-        </p>
+        </div>
     </div>
 </div>
 
@@ -105,7 +113,7 @@
         _userRegister.CodeVerifyEmail = GenerateCodeVerifyEmail();
 
         var httpResponse = await _httpClient.PostAsJsonAsync("/api/user/register", _userRegister);
-            
+
         switch (httpResponse.StatusCode)
         {
             case HttpStatusCode.Created:
@@ -128,13 +136,11 @@
                         UserJwt = _claims.Token,
                         SessionLocation = sessionLocation
                     };
-                    
+
                     await _httpClient.PostAsJsonAsync("/api/session", session);
-                    await _jsRuntime.InvokeAsync<string>("localStorage.setItem", "Email", _claims.Email);
-                    await _jsRuntime.InvokeAsync<string>("window.location.replace", "/verify-email");
+                    _navigationManager.NavigateTo($"/VerifyEmail/{_claims.UserId}");
                 }
                 
-                _userRegister = new UserRegister();
                 _registrationProcess = false;
                 break;
             }
@@ -142,14 +148,6 @@
             {
                 var error = httpResponse.Content.ReadAsStringAsync().Result;
                 await _jsRuntime.InvokeVoidAsync("showToast", "error", "Error", $"🙄 {error}");
-                _registrationProcess = false;
-                break;
-            }
-            case HttpStatusCode.Conflict:
-            {
-                var error = httpResponse.Content.ReadAsStringAsync().Result;
-                await _jsRuntime.InvokeVoidAsync("showToast", "error", "Error", $"😥 {error}");
-                _userRegister = new UserRegister();
                 _registrationProcess = false;
                 break;
             }
