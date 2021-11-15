@@ -80,17 +80,26 @@
 
 @code
 {
+    [CascadingParameter]
+    private Task<AuthenticationState> Authentication { get; set; }
+    
     string _email, _displayName, _urlProfilePicture, _urlProfile;
     bool _isDj;
 
     protected override async Task OnInitializedAsync()
     {
-        _email = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "Email");
-        _displayName = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "DisplayName");
-        var isDjString = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "IsDj");
-        _isDj = bool.Parse(isDjString);
-        _urlProfilePicture = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "UrlProfilePicture");
-        _urlProfile = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "UrlProfile");
+        var authState = await Authentication;
+        var claimsPrincipal = authState.User;
+
+        if (claimsPrincipal.Identity is {IsAuthenticated: true })
+        {
+            _email = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "Email");
+            _displayName = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "DisplayName");
+            var isDjString = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "IsDj");
+            _isDj = bool.Parse(isDjString);
+            _urlProfilePicture = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "UrlProfilePicture");
+            _urlProfile = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "UrlProfile");
+        }
     }
 
     private async Task Logout() => await _loginService.Logout();

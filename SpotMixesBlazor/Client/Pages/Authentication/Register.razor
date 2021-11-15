@@ -121,14 +121,6 @@
                 _claims = await httpResponse.Content.ReadFromJsonAsync<UserClaims>();
                 if (_claims != null)
                 {
-                    var verifyEmail = new VerifyEmail()
-                    {
-                        DisplayName = _userRegister.DisplayName,
-                        ToEmail = _userRegister.Email,
-                        CodeVerifyEmail = _userRegister.CodeVerifyEmail
-                    };
-                    await SendEmailWithVerificationCode(verifyEmail);
-
                     var sessionLocation = await GetDataFromPublicIp();
                     var session = new Session()
                     {
@@ -159,11 +151,6 @@
                 break;
             }
         }
-    }
-
-    private async Task SendEmailWithVerificationCode(VerifyEmail verifyEmail)
-    {
-        await _httpClient.PostAsJsonAsync("/api/mail/SendEmailWithVerificationCode", verifyEmail);
     }
 
     private static string GenerateCodeVerifyEmail()
