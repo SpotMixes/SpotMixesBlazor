@@ -1,0 +1,11 @@
+﻿@inject NavigationManager _navigationManager
+@inject IJSRuntime _jsRuntime
+
+@code
+{
+    protected override async Task OnInitializedAsync()
+    {
+        _navigationManager.NavigateTo("/");
+        await _jsRuntime.InvokeVoidAsync("showToast", "info", "Error", $"🤨 Esta sección está disponible únicamente para usuarios registrados");
+    }
+}

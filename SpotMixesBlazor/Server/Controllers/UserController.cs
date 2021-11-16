@@ -49,8 +49,20 @@ namespace SpotMixesBlazor.Server.Controllers
         }
         
         [HttpPost("login")]
-        public async Task<ActionResult> LoginUser([FromBody] UserLogin userLogin)
+        public async Task<ActionResult> LoginUser([FromBody] User userLogin)
         {
+            var verifiedUser = await _userService.GetUserByEmail(userLogin.Email);
+
+            if (verifiedUser == null)
+            {
+                return BadRequest("El correo proporcionado no está asociada a una cuenta.");
+            }
+            
+            if (verifiedUser.VerifiedEmail == false)
+            {
+                return BadRequest("El correo electrónico no está verificado.");
+            }
+
             var firebase = await _userService.SignInWithEmailAndPassword(userLogin.Email, userLogin.Password);
 
             if (firebase == null)
@@ -64,9 +76,7 @@ namespace SpotMixesBlazor.Server.Controllers
             {
                 Token = firebase.FirebaseToken,
                 Email = firebase.User.Email,
-                /*DisplayName = user.DisplayName,
-                UrlProfilePicture = user.UrlProfilePicture,
-                UrlProfile = user.UrlProfile*/
+                UserId = user.Id
             };
 
             return Ok(userClaims);

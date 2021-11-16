@@ -9,6 +9,9 @@
 {
     protected override async Task OnInitializedAsync()
     {
+        await _jsRuntime.InvokeVoidAsync("showHtml", "sidenav");
+        await _jsRuntime.InvokeVoidAsync("removeHtml", "page-misc");
+        await _jsRuntime.InvokeVoidAsync("removeHtml", "authentication");
         await _jsRuntime.InvokeVoidAsync("lottieLoaderPlay");
     }
 

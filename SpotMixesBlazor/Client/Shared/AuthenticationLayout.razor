@@ -19,6 +19,12 @@
     protected override async Task OnInitializedAsync()
     {
         await _jsRuntime.InvokeVoidAsync("addCssBlankPage");
-        await _jsRuntime.InvokeVoidAsync("removeHtml");
+        await _jsRuntime.InvokeVoidAsync("hideHtml", "sidenav");
+        await _jsRuntime.InvokeVoidAsync("lottieLoaderPlay");
+    }
+    
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await _jsRuntime.InvokeVoidAsync("lottieLoaderPause");
     }
 }

@@ -104,7 +104,8 @@ namespace SpotMixesBlazor.Client.Authorization
         {
             await _jsRuntime.InvokeAsync<string>("localStorage.removeItem", TokenKey);
             await _jsRuntime.InvokeAsync<string>("localStorage.removeItem", "Email");
-            await _jsRuntime.InvokeAsync<string>("localStorage.removeItem", "Nickname");
+            await _jsRuntime.InvokeAsync<string>("localStorage.removeItem", "DisplayName");
+            await _jsRuntime.InvokeAsync<string>("localStorage.removeItem", "IsDj");
             await _jsRuntime.InvokeAsync<string>("localStorage.removeItem", "UrlProfilePicture");
             await _jsRuntime.InvokeAsync<string>("localStorage.removeItem", "UrlProfile");
             _httpClient.DefaultRequestHeaders.Authorization = null;

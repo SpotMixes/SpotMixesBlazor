@@ -1,9 +1,0 @@
-﻿@inject IJSRuntime _jsRuntime
-
-@code
-{
-    protected override async Task OnInitializedAsync()
-    {
-        await _jsRuntime.InvokeVoidAsync("ShowAlertNotAuthorized");
-    }
-}

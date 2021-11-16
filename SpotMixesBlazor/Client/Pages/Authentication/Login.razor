@@ -1,95 +1,125 @@
-﻿@*@page "/Login"
+﻿@page "/Login"
 @using System.Net
-@using SpotMixesBlazor.Client.ViewModels
-@using SpotMixesBlazor.Shared.SharedData
+@using SpotMixesBlazor.Shared.ModelsData
 @layout AuthenticationLayout
 @inject HttpClient _httpClient
 @inject ILoginService _loginService
 @inject IJSRuntime _jsRuntime
 
-<!-- Left Text-->
-<div class="d-none d-lg-flex col-lg-8 align-items-center p-5">
-    <div class="w-100 d-lg-flex align-items-center justify-content-center px-5">
-        <img class="img-fluid" src="public/page/login/cover-login.svg" alt="Imagen inicio de sesión SpotMixes"/>
-    </div>
-</div>
-<!-- End Left Text-->
-<!-- Login-->
-<div class="d-flex col-lg-4 align-items-center auth-bg px-2 p-lg-5">
-    <div class="col-12 col-sm-8 col-md-6 col-lg-12 px-xl-2 mx-auto">
-        <h2 class="card-title fw-bold mb-1">¡Bienvenido de vuelta! 👋</h2>
-        <p class="card-text mb-2">Que bueno verte otra vez 😍</p>
-        <EditForm class="mt-2" Model="_userLogin" OnValidSubmit="LoginUserWithEmail">
-            <DataAnnotationsValidator></DataAnnotationsValidator>
-            <div class="mb-1">
-                <label class="form-label" for="login-email">Correo electrónico:</label>
-                <InputText class="form-control" id="login-email" type="text"
-                           placeholder="Escribe tú correo electrónico" autofocus tabindex="1"
-                           @bind-Value="_userLogin.Email"/>
-                <div class="text-danger form-label">
-                    <ValidationMessage For="() => _userLogin.Email"></ValidationMessage>
-                </div>
+<div class="auth-wrapper auth-cover">
+    <div class="auth-inner row m-0">
+        <!-- Brand logo-->
+        <a class="brand-logo" href="index.html">
+            <img src="public/brand/SpotMixes-Logo-TypographyOnRight.svg" alt="Logo SpotMixes" style="height: 28px;"/>
+        </a>
+        <!-- End Brand logo-->
+        <!-- Left Text-->
+        <div class="d-none d-lg-flex col-lg-8 align-items-center p-5">
+            <div class="w-100 d-lg-flex align-items-center justify-content-center px-5">
+                <img class="img-fluid" src="public/page/login/cover-login.svg" alt="Imagen inicio de sesión SpotMixes"/>
             </div>
-            <div class="mb-1">
-                <div class="d-flex justify-content-between">
-                    <label class="form-label" for="login-password">Contraseña:</label>
-                    <a href="">
-                        <small>¿Olvidaste tú contraseña?</small>
+        </div>
+        <!-- End Left Text-->
+        <!-- Login-->
+        <div class="d-flex col-lg-4 align-items-center auth-bg px-2 p-lg-5">
+            <div class="col-12 col-sm-8 col-md-6 col-lg-12 px-xl-2 mx-auto">
+                <h2 class="card-title fw-bold mb-1">¡Bienvenido de vuelta! 👋</h2>
+                <p class="card-text mb-2">Que bueno verte otra vez 😍</p>
+                <EditForm class="mt-2" Model="_userLogin" OnValidSubmit="LoginUserWithEmail">
+                    <DataAnnotationsValidator></DataAnnotationsValidator>
+                    <div class="mb-1">
+                        <label class="form-label" for="login-email">Correo electrónico:</label>
+                        <InputText class="form-control" id="login-email" type="text"
+                                   placeholder="Escribe tú correo electrónico" autofocus tabindex="1"
+                                   @bind-Value="_userLogin.Email"/>
+                        <div class="text-danger form-label">
+                            <ValidationMessage For="() => _userLogin.Email"></ValidationMessage>
+                        </div>
+                    </div>
+                    <div class="mb-1">
+                        <div class="d-flex justify-content-between">
+                            <label class="form-label" for="login-password">Contraseña:</label>
+                            <a href="">
+                                <small>¿Olvidaste tú contraseña?</small>
+                            </a>
+                        </div>
+                        <InputText class="form-control" id="login-password" type="password"
+                                   placeholder="Escribe tú contraseña" tabindex="2"
+                                   @bind-Value="_userLogin.Password"/>
+                        <div class="text-danger form-label">
+                            <ValidationMessage For="() => _userLogin.Password"></ValidationMessage>
+                        </div>
+                    </div>
+                    @if (_loginProcess)
+                    {
+                        <button class="btn btn-primary w-100" tabindex="5" disabled="">
+                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            Validando...
+                        </button>
+                    }
+                    else
+                    {
+                        <button class="btn btn-primary w-100" tabindex="3">Iniciar sesión</button>
+                    }
+                </EditForm>
+                <p class="text-center mt-2">
+                    <span>¿No tienes una cuenta?</span>
+                    <a href="/register">
+                        <span>Regístrate gratis</span>
+                    </a>
+                </p>
+                <div class="divider my-2">
+                    <div class="divider-text">Usa una de tus redes</div>
+                </div>
+                <div class="auth-footer-btn d-flex justify-content-center">
+                    <a class="btn btn-facebook" href="#">
+                        <i class="ri-facebook-fill"></i>
+                    </a>
+                    <a class="btn btn-twitter white" href="#">
+                        <i class="ri-twitter-fill"></i>
+                    </a>
+                    <a class="btn btn-google" href="#">
+                        <i class="ri-google-fill"></i>
                     </a>
                 </div>
-                <InputText class="form-control" id="login-password" type="password"
-                           placeholder="Escribe tú contraseña" tabindex="2"
-                           @bind-Value="_userLogin.Password"/>
-                <div class="text-danger form-label">
-                    <ValidationMessage For="() => _userLogin.Password"></ValidationMessage>
-                </div>
             </div>
-            <button class="btn btn-primary w-100" tabindex="3">Iniciar sesión</button>
-        </EditForm>
-        <p class="text-center mt-2">
-            <span>¿No tienes una cuenta?</span>
-            <a href="/register">
-                <span>Regístrate gratis</span>
-            </a>
-        </p>
-        $1$<div class="divider my-2">
-            <div class="divider-text">Usa una de tus redes</div>
         </div>
-        <div class="auth-footer-btn d-flex justify-content-center">
-            <a class="btn btn-facebook" href="#">
-                <i class="ri-facebook-fill"></i>
-            </a>
-            <a class="btn btn-twitter white" href="#">
-                <i class="ri-twitter-fill"></i>
-            </a>
-            <a class="btn btn-google" href="#">
-                <i class="ri-google-fill"></i>
-            </a>
-        </div>#1#
     </div>
 </div>
 
 @code
 {
     private readonly UserLogin _userLogin = new();
-    private UserClaims _claims;
+    private bool _loginProcess;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await _jsRuntime.InvokeVoidAsync("includeCss", "src/css/pages/authentication.css", "authentication");
+    }
 
     private async Task LoginUserWithEmail()
     {
+        _loginProcess = true;
+        
         using var httpResponse = await _httpClient.PostAsJsonAsync("/api/user/login", _userLogin);
 
         switch (httpResponse.StatusCode)
         {
             case HttpStatusCode.OK:
             {
-                _claims = await httpResponse.Content.ReadFromJsonAsync<UserClaims>();
-                if (_claims != null)
+                var claims = await httpResponse.Content.ReadFromJsonAsync<UserClaims>();
+                if (claims != null)
                 {
-                    await _loginService.Login(_claims.Token);
-                    await _jsRuntime.InvokeAsync<string>("localStorage.setItem", "Email", _claims.Email);
-                    await _jsRuntime.InvokeAsync<string>("localStorage.setItem", "Nickname", _claims.Nickname);
-                    await _jsRuntime.InvokeAsync<string>("localStorage.setItem", "UrlProfilePicture", _claims.UrlProfilePicture);
-                    await _jsRuntime.InvokeAsync<string>("localStorage.setItem", "UrlProfile", _claims.UrlProfile);
+                    var user = await _httpClient.GetFromJsonAsync<User>($"api/user/GetUserById/{claims.UserId}");
+                    
+                    await _loginService.Login(claims.Token);
+                    await _jsRuntime.InvokeAsync<string>("localStorage.setItem", "Email", user?.Email);
+                    await _jsRuntime.InvokeAsync<string>("localStorage.setItem", "DisplayName", user?.DisplayName);
+                    await _jsRuntime.InvokeAsync<string>("localStorage.setItem", "IsDj", user?.IsDj);
+                    await _jsRuntime.InvokeAsync<string>("localStorage.setItem", "UrlProfilePicture", user?.UrlProfilePicture);
+                    await _jsRuntime.InvokeAsync<string>("localStorage.setItem", "UrlProfile", user?.UrlProfile);
+
+                    _loginProcess = false;
                     await _jsRuntime.InvokeAsync<string>("window.location.replace", "/");
                 }
                 break;
@@ -98,11 +128,15 @@
             {
                 var error = httpResponse.Content.ReadAsStringAsync().Result;
                 await _jsRuntime.InvokeVoidAsync("showToast", "error", "Error", $"🤔 {error}");
+                _loginProcess = false;
                 break;
             }
             default:
+            {
                 await _jsRuntime.InvokeVoidAsync("showToast", "info", "Información", "😥 El servidor se encuentra en mantenimiento, disculpe las molestias.");
+                _loginProcess = false;
                 break;
+            }
         }
     }
-}*@
+}
