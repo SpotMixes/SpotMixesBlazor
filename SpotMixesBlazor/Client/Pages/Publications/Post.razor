@@ -1,4 +1,5 @@
-﻿@*@inject HttpClient _httpClient
+﻿@using SpotMixesBlazor.Shared.ModelsLookup
+@inject HttpClient _httpClient
 @inject IJSRuntime _jsRuntime
 
 <div class="card ecommerce-card">
@@ -10,12 +11,18 @@
 
     <div class="card-body">
         <div class="d-flex justify-content-between">
-            <a href="">
-                <div class="avatar avatar-sm">
-                    <img src="@Audio.UserUrlProfilePicture" alt="@Audio.UserNickname"/>
-                </div>
-                @Audio.UserNickname
-            </a>
+            @if (Audio.User != null)
+            {
+                @foreach (var user in Audio.User)
+                {
+                    <a href="">
+                        <div class="avatar avatar-sm">
+                            <img src="@user.UrlProfilePicture" alt="@user.DisplayName"/>
+                        </div>
+                        @user.DisplayName
+                    </a>
+                }
+            }
             <div>
                 <p class="h6">
                     <i class="ri-headphone-line"></i>
@@ -27,7 +34,7 @@
             <a class="text-body" href="">@Audio.Title</a>
         </h6>
         <div class="d-flex justify-content-between mt-1">
-            <p>@Audio.DatePublication.ToString("g")</p>
+            <p>@Audio.CreatedAt.ToString("g")</p>
             <span class="badge bg-dark h-50">@Audio.Genres</span>
         </div>
     </div>
@@ -54,10 +61,10 @@
 @code
 {
     [Parameter]
-    public Audio Audio { get; set; }
+    public AudioLookup Audio { get; set; }
 
     private async Task PlayMusic()
     {
-        await _jsRuntime.InvokeVoidAsync("playMusic", Audio.Title, Audio.UserNickname, Audio.UrlAudio, Audio.UrlCover, true);
+        await _jsRuntime.InvokeVoidAsync("playMusic", Audio.Title, "Test", Audio.UrlAudio, Audio.UrlCover, true);
     }
-}*@
+}

@@ -1,5 +1,5 @@
 ﻿@inject PageService _pageService
- 
+
 <!-- Post Pagination Starts -->
 <section id="ecommerce-pagination">
     <div class="row">
@@ -28,6 +28,24 @@
                             }
                             @realValue
                         </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="#">2</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="#">3</a>
+                    </li>
+                    <li class="page-item" aria-current="page">
+                        <a class="page-link" href="#">4</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="#">5</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="#">6</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="#">7</a>
                     </li>
                     <li class="page-item next-item">
                         <a class="page-link" @onclick="NextPage"></a>
@@ -66,7 +84,6 @@
         }
         else
         {
-            
         }
     }
 
@@ -75,17 +92,17 @@
         if (_pageService.ViewAll)
         {
             _pageService.ValueAll--;
-            await GetAudios.InvokeAsync($"api/audio/all/{_pageService.ValueAll}");    
+            await GetAudios.InvokeAsync($"api/audio/all/{_pageService.ValueAll}");
         }
         else if (_pageService.ViewRecent)
         {
             _pageService.ValueRecent--;
-            await GetAudios.InvokeAsync($"api/audio/recent/{_pageService.ValueRecent}");    
+            await GetAudios.InvokeAsync($"api/audio/recent/{_pageService.ValueRecent}");
         }
         else
         {
             _pageService.ValueMostListened--;
-            await GetAudios.InvokeAsync($"api/audio/mostListened/{_pageService.ValueMostListened}");    
+            await GetAudios.InvokeAsync($"api/audio/mostListened/{_pageService.ValueMostListened}");
         }
     }
 }

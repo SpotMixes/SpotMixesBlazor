@@ -1,4 +1,4 @@
-﻿@*@using System.Net.Http.Headers
+﻿@using System.Net.Http.Headers
 @using System.Net
 @inject HttpClient _httpClient
 @inject IJSRuntime _jsRuntime
@@ -134,8 +134,9 @@
 
     private async Task LoadExternalUserData()
     {
-        _audio.UserNickname = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "Nickname");
+        /*_audio.UserNickname = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "Nickname");
         _audio.UserUrlProfilePicture = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "UrlProfilePicture");
+        */
         
         var email = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "Email");
         var httpResponse = await _httpClient.GetAsync($"api/User/searchUserByEmail/{email}");
@@ -154,8 +155,8 @@
 
         await LoadExternalUserData();
         
-        if (string.IsNullOrEmpty(_audio.UserNickname) ||
-            string.IsNullOrEmpty(_audio.UserUrlProfilePicture) || 
+        if (/*string.IsNullOrEmpty(_audio.UserNickname) ||
+            string.IsNullOrEmpty(_audio.UserUrlProfilePicture) ||*/ 
             string.IsNullOrEmpty(_audio.UserId))
         {
             await _jsRuntime.InvokeVoidAsync("showToast", "error",
@@ -238,4 +239,4 @@
     }
 
     
-}*@
+}

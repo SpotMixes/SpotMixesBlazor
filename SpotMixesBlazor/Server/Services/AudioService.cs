@@ -30,7 +30,7 @@ namespace SpotMixesBlazor.Server.Services
         public async Task<IReadOnlyList<AudioLookup>> GetAllAudios(int audioPerPage, int page)
         {
             var skip = audioPerPage * page;
-            
+
             var audios = await _audiosCollection
                 .Aggregate()
                 .Lookup("Users", "UserId", "_id", "User")
