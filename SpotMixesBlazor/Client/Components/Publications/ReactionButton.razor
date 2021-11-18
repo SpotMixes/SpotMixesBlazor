@@ -1,0 +1,69 @@
+﻿@using SpotMixesBlazor.Shared.ModelsLookup
+@using System.Net
+@inject HttpClient _httpClient
+@inject IJSRuntime _jsRuntime
+
+<a @onclick="Like" class="btn btn-primary btn-cart">
+    @if (_isReactionCreated)
+    {
+        <i class="ri-heart-fill" style="color: red"></i>
+    }
+    else
+    {
+        <i class="ri-heart-line"></i>
+    }
+    <span>500</span>
+</a>
+
+
+@code {
+    [Parameter]
+    public AudioLookup Audio { get; set; }
+
+    private bool _isReactionCreated;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await IsReaction();
+    }
+
+    private async Task IsReaction()
+    {
+        var userId = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "UrlProfile");
+        _isReactionCreated = await _httpClient
+            .GetFromJsonAsync<bool>($"api/reaction/isReaction/{Audio.Id}/{userId}");
+    }
+
+    private async Task CreateReaction()
+    {
+        var userId = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "UrlProfile");
+        var reaction = new Reaction
+        {
+            AudioId = Audio.Id,
+            UserId = userId
+        };
+        var httpResponse = await _httpClient.PostAsJsonAsync("api/reaction", reaction);
+
+        if (httpResponse.StatusCode == HttpStatusCode.Created)
+        {
+            Console.WriteLine("Reaction created");
+        }
+    }
+    
+    private async Task DeleteReaction()
+    {
+        Console.WriteLine("Elimininando");
+    }
+    
+    private async Task Like() 
+    {
+        if (_isReactionCreated)
+        {
+            await DeleteReaction();
+        }
+        else
+        {
+            await CreateReaction();
+        }
+    }
+}
