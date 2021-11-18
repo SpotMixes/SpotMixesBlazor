@@ -1,5 +1,7 @@
 ﻿@using SpotMixesBlazor.Shared.ModelsLookup
 @using System.Net
+@using Microsoft.AspNetCore.SignalR.Client
+@inject NavigationManager _navigationManager
 @inject HttpClient _httpClient
 @inject IJSRuntime _jsRuntime
 
@@ -20,11 +22,34 @@
     [Parameter]
     public AudioLookup Audio { get; set; }
 
+    private HubConnection _hubConnection;
     private bool _isReactionCreated;
 
     protected override async Task OnInitializedAsync()
     {
+        _hubConnection = new HubConnectionBuilder()
+            .WithUrl(_navigationManager.ToAbsoluteUri("/reactionhub"))
+            .Build();
+
+        _hubConnection.On("ReceiveMessage", async () =>
+        {
+            await IsReaction();
+            StateHasChanged();
+        });
+
+        await _hubConnection.StartAsync();
+        
         await IsReaction();
+    }
+
+    private async Task SendMessage()
+    {
+        await _hubConnection.SendAsync("SendMessage");
+    }
+
+    private bool IsConnected()
+    {
+        return _hubConnection.State == HubConnectionState.Connected;
     }
 
     private async Task IsReaction()
@@ -32,6 +57,7 @@
         var userId = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "UrlProfile");
         _isReactionCreated = await _httpClient
             .GetFromJsonAsync<bool>($"api/reaction/isReaction/{Audio.Id}/{userId}");
+        StateHasChanged();
     }
 
     private async Task CreateReaction()
@@ -64,6 +90,11 @@
         else
         {
             await CreateReaction();
+        }
+
+        if (IsConnected())
+        {
+            await SendMessage();
         }
     }
 }

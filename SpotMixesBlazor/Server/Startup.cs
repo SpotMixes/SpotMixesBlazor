@@ -1,10 +1,13 @@
+using System.Linq;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using SpotMixesBlazor.Server.DataAccess;
+using SpotMixesBlazor.Server.Hubs;
 using SpotMixesBlazor.Server.Services;
 using SpotMixesBlazor.Server.Settings;
 
@@ -39,11 +42,20 @@ namespace SpotMixesBlazor.Server
             services.AddTransient<MailService>();
             services.AddTransient<SessionService>();
             services.AddTransient<ReactionService>();
+            //SignalR
+            services.AddSignalR();
+            services.AddResponseCompression(opts =>
+            {
+                opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
+                    new[] {"application/octet-stream"});
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseResponseCompression();
+            
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -66,6 +78,7 @@ namespace SpotMixesBlazor.Server
             {
                 endpoints.MapRazorPages();
                 endpoints.MapControllers();
+                endpoints.MapHub<ReactionHub>("/reactionhub");
                 endpoints.MapFallbackToFile("index.html");
             });
         }
