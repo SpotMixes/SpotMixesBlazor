@@ -1,0 +1,38 @@
+﻿@inject PageService _pageService
+@inject IJSRuntime _jsRuntime
+
+@ChildContent
+
+@code
+{
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+    
+    [Parameter]
+    public string ObserverTargetId { get; set; }
+    
+    [Parameter]
+    public EventCallback<string> GetAudios { get; set; }
+    
+    private DotNetObjectReference<InfiniteScroll> _dotNetRef;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _dotNetRef = DotNetObjectReference.Create(this);
+            await _jsRuntime.InvokeVoidAsync("startObserver", _dotNetRef, ObserverTargetId);
+        }
+    }
+
+    [JSInvokable]
+    public async Task MoreData()
+    {
+        if (_pageService.ViewAll)
+        {
+            _pageService.ValueAll += 21;
+            await GetAudios.InvokeAsync($"api/audio/all/{_pageService.ValueAll}/0");
+            Console.WriteLine($"All Audios {_pageService.ValueAll}");
+        }
+    }
+}

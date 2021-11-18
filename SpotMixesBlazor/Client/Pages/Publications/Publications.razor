@@ -74,7 +74,9 @@
                     }
                 </section>
                 <!-- Post List Ends -->
-                <Pagination GetAudios="GetAudios"></Pagination>
+                <InfiniteScroll ObserverTargetId="request-target" GetAudios="GetAudios">
+                    <div id="request-target"></div>
+                </InfiniteScroll>
                 <br><br><br><br><br><br><br>
             </div>
         </div>
