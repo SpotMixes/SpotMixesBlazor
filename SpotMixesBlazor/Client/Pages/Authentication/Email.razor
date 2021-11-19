@@ -11,7 +11,7 @@
         <div class="card mb-0">
             <div class="card-body">
                 <a href="/" class="brand-logo">
-                    <img src="public/brand/SpotMixes-Logo-TypographyDown.svg" alt="logo" />
+                    <img src="public/brand/SpotMixes-Logo-TypographyDown.svg" alt="Logo SpotMixes" style="height: 50px"/>
                 </a>
                 <h2 class="card-title fw-bolder mb-1">Verifique su correo electrónico ✉️</h2>
                 <p class="card-text mb-2">
@@ -67,24 +67,22 @@
 
     protected override async Task OnInitializedAsync()
     {
+        await _jsRuntime.InvokeVoidAsync("includeCss", "src/css/pages/authentication.css", "authentication");
         await GetUserById();
         await GetSessionByUserEmail();
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        var verifyEmail = new VerifyEmail()
+        
+        var sendEmail = new SendEmail()
         {
             DisplayName = _user.DisplayName,
             ToEmail = _user.Email,
             CodeVerifyEmail = _user.CodeVerifyEmail
         };
-        await SendEmailWithVerificationCode(verifyEmail);
+        await SendEmailWithVerificationCode(sendEmail);
     }
 
-    private async Task SendEmailWithVerificationCode(VerifyEmail verifyEmail)
+    private async Task SendEmailWithVerificationCode(SendEmail sendEmail)
     {
-        await _httpClient.PostAsJsonAsync("/api/mail/SendEmailWithVerificationCode", verifyEmail);
+        await _httpClient.PostAsJsonAsync("api/mail/SendEmailWithVerificationCode", sendEmail);
     }
     
     private async Task GetUserById()
@@ -107,6 +105,7 @@
             await _httpClient.PutAsJsonAsync($"api/user/{_user.Id}", _user);
 
             await _loginService.Login(_session.UserJwt);
+            await _jsRuntime.InvokeAsync<string>("localStorage.setItem", "Id", _user.Id);
             await _jsRuntime.InvokeAsync<string>("localStorage.setItem", "Email", _user.Email);
             await _jsRuntime.InvokeAsync<string>("localStorage.setItem", "DisplayName", _user.DisplayName);
             await _jsRuntime.InvokeAsync<string>("localStorage.setItem", "IsDj", _user.IsDj);
@@ -128,5 +127,4 @@
             _verificationProcess = false;
         }
     }
-
 }

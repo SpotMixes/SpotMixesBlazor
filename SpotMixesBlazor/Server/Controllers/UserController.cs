@@ -35,16 +35,16 @@ namespace SpotMixesBlazor.Server.Controllers
             
             var userRegister = await _userService.GetUserByEmail(user.Email);
             
+            userRegister.UrlProfile = userRegister.Id;
+            await _userService.UpdateUser(userRegister);
+            
             var userClaims = new UserClaims()
             {
                 Token = firebase.FirebaseToken,
                 Email = firebase.User.Email,
-                UserId = userRegister.Id
+                UserId = userRegister.Id,
             };
-
-            userRegister.UrlProfile = userRegister.Id;
-            await _userService.UpdateUser(userRegister);
-
+            
             return Created("Created", userClaims);
         }
         

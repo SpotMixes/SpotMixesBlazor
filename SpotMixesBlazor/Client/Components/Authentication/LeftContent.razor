@@ -1,0 +1,22 @@
+﻿<!-- Brand logo-->
+<a class="brand-logo" href="index.html">
+    <img src="public/brand/SpotMixes-Logo-TypographyOnRight.svg" alt="Logo SpotMixes" style="height: 28px;"/>
+</a>
+<!-- End Brand logo-->
+<!-- Left Text-->
+<div class="d-none d-lg-flex col-lg-8 align-items-center p-5">
+    <div class="w-100 d-lg-flex align-items-center justify-content-center px-5">
+        <img class="img-fluid" src="@UrlImage" alt="@AltImage"/>
+    </div>
+</div>
+<!-- /Left Text-->
+
+@code {
+
+    [Parameter]
+    public string UrlImage { get; set; }
+
+    [Parameter]
+    public string AltImage { get; set; }
+
+}

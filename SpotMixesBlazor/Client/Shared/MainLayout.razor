@@ -9,14 +9,11 @@
 {
     protected override async Task OnInitializedAsync()
     {
+        await _jsRuntime.InvokeVoidAsync("addCssNormalPage");
         await _jsRuntime.InvokeVoidAsync("showHtml", "sidenav");
+        // Error
         await _jsRuntime.InvokeVoidAsync("removeHtml", "page-misc");
+        // Authentication
         await _jsRuntime.InvokeVoidAsync("removeHtml", "authentication");
-        await _jsRuntime.InvokeVoidAsync("lottieLoaderPlay");
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        await _jsRuntime.InvokeVoidAsync("lottieLoaderPause");
     }
 }

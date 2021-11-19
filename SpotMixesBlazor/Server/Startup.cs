@@ -39,9 +39,9 @@ namespace SpotMixesBlazor.Server
             // Injection dependencies
             services.AddSingleton<UserService>();
             services.AddSingleton<AudioService>();
-            services.AddTransient<MailService>();
-            services.AddTransient<SessionService>();
-            services.AddTransient<ReactionService>();
+            services.AddSingleton<MailService>();
+            services.AddSingleton<SessionService>();
+            services.AddSingleton<ReactionService>();
             //SignalR
             services.AddSignalR();
             services.AddResponseCompression(opts =>

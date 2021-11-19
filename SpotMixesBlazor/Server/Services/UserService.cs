@@ -61,8 +61,7 @@ namespace SpotMixesBlazor.Server.Services
         {
             await _usersCollection.ReplaceOneAsync(u => u.Id == user.Id, user);
         }
-
-        #region GetUser
+        
         public async Task<User> GetUserById(string id)
         {
             return await _usersCollection.Find(user => user.Id == id).FirstOrDefaultAsync();
@@ -90,6 +89,5 @@ namespace SpotMixesBlazor.Server.Services
 
             return userLookup;
         }
-        #endregion
     }
 }

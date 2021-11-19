@@ -8,18 +8,7 @@
 
 <div class="auth-wrapper auth-cover">
     <div class="auth-inner row m-0">
-        <!-- Brand logo-->
-        <a class="brand-logo" href="index.html">
-            <img src="public/brand/SpotMixes-Logo-TypographyOnRight.svg" alt="Logo SpotMixes" style="height: 28px;"/>
-        </a>
-        <!-- End Brand logo-->
-        <!-- Left Text-->
-        <div class="d-none d-lg-flex col-lg-8 align-items-center p-5">
-            <div class="w-100 d-lg-flex align-items-center justify-content-center px-5">
-                <img class="img-fluid" src="public/page/login/cover-login.svg" alt="Imagen inicio de sesión SpotMixes"/>
-            </div>
-        </div>
-        <!-- End Left Text-->
+        <LeftContent UrlImage="public/page/login/cover-login.svg" AltImage="Imagen del proceso de inicio de sesión spotmixes"></LeftContent>
         <!-- Login-->
         <div class="d-flex col-lg-4 align-items-center auth-bg px-2 p-lg-5">
             <div class="col-12 col-sm-8 col-md-6 col-lg-12 px-xl-2 mx-auto">
@@ -89,7 +78,7 @@
 
 @code
 {
-    private readonly UserLogin _userLogin = new();
+    private UserLogin _userLogin = new();
     private bool _loginProcess;
     
     protected override async Task OnInitializedAsync()
@@ -101,7 +90,7 @@
     {
         _loginProcess = true;
         
-        using var httpResponse = await _httpClient.PostAsJsonAsync("/api/user/login", _userLogin);
+        var httpResponse = await _httpClient.PostAsJsonAsync("/api/user/login", _userLogin);
 
         switch (httpResponse.StatusCode)
         {
@@ -113,6 +102,7 @@
                     var user = await _httpClient.GetFromJsonAsync<User>($"api/user/GetUserById/{claims.UserId}");
                     
                     await _loginService.Login(claims.Token);
+                    await _jsRuntime.InvokeAsync<string>("localStorage.setItem", "Id", user?.Id);
                     await _jsRuntime.InvokeAsync<string>("localStorage.setItem", "Email", user?.Email);
                     await _jsRuntime.InvokeAsync<string>("localStorage.setItem", "DisplayName", user?.DisplayName);
                     await _jsRuntime.InvokeAsync<string>("localStorage.setItem", "IsDj", user?.IsDj);
@@ -128,12 +118,14 @@
             {
                 var error = httpResponse.Content.ReadAsStringAsync().Result;
                 await _jsRuntime.InvokeVoidAsync("showToast", "error", "Error", $"🤔 {error}");
+                _userLogin = new UserLogin();
                 _loginProcess = false;
                 break;
             }
             default:
             {
                 await _jsRuntime.InvokeVoidAsync("showToast", "info", "Información", "😥 El servidor se encuentra en mantenimiento, disculpe las molestias.");
+                _userLogin = new UserLogin();
                 _loginProcess = false;
                 break;
             }

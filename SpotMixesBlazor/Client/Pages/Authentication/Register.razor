@@ -1,8 +1,8 @@
 ﻿@page "/Register"
+@layout AuthenticationLayout
 @using System.Net
 @using IpInfo
 @using SpotMixesBlazor.Shared.ModelsData
-@layout AuthenticationLayout
 @inject HttpClient _httpClient
 @inject NavigationManager _navigationManager
 @inject IJSRuntime _jsRuntime
@@ -98,7 +98,6 @@
     </div>
 </div>
 
-<script src="src/js/components/components-popovers.min.js" suppress-error="BL9992"></script>
 
 @code
 {
@@ -106,12 +105,17 @@
     private UserClaims _claims = new();
     private bool _registrationProcess;
 
+    protected override async Task OnInitializedAsync()
+    {
+        await _jsRuntime.InvokeVoidAsync("includeCss", "src/css/pages/authentication.css", "authentication");
+    }
+    
     private async Task CreateUser()
     {
         _registrationProcess = true;
         _userRegister.CodeVerifyEmail = GenerateCodeVerifyEmail();
 
-        var httpResponse = await _httpClient.PostAsJsonAsync("/api/user/register", _userRegister);
+        var httpResponse = await _httpClient.PostAsJsonAsync("api/user/register", _userRegister);
 
         switch (httpResponse.StatusCode)
         {
@@ -131,7 +135,6 @@
                     await _httpClient.PostAsJsonAsync("/api/session", session);
                     _navigationManager.NavigateTo($"/VerifyEmail/{_claims.UserId}");
                 }
-                
                 _registrationProcess = false;
                 break;
             }

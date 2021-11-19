@@ -18,12 +18,12 @@ namespace SpotMixesBlazor.Server.Controllers
         }
         
         [HttpPost("SendEmailWithVerificationCode")]
-        public async Task<ActionResult> SendEmailWithVerificationCode([FromBody] VerifyEmail verifyEmail)
+        public async Task<ActionResult> SendEmailWithVerificationCode([FromBody] SendEmail sendEmail)
         {
             try
             {
-                await _mailService.SendEmailWithVerificationCode(verifyEmail);
-                return Ok($"Se envió el código de verificación al correo {verifyEmail.ToEmail}");
+                await _mailService.SendEmailWithVerificationCode(sendEmail);
+                return Ok($"Se envió el código de verificación al correo {sendEmail.ToEmail}");
             }
             catch (Exception e)
             {

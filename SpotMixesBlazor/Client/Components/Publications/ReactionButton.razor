@@ -8,7 +8,7 @@
 <a @onclick="Like" class="btn btn-primary btn-cart">
     @if (_isReactionCreated)
     {
-        <i class="ri-heart-fill" style="color: red"></i>
+        <i class="ri-heart-fill" style="color: red;"></i>
     }
     else
     {
@@ -19,6 +19,12 @@
 
 
 @code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+    
+    [Parameter]
+    public string IdHtml { get; set; }
+    
     [Parameter]
     public AudioLookup Audio { get; set; }
 
@@ -78,7 +84,13 @@
     
     private async Task DeleteReaction()
     {
-        Console.WriteLine("Elimininando");
+        var userId = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "UrlProfile");
+        var httpResponse = await _httpClient.DeleteAsync($"api/Reaction/delete/{Audio.Id}/{userId}");
+        if (httpResponse.StatusCode == HttpStatusCode.OK)
+        {
+            Console.WriteLine("Reaction deleted");
+            _isReactionCreated = false;
+        }
     }
     
     private async Task Like() 

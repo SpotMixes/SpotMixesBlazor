@@ -21,10 +21,10 @@ namespace SpotMixesBlazor.Server.Services
             await _reactionCollection.InsertOneAsync(reaction);
         }
         
-        public async Task<bool> DeleteReaction(Reaction reaction)
+        public async Task<bool> DeleteReaction(string audioId, string userId)
         {
             var resultDelete = await _reactionCollection
-                .DeleteOneAsync(r => r.AudioId == reaction.AudioId && r.UserId == reaction.UserId);
+                .DeleteOneAsync(reaction => reaction.AudioId == audioId && reaction.UserId == userId);
 
             return resultDelete.DeletedCount > 0;
         }

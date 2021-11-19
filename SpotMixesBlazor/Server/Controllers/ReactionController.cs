@@ -23,11 +23,17 @@ namespace SpotMixesBlazor.Server.Controllers
             return Created("Created", true);
         }
         
-        [HttpDelete]
-        public async Task<IActionResult> DeleteReaction([FromBody] Reaction reaction)
+        [HttpDelete("delete/{audioId}/{userId}")]
+        public async Task<IActionResult> DeleteReaction(string audioId, string userId)
         {
-            var result =await _reactionService.DeleteReaction(reaction);
-            return Ok(result);
+            var result =await _reactionService.DeleteReaction(audioId, userId);
+
+            if (!result)
+            {
+                return BadRequest("No se elimino");
+            }
+
+            return Ok("Eliminado");
         }
         
         [HttpGet("isReaction/{audioId}/{userId}")]
