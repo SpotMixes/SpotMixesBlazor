@@ -1,0 +1,21 @@
+{
+  "Version": 1,
+  "ProjectMap": {
+    "b2503d7f-b2f8-41ab-b79c-88b01dd97bcc": {
+      "ProjectGuid": "b2503d7f-b2f8-41ab-b79c-88b01dd97bcc",
+      "DisplayName": "SpotMixesBlazor.Client",
+      "ColorIndex": 0
+    },
+    "71cbc2f2-7511-44b8-ad43-740aef411cda": {
+      "ProjectGuid": "71cbc2f2-7511-44b8-ad43-740aef411cda",
+      "DisplayName": "SpotMixesBlazor.Shared",
+      "ColorIndex": 1
+    },
+    "03f5e397-9ff5-47b6-961a-f840047d7fb5": {
+      "ProjectGuid": "03f5e397-9ff5-47b6-961a-f840047d7fb5",
+      "DisplayName": "SpotMixesBlazor.Server",
+      "ColorIndex": 2
+    }
+  },
+  "NextColorIndex": 3
+}

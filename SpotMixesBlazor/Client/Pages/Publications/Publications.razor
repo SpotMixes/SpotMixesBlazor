@@ -30,7 +30,6 @@
                                             <i class="ri-upload-2-fill me-1"></i>
                                             Publicar
                                         </button>
-                                        
                                     </Authorized>
                                 </AuthorizeView>
                             </div>
@@ -50,10 +49,10 @@
                             <div class="input-group input-group-merge">
                                 <input type="text" class="form-control search-product"
                                        placeholder="Buscar por título, género y descripción." aria-label="Buscar..."
-                                       @oninput="SearchAudios"/>
-                                <span class="input-group-text">
+                                       @bind="_searchText"/>
+                                <button class="input-group-text" @onclick="SearchAudios">
                                     <i class="ri-search-line"></i>
-                                </span>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -106,12 +105,11 @@
 @code
 {
     private IReadOnlyList<AudioLookup> _audios;
+    private string _searchText;
 
     protected override async Task OnInitializedAsync()
     {
         await GetAudios($"api/audio/all/21/0");
-        var responseQuantity = await _httpClient.GetAsync("api/audio/quantity");
-        _quantityData.QuantityAudios = await responseQuantity.Content.ReadAsStringAsync();
     }
 
     private async Task GetAudios(string url)
@@ -119,16 +117,12 @@
         _audios = await _httpClient.GetFromJsonAsync<IReadOnlyList<AudioLookup>>(url);
     }
 
-    private async Task SearchAudios(ChangeEventArgs e)
+    private async Task SearchAudios()
     {
-        if (!string.IsNullOrEmpty(e.Value?.ToString()))
+        if (!string.IsNullOrEmpty(_searchText))
         {
-            var valueSearch = e.Value.ToString();
-            _audios = await _httpClient.GetFromJsonAsync<IReadOnlyList<AudioLookup>>($"api/audio/search/{valueSearch}/21/0");
-        }
-        else
-        {
-            await GetAudios($"api/audio/all/21/0");
+            _audios = await _httpClient
+                .GetFromJsonAsync<IReadOnlyList<AudioLookup>>($"api/audio/search/{_searchText}/21/0");
         }
     }
 }

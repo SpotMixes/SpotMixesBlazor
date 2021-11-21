@@ -2,7 +2,7 @@
 {
     public class PageService
     {
-        public int ValueAll { get; set; } = 21;
+        public int ValueAll { get; set; } = 0;
         public bool ViewAll { get; set; } = true;
 
         public int ValueRecent { get; set; } = 0;
