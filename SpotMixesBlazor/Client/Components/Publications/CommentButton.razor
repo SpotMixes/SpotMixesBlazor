@@ -1,0 +1,12 @@
+﻿@inject NavigationManager _navigationManager
+@inject IJSRuntime _jsRuntime
+
+<button type="button" class="btn btn-warning btn-cart">
+    <i class="ri-discuss-fill"></i>
+    <span class="add-to-cart">300</span>
+</button>
+
+@code {
+    [Parameter]
+    public string AudioId { get; set; }
+}

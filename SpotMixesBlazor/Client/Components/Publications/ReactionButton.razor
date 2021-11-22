@@ -5,7 +5,7 @@
 @inject HttpClient _httpClient
 @inject IJSRuntime _jsRuntime
 
-<a @onclick="Like" class="btn btn-primary btn-cart">
+<button @onclick="Like" class="btn btn-primary btn-cart">
     @if (_isReactionCreated)
     {
         <i class="ri-heart-fill" style="color: red;"></i>
@@ -15,7 +15,7 @@
         <i class="ri-heart-line"></i>
     }
     <span>@_likes</span>
-</a>
+</button>
 
 
 @code {
