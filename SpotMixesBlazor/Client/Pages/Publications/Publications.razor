@@ -26,10 +26,13 @@
                                 </div>
                                 <AuthorizeView>
                                     <Authorized>
-                                        <button class="btn btn-primary">
-                                            <i class="ri-upload-2-fill me-1"></i>
-                                            Publicar
-                                        </button>
+                                        @if (_isDj)
+                                        {
+                                            <button class="btn btn-primary">
+                                                <i class="ri-upload-2-fill me-1"></i>
+                                                Publicar
+                                            </button>
+                                        }
                                     </Authorized>
                                 </AuthorizeView>
                             </div>
@@ -60,7 +63,7 @@
                 <!-- Post Search Bar Ends -->
 
                 <!-- Post List Starts -->
-                <section class="grid-view">
+                <section class="row mt-2">
                     @if (_audios == null)
                     {
                         <p>Cargando Audio..</p>
@@ -69,7 +72,7 @@
                     {
                         @foreach (var audio in _audios)
                         {
-                            <PostCard Audio="audio"></PostCard>
+                            <PostCardNew Audio="audio"></PostCardNew>
                         }
                     }
                 </section>
@@ -106,9 +109,13 @@
 {
     private IReadOnlyList<AudioLookup> _audios;
     private string _searchText;
+    bool _isDj;
 
     protected override async Task OnInitializedAsync()
     {
+        var isDjString = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "IsDj");
+        _isDj = bool.Parse(isDjString);
+        
         await GetAudios($"api/audio/all/21/0");
     }
 

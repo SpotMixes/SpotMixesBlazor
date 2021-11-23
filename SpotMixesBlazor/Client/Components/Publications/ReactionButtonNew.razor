@@ -1,0 +1,127 @@
+﻿@using System.Net
+@using Microsoft.AspNetCore.SignalR.Client
+@inject NavigationManager _navigationManager
+@inject HttpClient _httpClient
+@inject IJSRuntime _jsRuntime
+
+<a @onclick="Like" class="text-center text-white">
+    @if (_isReactionCreated)
+    {
+        <i class="ri-heart-fill" style="color: red;"></i>
+    }
+    else
+    {
+        <i class="ri-heart-line" style="color: white"></i>
+    }
+    <p class="m-0 p-0">@_likes</p>
+</a>
+
+
+@code {
+
+    [Parameter]
+    public string AudioId { get; set; }
+
+    private HubConnection _hubConnection;
+    private bool _isReactionCreated;
+    private long _likes;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await IsReaction();
+        await NumberOfLikes();
+    }
+
+    private async Task CreateHubConnection()
+    {
+        _hubConnection = new HubConnectionBuilder()
+            .WithUrl(_navigationManager.ToAbsoluteUri("/reactionhub"))
+            .Build();
+
+        _hubConnection.On("ReceiveMessage", async () =>
+        {
+            await NumberOfLikes();
+            StateHasChanged();
+        });
+
+        await _hubConnection.StartAsync();
+    }
+
+    private async Task SendMessage()
+    {
+        Console.WriteLine("Se envio un mensaje");
+        await _hubConnection.SendAsync("SendMessage");
+    }
+
+    private bool IsConnected() => _hubConnection.State == HubConnectionState.Connected;
+
+    private async ValueTask DisposeAsync()
+    {
+        if (_hubConnection is not null)
+        {
+            await _hubConnection.DisposeAsync();
+        }
+    }
+
+    private async Task IsReaction()
+    {
+        var userId = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "Id");
+
+        _isReactionCreated = await _httpClient
+            .GetFromJsonAsync<bool>($"api/reaction/isReaction/{AudioId}/{userId}");
+    }
+
+    private async Task NumberOfLikes()
+    {
+        _likes = await _httpClient.GetFromJsonAsync<long>($"api/reaction/countReactions/{AudioId}");
+    }
+
+    private async Task CreateReaction()
+    {
+        var userId = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "Id");
+        var reaction = new Reaction
+        {
+            AudioId = AudioId,
+            UserId = userId
+        };
+
+        var httpResponse = await _httpClient.PostAsJsonAsync("api/reaction", reaction);
+
+        if (httpResponse.StatusCode == HttpStatusCode.Created)
+        {
+            _isReactionCreated = true;
+        }
+    }
+
+    private async Task DeleteReaction()
+    {
+        var userId = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "UrlProfile");
+
+        var httpResponse = await _httpClient.DeleteAsync($"api/Reaction/delete/{AudioId}/{userId}");
+
+        if (httpResponse.StatusCode == HttpStatusCode.OK)
+        {
+            _isReactionCreated = false;
+        }
+    }
+
+    private async Task Like()
+    {
+        await DisposeAsync();
+        await CreateHubConnection();
+
+        if (_isReactionCreated)
+        {
+            await DeleteReaction();
+            StateHasChanged();
+        }
+        else
+        {
+            await CreateReaction();
+            StateHasChanged();
+        }
+
+        await SendMessage();
+    }
+
+}

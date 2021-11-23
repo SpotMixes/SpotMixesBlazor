@@ -1,7 +1,7 @@
 ﻿@using SpotMixesBlazor.Shared.ModelsLookup
 @inject IJSRuntime _jsRuntime
 
-<div class="col-4">
+<div class="col-sm-12 col-md-6 col-lg-4">
     <div class="has-items-overlay playlist">
         <figure>
             <div class="img-wrapper" style="border-radius: 0.428rem;">
@@ -10,22 +10,27 @@
                     <div class="figcaption">
                         <ul class="list-inline d-flex align-items-center justify-content-between">
                             <li class="list-inline-item">
-                                <a href="#" class="text-center text-white">
-                                    <i class="ri-heart-line" style="color: white"></i>
-                                    <p class="m-0 p-0">500</p>
-                                </a>
+                                <AuthorizeView>
+                                    <Authorized>
+                                        <ReactionButtonNew AudioId="@Audio.Id"></ReactionButtonNew>
+                                    </Authorized>
+                                </AuthorizeView>
                             </li>
                             <li class="list-inline-item">
                                 <a @onclick="PlayMusic" class="text-center text-white">
                                     <i class="ri-play-line" style="color: white; font-size: 50px"></i>
-                                    <p class="m-0 p-0">500</p>
+                                    <p class="m-0 p-0">@Audio.NumReproduction</p>
                                 </a>
                             </li>
                             <li class="list-inline-item">
-                                <a href="#" class="text-center text-white">
-                                    <i class="ri-chat-1-line" style="color: white"></i>
-                                    <p class="m-0 p-0">200</p>
-                                </a>
+                                <AuthorizeView>
+                                    <Authorized>
+                                        <a href="#" class="text-center text-white">
+                                            <i class="ri-chat-1-line" style="color: white"></i>
+                                            <p class="m-0 p-0">2k</p>
+                                        </a>
+                                    </Authorized>
+                                </AuthorizeView>
                             </li>
                         </ul>
                         <div class="text-center mt-6">
@@ -45,7 +50,7 @@
                                     <img class="round" src="@user.UrlProfilePicture" alt="@user.DisplayName" height="30" width="30"/>
                                 </div>
                                 <!--/ avatar -->
-                                <div class="profile-user-info">
+                                <div>
                                     <h6 class="mb-0">@user.DisplayName</h6>
                                     <small class="text-muted">@Audio.CreatedAt.ToString("g")</small>
                                 </div>
