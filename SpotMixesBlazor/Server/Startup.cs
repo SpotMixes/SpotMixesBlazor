@@ -42,6 +42,7 @@ namespace SpotMixesBlazor.Server
             services.AddSingleton<MailService>();
             services.AddSingleton<SessionService>();
             services.AddSingleton<ReactionService>();
+            services.AddSingleton<CommentService>();
             //SignalR
             services.AddSignalR();
             services.AddResponseCompression(opts =>

@@ -1,0 +1,158 @@
+﻿@page "/AudioDetails/{AudioId}"
+@using SpotMixesBlazor.Shared.ModelsLookup
+@using System.Net
+@layout MainLayout
+@inject IJSRuntime _jsRuntime
+@inject HttpClient _httpClient
+
+<!-- BEGIN: Content-->
+<div class="app-content content ">
+    <div class="content-overlay"></div>
+    <div class="header-navbar-shadow"></div>
+    <div class="content-wrapper container-xxl p-0">
+        <div class="content-body">
+            @if (_audioLookup == null)
+            {
+                <p>Audio no encontrado</p>
+            }
+            else
+            {
+                <div class="p-1" style="background: #283046; border-radius: 0.428rem;">
+                    <div class="row">
+                        <!-- Audio Cove -->
+                        <div class="col-sm-12 col-md-4">
+                            <img src="@_audioLookup.UrlCover" alt="@_audioLookup.Title" style="width: 100%">
+                        </div>
+                        <!-- End Audio Cove -->
+                        <!-- End Audio Data -->
+                        <div class="col-sm-12 col-md-8">
+                            <div class="content-audio__data d-flex flex-column">
+                                <div class="audio__text d-flex flex-row">
+                                    <div class="audio__text__play d-flex justify-content-center align-items-center">
+                                        <button class="btn btn-icon rounded-circle btn-primary width-50 height-50">
+                                            <i class="ri-play-fill"></i>
+                                        </button>
+                                    </div>
+                                    <div class="audio__text__title">
+                                        <h1 class="mt-2">@_audioLookup.Title</h1>
+                                        @if (_audioLookup.User != null)
+                                        {
+                                            @foreach (var user in _audioLookup.User)
+                                            {
+                                                <a href="/profile/@user.Id">@user.DisplayName</a>
+                                            }
+                                        }
+                                    </div>
+                                </div>
+                                <div class="audio__wave d-flex flex-column justify-content-center">
+                                    <div id="waveform" class="d-none d-sm-block"></div>
+                                </div>
+                                <div class="audio__reactions d-flex justify-content-between align-items-end">
+                                    <ReactionButtonNew AudioId="@AudioId" IsHtmlP="false"></ReactionButtonNew>
+                                    <CommentButton AudioId="@AudioId" IsHtmlP="false"></CommentButton>
+                                    <a href="" class="text-white">
+                                        <i class="ri-share-fill"></i> 500
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- End Audio Data -->
+                        <!-- Comment box -->
+                        <div class="col-12 mt-2">
+                            <EditForm Model="_commentContent" OnValidSubmit="CreateComment" class="row">
+                                <DataAnnotationsValidator></DataAnnotationsValidator>
+                                <div class="col-sm-12 col-md-10 margin-top-10">
+                                    <InputTextArea class="form-control p-2" placeholder="Add Comment" rows="1"
+                                                   autofocus tabindex="1" @bind-Value="_commentContent.Content"/>
+                                </div>
+                                <div class="col-sm-12 col-md-2 d-grid gap-2">
+                                    @if (_commentProcess)
+                                    {
+                                        <button class="btn btn-outline-primary" tabindex="2" disabled>
+                                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                            Commentando...
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <button class="btn btn-outline-primary" tabindex="2">
+                                            Comentar
+                                            <i class="ri-send-plane-fill"></i>
+                                        </button>
+                                    }
+                                </div>
+                                <div class="col-12 text-danger form-label">
+                                    <ValidationMessage For="() => _commentContent.Content"></ValidationMessage>
+                                </div>
+                            </EditForm>
+                        </div>
+                        <!--/ End Comment box -->
+                        <!-- Comments -->
+                        <div class="comment-body mt-1">
+                            <div class="d-flex align-items-start mb-1 mt-1">
+                                <div class="avatar mt-25 me-75">
+                                    <img src="https://i.pinimg.com/originals/d0/ab/c1/d0abc175e2023571107820067049aa19.png" alt="Avatar" height="34" width="34"/>
+                                </div>
+                                <div class="profile-user-info w-100 p-1">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <h6 class="mb-0">Kitty Allanson</h6>
+                                        <p>12/02/2000</p>
+                                    </div>
+                                    <small>
+                                        Easy & smart fuzzy search🕵🏻 functionality which enables users to search quickly.
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Comments -->
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+<!-- END: Content-->
+
+@code
+{
+    [Parameter]
+    public string AudioId { get; set; }
+
+    private AudioLookup _audioLookup = new();
+    private CommentContent _commentContent = new();
+    //private IReadOnlyList<CommentLookup> _comments;
+    private bool _commentProcess;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetAudioById();
+        await _jsRuntime.InvokeVoidAsync("loadWaveSurfer", $"{_audioLookup.UrlAudio}");
+    }
+    
+    private async Task GetAudioById()
+    {
+        _audioLookup = await _httpClient.GetFromJsonAsync<AudioLookup>($"api/audio/GetAudioById/{AudioId}");
+    }
+    
+    private async Task CreateComment()
+    {
+        _commentProcess = true;
+        
+        var userId = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "Id");
+        
+        var comment = new Comment()
+        {
+            AudioId = AudioId,
+            UserId = userId,
+            Content = _commentContent.Content
+        };
+        
+        var httpResponseMessage = await _httpClient.PostAsJsonAsync("api/comment", comment);
+
+        if (httpResponseMessage.StatusCode == HttpStatusCode.Created)
+        {
+            _commentProcess = false;
+            _commentContent = new CommentContent();
+        }
+    }
+}

@@ -1,12 +1,37 @@
 ﻿@inject NavigationManager _navigationManager
 @inject IJSRuntime _jsRuntime
+@inject HttpClient _httpClient
 
-<button type="button" class="btn btn-warning btn-cart">
-    <i class="ri-discuss-fill"></i>
-    <span class="add-to-cart">300</span>
-</button>
+<a @onclick="SendToComment" class="text-center text-white" style="font-size: 20px">
+    <i class="ri-chat-1-line" style="color: white"></i>
+    @if (IsHtmlP)
+    {
+        <p class="m-0 p-0">@_comments</p>
+    }
+    else
+    {
+        <samp style="margin-left: 5px">@_comments</samp>
+    }
+</a>
 
 @code {
     [Parameter]
     public string AudioId { get; set; }
+    
+    [Parameter]
+    public bool IsHtmlP { get; set; }
+    
+    private long _comments;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await NumberOfComments();
+    }
+
+    private void SendToComment() => _navigationManager.NavigateTo($"/audioDetails/{AudioId}");
+    
+    private async Task NumberOfComments()
+    {
+        _comments = await _httpClient.GetFromJsonAsync<long>($"api/comment/countComments/{AudioId}");
+    }
 }

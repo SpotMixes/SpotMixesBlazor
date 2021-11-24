@@ -71,6 +71,19 @@ namespace SpotMixesBlazor.Server.Services
             return audios.Select(audio => BsonSerializer.Deserialize<AudioLookup>(audio)).ToList();
         }
         
+        public async Task<AudioLookup> GetAudioById(string audioId)
+        {
+            var audios = await _audiosCollection
+                .Aggregate()
+                .Match(Builders<Audio>.Filter.Eq(a => a.Id, audioId))
+                .Lookup("Users", "UserId", "_id", "User")
+                .FirstOrDefaultAsync();
+
+            var audio = BsonSerializer.Deserialize<AudioLookup>(audios);
+
+            return audio;
+        }
+        
         public async Task<IReadOnlyList<AudioLookup>> SearchAudios(int audioPerPage, int page, string textSearch)
         {
             var skip = audioPerPage * page;

@@ -4,16 +4,23 @@
 @inject HttpClient _httpClient
 @inject IJSRuntime _jsRuntime
 
-<a @onclick="Like" class="text-center text-white">
+<a @onclick="Like" class="text-center text-white" style="font-size: 20px">
     @if (_isReactionCreated)
     {
-        <i class="ri-heart-fill" style="color: red;"></i>
+        <i class="ri-heart-fill" style="color: #FF005C; border: none"></i>
     }
     else
     {
         <i class="ri-heart-line" style="color: white"></i>
     }
-    <p class="m-0 p-0">@_likes</p>
+    @if (IsHtmlP)
+    {
+        <p class="m-0 p-0">@_likes</p>
+    }
+    else
+    {
+        <spam style="margin-left: 5px">@_likes</spam>
+    }
 </a>
 
 
@@ -21,6 +28,9 @@
 
     [Parameter]
     public string AudioId { get; set; }
+    
+    [Parameter]
+    public bool IsHtmlP { get; set; }
 
     private HubConnection _hubConnection;
     private bool _isReactionCreated;

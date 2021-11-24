@@ -54,6 +54,16 @@ namespace SpotMixesBlazor.Server.Controllers
             return Ok(audios);
         }
         
+        [HttpGet("GetAudioById/{audioId}")]
+        public async Task<ActionResult> GetMostListenedAudios(string audioId)
+        {
+            var audios = await _audioService.GetAudioById(audioId);
+            
+            if (audios == null) return BadRequest("Not found");
+            
+            return Ok(audios);
+        }
+        
         [HttpGet("search/{textSearch}/{audioPerPage:int}/{page}")]
         public async Task<ActionResult> SearchAudios(int audioPerPage, int page, string textSearch)
         {

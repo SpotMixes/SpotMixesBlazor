@@ -12,7 +12,7 @@
                             <li class="list-inline-item">
                                 <AuthorizeView>
                                     <Authorized>
-                                        <ReactionButtonNew AudioId="@Audio.Id"></ReactionButtonNew>
+                                        <ReactionButtonNew AudioId="@Audio.Id" IsHtmlP="true"></ReactionButtonNew>
                                     </Authorized>
                                 </AuthorizeView>
                             </li>
@@ -23,14 +23,7 @@
                                 </a>
                             </li>
                             <li class="list-inline-item">
-                                <AuthorizeView>
-                                    <Authorized>
-                                        <a href="#" class="text-center text-white">
-                                            <i class="ri-chat-1-line" style="color: white"></i>
-                                            <p class="m-0 p-0">2k</p>
-                                        </a>
-                                    </Authorized>
-                                </AuthorizeView>
+                                <CommentButton AudioId="@Audio.Id" IsHtmlP="true"></CommentButton>
                             </li>
                         </ul>
                         <div class="text-center mt-6">
