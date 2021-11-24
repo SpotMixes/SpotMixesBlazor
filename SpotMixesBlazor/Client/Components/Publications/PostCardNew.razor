@@ -23,11 +23,16 @@
                                 </a>
                             </li>
                             <li class="list-inline-item">
-                                <CommentButton AudioId="@Audio.Id" IsHtmlP="true"></CommentButton>
+                                <AuthorizeView>
+                                    <Authorized>
+                                        <CommentButton AudioId="@Audio.Id" IsHtmlP="true"></CommentButton>
+                                    </Authorized>
+                                </AuthorizeView>
                             </li>
                         </ul>
                         <div class="text-center mt-6">
-                            <h5>@Audio.Title</h5>
+                            <a href="/audiodetails/@Audio.Id" class="text-white h4">@Audio.Title</a>
+                            <br>
                             <span>@Audio.Genres</span>
                         </div>
                     </div>

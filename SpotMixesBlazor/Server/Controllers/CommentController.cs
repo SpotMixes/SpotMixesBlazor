@@ -37,9 +37,6 @@ namespace SpotMixesBlazor.Server.Controllers
         public async Task<IActionResult> CountComments(string audioId)
         {
             var numberOfComments = await _commentService.CountComments(audioId);
-            
-            if (numberOfComments < 1) return BadRequest("Not found");
-
             return Ok(numberOfComments);
         }
     }

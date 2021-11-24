@@ -25,7 +25,9 @@
 
 
 @code {
-
+    [CascadingParameter]
+    public Task<AuthenticationState> Authentication { get; set; }
+    
     [Parameter]
     public string AudioId { get; set; }
     
@@ -36,9 +38,18 @@
     private bool _isReactionCreated;
     private long _likes;
 
+    private async Task<bool> VerifyAuthenticatedUser()
+    {
+        var authState = await Authentication;
+        var claimsPrincipal = authState.User;
+
+        return claimsPrincipal.Identity is {IsAuthenticated: true};
+    }
+
+
     protected override async Task OnInitializedAsync()
     {
-        await IsReaction();
+        if (await VerifyAuthenticatedUser()) await IsReaction();
         await NumberOfLikes();
     }
 
@@ -117,21 +128,28 @@
 
     private async Task Like()
     {
-        await DisposeAsync();
-        await CreateHubConnection();
-
-        if (_isReactionCreated)
+        if (await VerifyAuthenticatedUser())
         {
-            await DeleteReaction();
-            StateHasChanged();
+            await DisposeAsync();
+            await CreateHubConnection();
+
+            if (_isReactionCreated)
+            {
+                await DeleteReaction();
+                StateHasChanged();
+            }
+            else
+            {
+                await CreateReaction();
+                StateHasChanged();
+            }
+
+            await SendMessage();
         }
         else
         {
-            await CreateReaction();
-            StateHasChanged();
+            Console.WriteLine("No esta autenticado");
         }
-
-        await SendMessage();
     }
 
 }

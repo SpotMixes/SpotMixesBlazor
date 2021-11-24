@@ -1,9 +1,11 @@
 ﻿@page "/AudioDetails/{AudioId}"
 @using SpotMixesBlazor.Shared.ModelsLookup
 @using System.Net
+@using Microsoft.AspNetCore.SignalR.Client
 @layout MainLayout
 @inject IJSRuntime _jsRuntime
 @inject HttpClient _httpClient
+@inject NavigationManager _navigationManager
 
 <!-- BEGIN: Content-->
 <div class="app-content content ">
@@ -49,7 +51,10 @@
                                 </div>
                                 <div class="audio__reactions d-flex justify-content-between align-items-end">
                                     <ReactionButtonNew AudioId="@AudioId" IsHtmlP="false"></ReactionButtonNew>
-                                    <CommentButton AudioId="@AudioId" IsHtmlP="false"></CommentButton>
+                                    <a class="text-center text-white" style="font-size: 20px">
+                                        <i class="ri-chat-1-line" style="color: white"></i>
+                                        <samp style="margin-left: 5px">@_comments</samp>
+                                    </a>
                                     <a href="" class="text-white">
                                         <i class="ri-share-fill"></i> 500
                                     </a>
@@ -59,7 +64,7 @@
                         <!-- End Audio Data -->
                         <!-- Comment box -->
                         <div class="col-12 mt-2">
-                            <EditForm Model="_commentContent" OnValidSubmit="CreateComment" class="row">
+                            <EditForm Model="_commentContent" OnValidSubmit="VerifyAuthenticatedUser" class="row">
                                 <DataAnnotationsValidator></DataAnnotationsValidator>
                                 <div class="col-sm-12 col-md-10 margin-top-10">
                                     <InputTextArea class="form-control p-2" placeholder="Add Comment" rows="1"
@@ -89,20 +94,17 @@
                         <!--/ End Comment box -->
                         <!-- Comments -->
                         <div class="comment-body mt-1">
-                            <div class="d-flex align-items-start mb-1 mt-1">
-                                <div class="avatar mt-25 me-75">
-                                    <img src="https://i.pinimg.com/originals/d0/ab/c1/d0abc175e2023571107820067049aa19.png" alt="Avatar" height="34" width="34"/>
-                                </div>
-                                <div class="profile-user-info w-100 p-1">
-                                    <div class="d-flex align-items-center justify-content-between">
-                                        <h6 class="mb-0">Kitty Allanson</h6>
-                                        <p>12/02/2000</p>
-                                    </div>
-                                    <small>
-                                        Easy & smart fuzzy search🕵🏻 functionality which enables users to search quickly.
-                                    </small>
-                                </div>
-                            </div>
+                            @if(_commentsLookups == null)
+                            {
+                                <p>Cargando commentarios...</p>
+                            }
+                            else
+                            {
+                                @foreach ( var comment in _commentsLookups)
+                                {
+                                    <CommentCard Comment="comment"></CommentCard>
+                                }
+                            }
                         </div>
                         <!-- Comments -->
                     </div>
@@ -115,44 +117,107 @@
 
 @code
 {
+    [CascadingParameter]
+    public Task<AuthenticationState> Authentication { get; set; }
+    
     [Parameter]
     public string AudioId { get; set; }
 
     private AudioLookup _audioLookup = new();
     private CommentContent _commentContent = new();
-    //private IReadOnlyList<CommentLookup> _comments;
+    private IReadOnlyList<CommentLookup> _commentsLookups;
+    private HubConnection _hubConnection;
+    private long _comments;
     private bool _commentProcess;
 
     protected override async Task OnInitializedAsync()
     {
+        _hubConnection = new HubConnectionBuilder()
+            .WithUrl(_navigationManager.ToAbsoluteUri("/commenthub"))
+            .Build();
+
+        _hubConnection.On("ReceiveMessage", async () =>
+        {
+            await NumberOfComments();
+            await GetAllComments();
+            StateHasChanged();
+        });
+
+        await _hubConnection.StartAsync();
+        
+        // Cargar información de audio
         await GetAudioById();
+        await NumberOfComments();
         await _jsRuntime.InvokeVoidAsync("loadWaveSurfer", $"{_audioLookup.UrlAudio}");
+        // Cargar comentarios
+        await GetAllComments();
     }
-    
+
+    private async Task SendMessage() => await _hubConnection.SendAsync("SendMessage");
+
+    private bool IsConnected() => _hubConnection.State == HubConnectionState.Connected;
+
+    private async ValueTask DisposeAsync()
+    {
+        if (_hubConnection is not null)
+        {
+            await _hubConnection.DisposeAsync();
+        }
+    }
+
+    private async Task NumberOfComments()
+    {
+        _comments = await _httpClient.GetFromJsonAsync<long>($"api/comment/countComments/{AudioId}");
+    }
+
     private async Task GetAudioById()
     {
         _audioLookup = await _httpClient.GetFromJsonAsync<AudioLookup>($"api/audio/GetAudioById/{AudioId}");
     }
-    
+
     private async Task CreateComment()
     {
         _commentProcess = true;
-        
+
         var userId = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "Id");
-        
+
         var comment = new Comment()
         {
             AudioId = AudioId,
             UserId = userId,
             Content = _commentContent.Content
         };
-        
+
         var httpResponseMessage = await _httpClient.PostAsJsonAsync("api/comment", comment);
 
         if (httpResponseMessage.StatusCode == HttpStatusCode.Created)
         {
             _commentProcess = false;
             _commentContent = new CommentContent();
+            if (IsConnected())
+            {
+                await SendMessage();
+            }
+        }
+    }
+
+    private async Task GetAllComments()
+    {
+        _commentsLookups = await _httpClient.GetFromJsonAsync<IReadOnlyList<CommentLookup>>($"api/comment/GetAllComments/{AudioId}");
+    }
+
+    private async Task VerifyAuthenticatedUser()
+    {
+        var authState = await Authentication;
+        var claimsPrincipal = authState.User;
+
+        if (claimsPrincipal.Identity is {IsAuthenticated: true})
+        {
+            await CreateComment();
+        }
+        else
+        {
+            Console.WriteLine("No estas autenticado");
         }
     }
 }

@@ -103,6 +103,7 @@ namespace SpotMixesBlazor.Client.Authorization
         public async Task Logout()
         {
             await _jsRuntime.InvokeAsync<string>("localStorage.removeItem", TokenKey);
+            await _jsRuntime.InvokeAsync<string>("localStorage.removeItem", "Id");
             await _jsRuntime.InvokeAsync<string>("localStorage.removeItem", "Email");
             await _jsRuntime.InvokeAsync<string>("localStorage.removeItem", "DisplayName");
             await _jsRuntime.InvokeAsync<string>("localStorage.removeItem", "IsDj");

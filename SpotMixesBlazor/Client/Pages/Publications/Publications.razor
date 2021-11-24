@@ -107,15 +107,24 @@
 
 @code
 {
+    [CascadingParameter]
+    public Task<AuthenticationState> Authentication { get; set; }
+    
     private IReadOnlyList<AudioLookup> _audios;
     private string _searchText;
     bool _isDj;
 
     protected override async Task OnInitializedAsync()
     {
-        var isDjString = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "IsDj");
-        _isDj = bool.Parse(isDjString);
-        
+        var authState = await Authentication;
+        var claimsPrincipal = authState.User;
+
+        if (claimsPrincipal.Identity is {IsAuthenticated: true})
+        {
+            var isDjString = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "IsDj");
+            _isDj = bool.Parse(isDjString);
+        }
+
         await GetAudios($"api/audio/all/21/0");
     }
 
