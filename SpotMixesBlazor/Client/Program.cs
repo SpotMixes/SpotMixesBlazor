@@ -37,8 +37,6 @@ namespace SpotMixesBlazor.Client
             
             // Pagination value
             services.AddSingleton<PageService>();
-            // Quantity data
-            services.AddSingleton<QuantityData>();
         }
     }
 }

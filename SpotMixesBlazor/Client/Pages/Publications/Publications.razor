@@ -2,7 +2,6 @@
 @using SpotMixesBlazor.Shared.ModelsLookup
 @layout MainLayout
 @inject HttpClient _httpClient
-@inject QuantityData _quantityData
 @inject IJSRuntime _jsRuntime
 
 <!-- BEGIN: Content-->
@@ -72,15 +71,11 @@
                     {
                         @foreach (var audio in _audios)
                         {
-                            <PostCardNew Audio="audio"></PostCardNew>
+                            <PostCard Audio="audio"></PostCard>
                         }
                     }
                 </section>
-                <!-- Post List Ends -->
-                <InfiniteScroll ObserverTargetId="request-target" GetAudios="GetAudios">
-                    <div id="request-target"></div>
-                </InfiniteScroll>
-                <br><br><br><br><br><br><br>
+                <Pagination GetAudios="GetAudios"></Pagination>
             </div>
         </div>
         <div class="sidebar-detached sidebar-left">

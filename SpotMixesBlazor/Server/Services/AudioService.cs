@@ -25,8 +25,12 @@ namespace SpotMixesBlazor.Server.Services
         {
             await _audiosCollection.InsertOneAsync(audio);
         }
+        
+        public async Task<long> CountAudios()
+        {
+            return await _audiosCollection.CountDocumentsAsync(new BsonDocument());
+        }
 
-        #region GetAudios
         public async Task<IReadOnlyList<AudioLookup>> GetAllAudios(int audioPerPage, int page)
         {
             var skip = audioPerPage * page;
@@ -101,6 +105,5 @@ namespace SpotMixesBlazor.Server.Services
 
             return audios.Select(audio => BsonSerializer.Deserialize<AudioLookup>(audio)).ToList();
         }
-        #endregion
     }
 }

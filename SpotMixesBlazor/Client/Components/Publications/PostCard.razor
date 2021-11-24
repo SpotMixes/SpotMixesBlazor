@@ -1,59 +1,66 @@
 ﻿@using SpotMixesBlazor.Shared.ModelsLookup
-@inject HttpClient _httpClient
 @inject IJSRuntime _jsRuntime
 
-<div class="card ecommerce-card">
-    <div class="card-img">
-        <a @onclick="PlayMusic">
-            <img class="img-fluid card-img-top width-500" src="@Audio.UrlCover" alt=""/>
-        </a>
-    </div>
-
-    <div class="card-body">
-        <div class="d-flex justify-content-between">
-            @if (Audio.User != null)
-            {
-                @foreach (var user in Audio.User)
-                {
-                    <a href="">
-                        <div class="avatar avatar-sm">
-                            <img src="@user.UrlProfilePicture" alt="@user.DisplayName"/>
+<div class="col-sm-12 col-md-6 col-lg-4">
+    <div class="has-items-overlay playlist">
+        <figure>
+            <div class="img-wrapper" style="border-radius: 0.428rem;">
+                <img src="@Audio.UrlCover" alt="@Audio.Title" style="width: 100%;">
+                <div class="img-overlay text-white">
+                    <div class="figcaption">
+                        <ul class="list-inline d-flex align-items-center justify-content-between">
+                            <li class="list-inline-item">
+                                <AuthorizeView>
+                                    <Authorized>
+                                        <ReactionButton AudioId="@Audio.Id" IsHtmlP="true"></ReactionButton>
+                                    </Authorized>
+                                </AuthorizeView>
+                            </li>
+                            <li class="list-inline-item">
+                                <a @onclick="PlayMusic" class="text-center text-white">
+                                    <i class="ri-play-line" style="color: white; font-size: 50px"></i>
+                                    <p class="m-0 p-0">@Audio.NumReproduction</p>
+                                </a>
+                            </li>
+                            <li class="list-inline-item">
+                                <AuthorizeView>
+                                    <Authorized>
+                                        <CommentButton AudioId="@Audio.Id" IsHtmlP="true"></CommentButton>
+                                    </Authorized>
+                                </AuthorizeView>
+                            </li>
+                        </ul>
+                        <div class="text-center mt-6">
+                            <a href="/audiodetails/@Audio.Id" class="text-white h4">@Audio.Title</a>
+                            <br>
+                            <span>@Audio.Genres</span>
                         </div>
-                        @user.DisplayName
-                    </a>
-                }
-            }
-            else
-            {
-                <p>Anonimo</p>
-            }
-            <div>
-                <p class="h6">
-                    <i class="ri-headphone-line"></i>
-                    @Audio.NumReproduction
-                </p>
+                    </div>
+                </div>
+                <div class="figure-title p-2">
+                    <div class="d-flex justify-content-start align-items-center mb-1">
+                        @if (Audio.User != null)
+                        {
+                            @foreach (var user in Audio.User)
+                            {
+                                <!-- avatar -->
+                                <div class="avatar me-1">
+                                    <img class="round" src="@user.UrlProfilePicture" alt="@user.DisplayName" height="30" width="30"/>
+                                </div>
+                                <!--/ avatar -->
+                                <div>
+                                    <h6 class="mb-0">@user.DisplayName</h6>
+                                    <small class="text-muted">@Audio.CreatedAt.ToString("g")</small>
+                                </div>
+                            }
+                        }
+                    </div>
+                    <h5 class="audio-title">@Audio.Title</h5>
+                    <span>@Audio.Genres</span>
+                </div>
             </div>
-        </div>
-        <h6 class="item-name mt-1">
-            <a class="text-body" href="">@Audio.Title</a>
-        </h6>
-        <div class="d-flex justify-content-between mt-1">
-            <p>@Audio.CreatedAt.ToString("g")</p>
-            <span class="badge bg-dark h-50">@Audio.Genres</span>
-        </div>
+        </figure>
     </div>
-    <AuthorizeView>
-        <Authorized>
-            <div class="item-options text-center">
-                <ReactionButton AudioId="@Audio.Id"></ReactionButton>
-                <CommentButton AudioId="@Audio.Id"></CommentButton>
-                <a href="#" class="btn btn-info btn-cart">
-                    <i class="ri-share-fill"></i>
-                    <span class="add-to-cart">100</span>
-                </a>
-            </div>
-        </Authorized>
-    </AuthorizeView>
 </div>
 
 @code

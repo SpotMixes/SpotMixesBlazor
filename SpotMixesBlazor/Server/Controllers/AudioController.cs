@@ -23,7 +23,13 @@ namespace SpotMixesBlazor.Server.Controllers
             return Created("Created", true);
         }
 
-        #region GetAudio
+        [HttpGet("count-audios")]
+        public async Task<IActionResult> CountAudios(string audioId)
+        {
+            var numberOfAudios = await _audioService.CountAudios();
+            return Ok(numberOfAudios);
+        }
+        
         [HttpGet("all/{audioPerPage:int}/{page:int}")]
         public async Task<ActionResult> GetAllAudios(int audioPerPage, int page)
         {
@@ -73,6 +79,5 @@ namespace SpotMixesBlazor.Server.Controllers
             
             return Ok(audios);
         }
-        #endregion
     }
 }

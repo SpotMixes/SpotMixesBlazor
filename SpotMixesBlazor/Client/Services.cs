@@ -11,9 +11,4 @@
         public int ValueMostListened { get; set; } = 0;
         public bool ViewMostListened { get; set; } = true;
     }
-    
-    public class QuantityData
-    {
-        public string QuantityAudios { get; set; }
-    }
 }

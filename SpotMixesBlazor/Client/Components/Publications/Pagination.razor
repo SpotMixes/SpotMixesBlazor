@@ -1,0 +1,42 @@
+﻿@inject PageService _pageService
+@inject HttpClient _httpClient
+
+<div class="d-flex justify-content-center w-100">
+    <ul class="pagination mt-2">
+        <li class="page-item prev-item">
+            <a class="page-link width-50 height-50"></a>
+        </li>
+        <li class="page-item active">
+            <p class="page-link width-50 height-50">@_pageService.ValueAll++</p>
+        </li>
+        <li class="page-item">
+            <p class="page-link width-50 height-50">..</p>
+        </li>
+        <li class="page-item">
+            <p class="page-link width-50 height-50">@_numberOfAudiosForPagination</p>
+        </li>
+        <li class="page-item next-item">
+            <a @onclick="NexPage" class="page-link width-50 height-50"></a>
+        </li>
+    </ul>
+</div>
+
+@code {
+    [Parameter]
+    public EventCallback<string> GetAudios { get; set; }
+    
+    private long _numberOfAudiosForPagination;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var numberOfAudios = await _httpClient.GetFromJsonAsync<long>("api/audio/count-audios");
+        _numberOfAudiosForPagination = numberOfAudios / 30;
+    }
+
+    private async Task NexPage()
+    {
+        _pageService.ValueAll++;
+        await GetAudios.InvokeAsync($"api/audio/all/21/{_pageService.ValueAll}");
+    }
+
+}
