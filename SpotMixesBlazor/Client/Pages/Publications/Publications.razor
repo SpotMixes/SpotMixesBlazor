@@ -50,8 +50,7 @@
                         <div class="col-sm-12">
                             <div class="input-group input-group-merge">
                                 <input type="text" class="form-control search-product"
-                                       placeholder="Buscar por título, género y descripción." aria-label="Buscar..."
-                                       @bind="_searchText"/>
+                                       placeholder="Buscar mixes..." @bind="_searchText"/>
                                 <button class="input-group-text" @onclick="SearchAudios">
                                     <i class="ri-search-line"></i>
                                 </button>
@@ -120,7 +119,7 @@
             _isDj = bool.Parse(isDjString);
         }
 
-        await GetAudios($"api/audio/all/21/0");
+        await GetAudios("api/audio/mostListened/30/1");
     }
 
     private async Task GetAudios(string url)
@@ -133,7 +132,7 @@
         if (!string.IsNullOrEmpty(_searchText))
         {
             _audios = await _httpClient
-                .GetFromJsonAsync<IReadOnlyList<AudioLookup>>($"api/audio/search/{_searchText}/21/0");
+                .GetFromJsonAsync<IReadOnlyList<AudioLookup>>($"api/audio/searchAudioByTitle/{_searchText}/21/1");
         }
     }
 }

@@ -21,60 +21,50 @@ namespace SpotMixesBlazor.Server.Services
             _audiosCollection = database.GetCollection<Audio>("Audios");
         }
 
-        public async Task CreateAudio(Audio audio)
-        {
-            await _audiosCollection.InsertOneAsync(audio);
-        }
-        
-        public async Task<long> CountAudios()
-        {
-            return await _audiosCollection.CountDocumentsAsync(new BsonDocument());
-        }
+        public async Task CreateAudio(Audio audio) => await _audiosCollection.InsertOneAsync(audio);
+
+
+        public async Task<long> CountAudios() => await _audiosCollection.CountDocumentsAsync(new BsonDocument());
+
 
         public async Task<IReadOnlyList<AudioLookup>> GetAllAudios(int audioPerPage, int page)
         {
-            var skip = audioPerPage * page;
-
             var audios = await _audiosCollection
                 .Aggregate()
-                .Lookup("Users", "UserId", "_id", "User")
+                .Skip((page - 1) * audioPerPage)
                 .Limit(audioPerPage)
-                .Skip(skip)
+                .Lookup("Users", "UserId", "_id", "User")
                 .ToListAsync();
 
             return audios.Select(audio => BsonSerializer.Deserialize<AudioLookup>(audio)).ToList();
         }
-        
+
         public async Task<IReadOnlyList<AudioLookup>> GetRecentAudios(int audioPerPage, int page)
         {
-            var skip = audioPerPage * page;
-            
             var audios = await _audiosCollection
                 .Aggregate()
                 .SortByDescending(audio => audio.CreatedAt)
-                .Lookup("Users", "UserId", "_id", "User")
+                .Skip((page - 1) * audioPerPage)
                 .Limit(audioPerPage)
-                .Skip(skip)
+                .Lookup("Users", "UserId", "_id", "User")
                 .ToListAsync();
 
             return audios.Select(audio => BsonSerializer.Deserialize<AudioLookup>(audio)).ToList();
         }
-        
+
         public async Task<IReadOnlyList<AudioLookup>> GetMostListenedAudios(int audioPerPage, int page)
         {
-            var skip = audioPerPage * page;
-            
             var audios = await _audiosCollection
                 .Aggregate()
                 .SortByDescending(audio => audio.NumReproduction)
-                .Lookup("Users", "UserId", "_id", "User")
+                .Skip((page - 1) * audioPerPage)
                 .Limit(audioPerPage)
-                .Skip(skip)
+                .Lookup("Users", "UserId", "_id", "User")
                 .ToListAsync();
 
             return audios.Select(audio => BsonSerializer.Deserialize<AudioLookup>(audio)).ToList();
         }
-        
+
         public async Task<AudioLookup> GetAudioById(string audioId)
         {
             var audios = await _audiosCollection
@@ -83,24 +73,34 @@ namespace SpotMixesBlazor.Server.Services
                 .Lookup("Users", "UserId", "_id", "User")
                 .FirstOrDefaultAsync();
 
-            var audio = BsonSerializer.Deserialize<AudioLookup>(audios);
-
-            return audio;
+            return BsonSerializer.Deserialize<AudioLookup>(audios);
         }
-        
-        public async Task<IReadOnlyList<AudioLookup>> SearchAudios(int audioPerPage, int page, string textSearch)
-        {
-            var skip = audioPerPage * page;
 
-            var regularExpression = new BsonRegularExpression(textSearch, "/@/i");
-            
+        public async Task<IReadOnlyList<AudioLookup>> GetAudioByGenre(int audioPerPage, int page, string textGenre)
+        {
             var audios = await _audiosCollection
                 .Aggregate()
-                .Match(Builders<Audio>.Filter.Regex(x => x.Title, regularExpression))
+                .Match(Builders<Audio>.Filter.Eq(audio => audio.Genres, textGenre))
                 .SortByDescending(audio => audio.NumReproduction)
-                .Lookup("Users", "UserId", "_id", "User")
+                .Skip((page - 1) * audioPerPage)
                 .Limit(audioPerPage)
-                .Skip(skip)
+                .Lookup("Users", "UserId", "_id", "User")
+                .ToListAsync();
+
+            return audios.Select(audio => BsonSerializer.Deserialize<AudioLookup>(audio)).ToList();
+        }
+        
+        public async Task<IReadOnlyList<AudioLookup>> SearchAudioByTitle(int audioPerPage, int page, string textSearch)
+        {
+            var regularExpression = new BsonRegularExpression(textSearch, "/@/i");
+
+            var audios = await _audiosCollection
+                .Aggregate()
+                .Match(Builders<Audio>.Filter.Regex(audio => audio.Title, regularExpression))
+                .SortByDescending(audio => audio.NumReproduction)
+                .Skip((page - 1) * audioPerPage)
+                .Limit(audioPerPage)
+                .Lookup("Users", "UserId", "_id", "User")
                 .ToListAsync();
 
             return audios.Select(audio => BsonSerializer.Deserialize<AudioLookup>(audio)).ToList();

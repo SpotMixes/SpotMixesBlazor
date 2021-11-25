@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components.Authorization;
 using SpotMixesBlazor.Client.Authorization;
+using SpotMixesBlazor.Client.Helpers;
 
 namespace SpotMixesBlazor.Client
 {
@@ -35,8 +36,8 @@ namespace SpotMixesBlazor.Client
             services.AddScoped<ILoginService, AuthenticationProviderJwt>(
                 provider => provider.GetRequiredService<AuthenticationProviderJwt>());
             
-            // Pagination value
-            services.AddSingleton<PageService>();
+            // Pagination services
+            services.AddSingleton<PaginationService>();
         }
     }
 }
