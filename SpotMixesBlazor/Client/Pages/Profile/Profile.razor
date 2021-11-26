@@ -1,31 +1,42 @@
-﻿@*@page "/Profile/{UrlProfile}"
-@using System.Text.Json
+﻿@page "/Profile/{UrlProfile}"
 @using System.Net
+@using SpotMixesBlazor.Shared.ModelsLookup
+@layout MainLayout
 @inject HttpClient _httpClient
 @inject IJSRuntime _jsRuntime
 
-@if (_user != null)
-{
-    <!-- BEGIN: Content-->
-    <div class="app-content content ">
-        <div class="content-overlay"></div>
-        <div class="header-navbar-shadow"></div>
-        <div class="content-wrapper container-xxl p-0">
-            <div class="content-body">
+<!-- BEGIN: Content-->
+<div class="app-content content ">
+    <div class="content-overlay"></div>
+    <div class="header-navbar-shadow"></div>
+    <div class="content-wrapper container-xxl p-0">
+        <div class="content-body">
+            @if (_userLookup == null)
+            {
+                <p>El usuario no existe</p>
+            }
+            else
+            {
                 <div id="user-profile">
                     <!-- Profile Header -->
                     <div class="row">
                         <div class="col-12">
                             <div class="card profile-header mb-2">
-                                <img class="card-img-top" src="@_user.UrlCoverPicture" alt="Foto de portada @_user.Nickname"/>
+                                <img class="img-fluid card-img-top height-450"
+                                     src="@_userLookup.UrlCoverPicture"
+                                     alt="Foto de portada @_userLookup.DisplayName"
+                                     style="object-fit: cover"/>
                                 <div class="position-relative">
                                     <div class="profile-img-container d-flex align-items-center">
                                         <div class="profile-img">
-                                            <img class="rounded img-fluid" src="@_user.UrlProfilePicture"/>
+                                            <img class="rounded img-fluid"
+                                                 src="@_userLookup.UrlProfilePicture"
+                                                 alt="Foto de perfil @_userLookup.DisplayName"
+                                                 style="object-fit: cover; height: 100%"/>
                                         </div>
                                         <div class="profile-title ms-3">
-                                            <h2 class="text-white">@_user.Nickname</h2>
-                                            @if (_user.IsDj)
+                                            <h2 class="text-white">@_userLookup.DisplayName</h2>
+                                            @if (_userLookup.IsDj)
                                             {
                                                 <p class="text-white">Dj</p>
                                             }
@@ -38,7 +49,10 @@
                                 </div>
                                 <div class="profile-header-nav">
                                     <nav class="navbar navbar-expand-md navbar-light justify-content-end justify-content-md-between w-100">
-                                        <button class="btn btn-icon navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                                        <button class="btn btn-icon navbar-toggler" type="button"
+                                                data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                                                aria-controls="navbarSupportedContent" aria-expanded="false"
+                                                aria-label="Toggle navigation">
                                             <i class="ri-more-line"></i>
                                         </button>
 
@@ -58,7 +72,7 @@
                                                         </a>
                                                     </li>
                                                 </ul>
-                                                @if (_urlProfile == UrlProfile)
+                                                @if (_urlProfileLocalStorage == UrlProfile)
                                                 {
                                                     <button class="btn btn-primary">
                                                         <i class="ri-edit-box-line d-block d-md-none"></i>
@@ -87,13 +101,40 @@
                             <!-- Left profile info section -->
                             <div class="col-lg-9 col-12 order-1">
                                 <div class="row">
-                                    @if (_urlProfile == UrlProfile)
+                                    @if (_userLookup.Audios != null)
                                     {
-                                        <PersonalPost AudioList="_user.ListAudios"></PersonalPost>
-                                    }
-                                    else
-                                    {
-                                        <GeneralPost></GeneralPost>
+                                        @if (_urlProfileLocalStorage == UrlProfile)
+                                        {
+                                            @foreach (var audio in _userLookup.Audios)
+                                            {
+                                                <DjGeneralPost
+                                                    Audio="audio"
+                                                    UrlProfilePicture="@_userLookup.UrlProfilePicture"
+                                                    DisplayName="@_userLookup.DisplayName">
+                                                    <button class="btn btn-warning btn-sm">
+                                                        <i class="ri-edit-box-line"></i>
+                                                        <span>Editar</span>
+                                                    </button>
+                                                    <DeleteAudioButton
+                                                        AudioId="@audio.Id"
+                                                        AudioTitle="@audio.Title"
+                                                        AudioNumReproduction="@audio.NumReproduction">
+                                                    </DeleteAudioButton>
+                                                </DjGeneralPost>
+                                            }
+                                            <DeleteAudioModal></DeleteAudioModal>
+                                        }
+                                        else
+                                        {
+                                            @foreach (var audio in _userLookup.Audios)
+                                            {
+                                                <DjGeneralPost
+                                                    Audio="audio"
+                                                    UrlProfilePicture="@_userLookup.UrlProfilePicture"
+                                                    DisplayName="@_userLookup.DisplayName">
+                                                </DjGeneralPost>
+                                            }
+                                        }
                                     }
                                 </div>
                             </div>
@@ -111,36 +152,36 @@
                         </div>
                     </section>
                 </div>
-            </div>
+            }
         </div>
     </div>
-    <!-- END: Content-->
-}
+</div>
+<!-- END: Content-->
 
 @code {
 
     [Parameter]
     public string UrlProfile { get; set; }
 
-    private User _user = new();
-    private string _urlProfile;
+    private UserLookup _userLookup = new();
+    private string _urlProfileLocalStorage;
 
     protected override async Task OnInitializedAsync()
     {
-        _urlProfile = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "UrlProfile");
+        _urlProfileLocalStorage = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "UrlProfile");
         await GetUserByUrlProfile();
     }
 
     private async Task GetUserByUrlProfile()
     {
-        var httpResponse = await _httpClient.GetAsync($"api/user/GetAudiosByUrlProfile/{UrlProfile}");
+        var httpResponse = await _httpClient.GetAsync($"api/user/GetUserDataByUrlProfile/{UrlProfile}");
 
         switch (httpResponse.StatusCode)
         {
             case HttpStatusCode.OK:
             {
-                _user = await httpResponse.Content.ReadFromJsonAsync<User>();
-                if (_user != null) Console.WriteLine(_user.Email);
+                _userLookup = await httpResponse.Content.ReadFromJsonAsync<UserLookup>();
+                if (_userLookup != null) Console.WriteLine(_userLookup.Email);
                 break;
             }
             case HttpStatusCode.BadRequest:
@@ -156,4 +197,4 @@
         }
     }
 
-}*@
+}

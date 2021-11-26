@@ -1,0 +1,79 @@
+﻿@using SpotMixesBlazor.Client.Helpers
+@inject DjPagingService _djPagingService
+@inject HttpClient _httpClient
+@inject IJSRuntime _jsRuntime
+
+<div class="d-flex justify-content-center w-100">
+    <ul class="pagination mt-2">
+        <li class="page-item prev-item">
+            <a class="page-link width-50 height-50"></a>
+        </li>
+        <li class="page-item active">
+            <p class="page-link width-50 height-50">
+                @{
+                    var realSkip = 1;
+                    if (_djPagingService.FilterVerified)
+                    {
+                        realSkip = _djPagingService.SkipVerified;
+                    }
+                    else if (_djPagingService.FilterRecent)
+                    {
+                        realSkip = _djPagingService.SkipRecent;
+                    }
+                    else
+                    {
+                        realSkip = _djPagingService.SkipAll;
+                    }
+                }
+                @realSkip
+            </p>
+        </li>
+        <li class="page-item">
+            <p class="page-link width-50 height-50">..</p>
+        </li>
+        <li class="page-item">
+            <p class="page-link width-50 height-50">@_djPagingService.NumberOfUsersForPagination</p>
+        </li>
+        <li class="page-item next-item">
+            <a @onclick="NexPage" class="page-link width-50 height-50"></a>
+        </li>
+    </ul>
+</div>
+
+@code {
+    [Parameter]
+    public EventCallback<string> GetUsers { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _djPagingService.NumberOfUsersForPagination = await CalculateNumberOfAudios("countVerifiedUsers");
+    }
+
+    private async Task<long> CalculateNumberOfAudios(string url)
+    {
+        var numberOfAudios = await _httpClient.GetFromJsonAsync<long>($"api/user/{url}");
+        return numberOfAudios / 30;
+    }
+
+    private async Task NexPage()
+    {
+        if (_djPagingService.FilterVerified)
+        {
+            _djPagingService.SkipVerified++;
+            await GetUsers.InvokeAsync($"api/user/verified/30/{_djPagingService.SkipVerified}");   
+        }
+        else if (_djPagingService.FilterRecent)
+        {
+            _djPagingService.SkipRecent++;
+            await GetUsers.InvokeAsync($"api/user/recent/30/{_djPagingService.SkipRecent}");
+        }
+        else if (_djPagingService.FilterAll)
+        {
+            _djPagingService.SkipAll++;
+            await GetUsers.InvokeAsync($"api/user/all/30/{_djPagingService.SkipAll}");
+        }
+
+        await _jsRuntime.InvokeVoidAsync("window.scroll", "1", "0");
+    }
+
+}

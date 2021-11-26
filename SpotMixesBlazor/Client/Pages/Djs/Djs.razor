@@ -1,8 +1,104 @@
 ﻿@page "/Djs"
 @attribute [Authorize]
+@layout MainLayout
+@inject HttpClient _httpClient
+@inject IJSRuntime _jsRuntime
 
-<h3>Djs</h3>
+<!-- BEGIN: Content-->
+<div class="app-content content ecommerce-application">
+    <div class="content-overlay"></div>
+    <div class="header-navbar-shadow"></div>
+    <div class="content-wrapper container-xxl p-0">
+        <div class="content-detached content-right">
+            <div class="content-body">
+                <!-- Post Header Starts -->
+                <section id="ecommerce-header">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="ecommerce-header-items">
+                                <div class="result-toggler">
+                                    <button class="navbar-toggler shop-sidebar-toggler" type="button" data-bs-toggle="collapse">
+                                        <span class="navbar-toggler-icon d-block d-lg-none">
+                                            <i class="ri-filter-3-fill"></i>
+                                        </span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <!-- Post Header Ends -->
+
+                <!-- background Overlay when sidebar is shown  starts-->
+                <div class="body-content-overlay"></div>
+                <!-- background Overlay when sidebar is shown  ends-->
+
+                <!-- Post Search Bar Starts -->
+                <section id="ecommerce-searchbar" class="ecommerce-searchbar">
+                    <div class="row mt-1">
+                        <div class="col-sm-12">
+                            <div class="input-group input-group-merge">
+                                <input type="text" class="form-control search-product"
+                                       placeholder="Buscar Djs..."/>
+                                <span class="input-group-text">
+                                    <i class="ri-search-line"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <!-- Post Search Bar Ends -->
+
+                <!-- Post List Starts -->
+                <section class="row mt-2">
+                    @if (_users == null)
+                    {
+                        <p>Cargando..</p>
+                    }
+                    else
+                    {
+                        @foreach (var user in _users)
+                        {
+                            <DjCard User="user"></DjCard>
+                        }
+                    }
+                </section>
+                <DjPagination GetUsers="GetUsers"></DjPagination>
+            </div>
+        </div>
+        <div class="sidebar-detached sidebar-left">
+            <div class="sidebar">
+                <!-- Post Sidebar Starts -->
+                <div class="sidebar-shop">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <h6 class="filter-heading d-none d-lg-block">Filtros</h6>
+                        </div>
+                    </div>
+                    <DjFilters GetUsers="GetUsers"></DjFilters>
+                </div>
+                <!-- Post Sidebar Ends -->
+            </div>
+        </div>
+    </div>
+</div>
+<!-- END: Content-->
+
+<!-- Page JS-->
+<script src="src/js/page/app-ecommerce.js" suppress-error="BL9992"></script>
+<!-- End Page JS-->
 
 @code {
+    private IReadOnlyList<User> _users;
     
+    protected override async Task OnInitializedAsync()
+    {
+        await GetUsers("api/user/verified/30/1");
+    }
+    
+    private async Task GetUsers(string url)
+    {
+        _users = await _httpClient.GetFromJsonAsync<IReadOnlyList<User>>(url);
+    }
+ 
 }

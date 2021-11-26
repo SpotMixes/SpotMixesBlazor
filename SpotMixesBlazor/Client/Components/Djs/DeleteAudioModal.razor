@@ -1,0 +1,32 @@
+﻿@inject IJSRuntime _jsRuntime
+
+<!-- Modal -->
+<div class="modal fade modal-danger text-start" id="deleteAudioModal" 
+     tabindex="-1" aria-labelledby="deleteAudioModal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Eliminar audio</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input id="deleteAudioId" type="hidden"/>
+                ¿Estás seguro del eliminar el audio
+                <samp id="deleteAudioTitle" class="text-danger" style="font-weight: bold">mix</samp>?
+                Este audio pose <samp id="deleteAudioReproduction">30</samp> reproducciones 🤔.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-danger" @onclick="DeleteAudio">Si</button>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">No</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code
+{
+    private async Task DeleteAudio()
+    {
+        await _jsRuntime.InvokeVoidAsync("DeleteAudio");
+    }
+}

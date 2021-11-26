@@ -1,0 +1,81 @@
+﻿@using SpotMixesBlazor.Shared.ModelsLookup
+@inject IJSRuntime _jsRuntime
+
+<div class="col-sm-12 col-md-6 col-lg-4">
+    <div class="has-items-overlay playlist">
+        <figure>
+            <div class="img-wrapper" style="border-radius: 0.428rem;">
+                <img src="@Audio.UrlCover" alt="@Audio.Title" style="width: 100%;">
+                <div class="img-overlay text-white">
+                    <div class="figcaption">
+                        <ul class="list-inline d-flex align-items-center justify-content-between">
+                            <li class="list-inline-item">
+                                <AuthorizeView>
+                                    <Authorized>
+                                        <ReactionButton AudioId="@Audio.Id" IsHtmlP="true"></ReactionButton>
+                                    </Authorized>
+                                </AuthorizeView>
+                            </li>
+                            <li class="list-inline-item">
+                                <a @onclick="PlayMusic" class="text-center text-white">
+                                    <i class="ri-play-line" style="color: white; font-size: 50px"></i>
+                                    <p class="m-0 p-0">@Audio.NumReproduction</p>
+                                </a>
+                            </li>
+                            <li class="list-inline-item">
+                                <AuthorizeView>
+                                    <Authorized>
+                                        <CommentButton AudioId="@Audio.Id" IsHtmlP="true"></CommentButton>
+                                    </Authorized>
+                                </AuthorizeView>
+                            </li>
+                        </ul>
+                        <div class="text-center mt-6">
+                            <a href="/audiodetails/@Audio.Id" class="text-white h4">@Audio.Title</a>
+                            <br>
+                            <span>@Audio.Genres</span>
+                        </div>
+                        <div class="mt-4 d-flex justify-content-between">
+                            @ChildContent
+                        </div>
+                    </div>
+                </div>
+                <div class="figure-title p-2">
+                    <div class="d-flex justify-content-start align-items-center mb-1">
+                        <!-- avatar -->
+                        <div class="avatar me-1">
+                            <img class="round" src="@UrlProfilePicture" alt="@DisplayName" height="30" width="30"/>
+                        </div>
+                        <!--/ avatar -->
+                        <div>
+                            <h6 class="mb-0">@DisplayName</h6>
+                            <small class="text-muted">@Audio.CreatedAt.ToString("g")</small>
+                        </div>
+                    </div>
+                    <h5 class="audio-title">@Audio.Title</h5>
+                    <span>@Audio.Genres</span>
+                </div>
+            </div>
+        </figure>
+    </div>
+</div>
+
+@code
+{
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+    
+    [Parameter]
+    public Audio Audio { get; set; }
+    
+    [Parameter]
+    public string UrlProfilePicture { get; set; }
+    
+    [Parameter]
+    public string DisplayName { get; set; }
+
+    private async Task PlayMusic()
+    {
+        await _jsRuntime.InvokeVoidAsync("playMusic", Audio.Title, DisplayName, Audio.UrlAudio, Audio.UrlCover, true);
+    }
+}

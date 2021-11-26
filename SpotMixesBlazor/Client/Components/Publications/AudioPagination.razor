@@ -1,5 +1,5 @@
 ﻿@using SpotMixesBlazor.Client.Helpers
-@inject PaginationService _paginationService
+@inject AudioPagingService _audioPagingService
 @inject HttpClient _httpClient
 @inject IJSRuntime _jsRuntime
 
@@ -12,17 +12,17 @@
             <p class="page-link width-50 height-50">
                 @{
                     var realSkip = 1;
-                    if (_paginationService.FilterMostListened)
+                    if (_audioPagingService.FilterMostListened)
                     {
-                        realSkip = _paginationService.SkipMostListened;
+                        realSkip = _audioPagingService.SkipMostListened;
                     }
-                    else if (_paginationService.FilterRecent)
+                    else if (_audioPagingService.FilterRecent)
                     {
-                        realSkip = _paginationService.SkipRecent;
+                        realSkip = _audioPagingService.SkipRecent;
                     }
                     else
                     {
-                        realSkip = _paginationService.SkipAll;
+                        realSkip = _audioPagingService.SkipAll;
                     }
                 }
                 @realSkip
@@ -51,23 +51,23 @@
         var numberOfAudios = await _httpClient.GetFromJsonAsync<long>("api/audio/countAudios");
         _numberOfAudiosForPagination = numberOfAudios / 30;
     }
-    
+
     private async Task NexPage()
     {
-        if (_paginationService.FilterMostListened)
+        if (_audioPagingService.FilterMostListened)
         {
-            _paginationService.SkipMostListened++;
-            await GetAudios.InvokeAsync($"api/audio/mostListened/30/{_paginationService.SkipMostListened}");   
+            _audioPagingService.SkipMostListened++;
+            await GetAudios.InvokeAsync($"api/audio/mostListened/30/{_audioPagingService.SkipMostListened}");   
         } 
-        else if (_paginationService.FilterRecent)
+        else if (_audioPagingService.FilterRecent)
         {
-            _paginationService.SkipRecent++;
-            await GetAudios.InvokeAsync($"api/audio/recent/30/{_paginationService.SkipRecent}");
+            _audioPagingService.SkipRecent++;
+            await GetAudios.InvokeAsync($"api/audio/recent/30/{_audioPagingService.SkipRecent}");
         }
-        else if (_paginationService.FilterAll)
+        else if (_audioPagingService.FilterAll)
         {
-            _paginationService.SkipAll++;
-            await GetAudios.InvokeAsync($"api/audio/all/30/{_paginationService.SkipAll}");
+            _audioPagingService.SkipAll++;
+            await GetAudios.InvokeAsync($"api/audio/all/30/{_audioPagingService.SkipAll}");
         }
 
         await _jsRuntime.InvokeVoidAsync("window.scroll", "1", "0");

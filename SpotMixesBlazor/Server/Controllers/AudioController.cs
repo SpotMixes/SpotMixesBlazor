@@ -23,6 +23,16 @@ namespace SpotMixesBlazor.Server.Controllers
             return Created("Created", true);
         }
 
+        [HttpDelete("{id}")]
+        public async Task<IActionResult>DeleteAudio(string id)
+        {
+            var deleteResult = await _audioService.DeleteAudio(id);
+
+            if (deleteResult) return Ok("200");
+
+            return BadRequest("400");
+        }
+        
         [HttpGet("countAudios")]
         public async Task<IActionResult> CountAudios()
         {

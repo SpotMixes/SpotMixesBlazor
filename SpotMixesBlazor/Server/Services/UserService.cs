@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Firebase.Auth;
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using SpotMixesBlazor.Server.DataAccess;
@@ -62,6 +64,47 @@ namespace SpotMixesBlazor.Server.Services
             await _usersCollection.ReplaceOneAsync(u => u.Id == user.Id, user);
         }
         
+        public async Task<long> CountUsers() => 
+            await _usersCollection.CountDocumentsAsync(new BsonDocument());
+
+        public async Task<long> CountVerifiedUsers() => 
+            await _usersCollection.CountDocumentsAsync(user => user.VerifiedProfile == true);
+
+        public async Task<IReadOnlyList<User>> GetAllUsers(int userPerPage, int page)
+        {
+            var users = await _usersCollection
+                .Find(user => true)
+                .Skip((page - 1) * userPerPage)
+                .Limit(userPerPage)
+                .ToListAsync();
+            
+            return users;
+        }
+        
+        public async Task<IReadOnlyList<User>> GetRecentUsers(int userPerPage, int page)
+        {
+            var users = await _usersCollection
+                .Find(user => true)
+                .SortByDescending(user => user.CreatedAt)
+                .Skip((page - 1) * userPerPage)
+                .Limit(userPerPage)
+                .ToListAsync();
+            
+            return users;
+        }
+
+        public async Task<IReadOnlyList<User>> GetVerifiedUsers(int userPerPage, int page)
+        {
+            var users = await _usersCollection
+                .Find(user => user.VerifiedProfile == true)
+                .SortByDescending(user => user.CreatedAt)
+                .Skip((page - 1) * userPerPage)
+                .Limit(userPerPage)
+                .ToListAsync();
+            
+            return users;
+        }
+        
         public async Task<User> GetUserById(string id)
         {
             return await _usersCollection.Find(user => user.Id == id).FirstOrDefaultAsync();
@@ -74,20 +117,15 @@ namespace SpotMixesBlazor.Server.Services
         
         public async Task<UserLookup> GetUserDataByUrlProfile(string urlProfile)
         {
-            var userList = await _usersCollection
+            var user = await _usersCollection
                 .Aggregate()
-                .Match(Builders<User>.Filter.Eq(u => u.UrlProfile, urlProfile))
+                .Match(Builders<User>.Filter.Eq(user => user.UrlProfile, urlProfile))
                 .Lookup("Audios", "_id", "UserId", "Audios")
-                .ToListAsync();
+                .FirstOrDefaultAsync();
 
-            UserLookup userLookup = new();
-            
-            foreach (var userData in userList)
-            {
-                userLookup = BsonSerializer.Deserialize<UserLookup>(userData);
-            }
+            if (user == null) return null;
 
-            return userLookup;
+            return BsonSerializer.Deserialize<UserLookup>(user);
         }
     }
 }

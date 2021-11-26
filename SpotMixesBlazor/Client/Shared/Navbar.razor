@@ -105,5 +105,7 @@
     private async Task Logout() => await _loginService.Logout();
     private void Login() => _navigationManager.NavigateTo("/login");
     private void Register() => _navigationManager.NavigateTo("/register");
-    private void Profile() => _navigationManager.NavigateTo($"/profile/{_urlProfile}");
+
+    private async Task Profile() =>
+        await _jsRuntime.InvokeAsync<string>("window.location.replace", $"/profile/{_urlProfile}");
 }

@@ -1,0 +1,78 @@
+﻿@using SpotMixesBlazor.Client.Helpers
+@inject DjPagingService _djPagingService
+@inject HttpClient _httpClient
+
+<div class="card" style="height: 100%">
+    <div class="card-body">
+        <!-- Filter starts -->
+        <div class="multi-range-price">
+            <h6 class="filter-title mt-0">Rango</h6>
+            <ul class="list-unstyled price-range" id="filter-audio">
+                <li>
+                    <div class="form-check">
+                        <input type="radio" id="verifiedUsers" name="filter-audio"
+                               class="form-check-input" @onclick="GetVerifiedUsers" checked/>
+                        <label class="form-check-label" for="verifiedUsers">Verificados</label>
+                    </div>
+                </li>
+                <li>
+                    <div class="form-check">
+                        <input type="radio" id="recentUsers" name="filter-audio"
+                               class="form-check-input" @onclick="GetRecentUsers"/>
+                        <label class="form-check-label" for="recentUsers">Nuevos</label>
+                    </div>
+                </li>
+                <li>
+                    <div class="form-check">
+                        <input type="radio" id="allUsers" name="filter-audio"
+                               class="form-check-input" @onclick="GetAllUsers"/>
+                        <label class="form-check-label" for="allUsers">Todos</label>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <!-- Filter ends -->
+    </div>
+</div>
+
+@code
+{
+    [Parameter]
+    public EventCallback<string> GetUsers { get; set; }
+
+    private async Task<long> CalculateNumberOfAudios(string url)
+    {
+        var numberOfAudios = await _httpClient.GetFromJsonAsync<long>($"api/user/{url}");
+        return numberOfAudios / 30;
+    }
+    
+    private async Task GetVerifiedUsers()
+    {
+        _djPagingService.NumberOfUsersForPagination = await CalculateNumberOfAudios("countVerifiedUsers");
+        
+        _djPagingService.FilterVerified = true;
+        _djPagingService.FilterRecent = false;
+        _djPagingService.FilterAll = false;
+        await GetUsers.InvokeAsync($"api/user/verified/30/{_djPagingService.SkipVerified}");
+    }
+
+    private async Task GetRecentUsers()
+    {
+        _djPagingService.NumberOfUsersForPagination = await CalculateNumberOfAudios("countUsers");
+        
+        _djPagingService.FilterVerified = false;
+        _djPagingService.FilterRecent = true;
+        _djPagingService.FilterAll = false;
+        await GetUsers.InvokeAsync($"api/user/recent/30/{_djPagingService.SkipRecent}");
+    }
+
+    private async Task GetAllUsers()
+    {
+        _djPagingService.NumberOfUsersForPagination = await CalculateNumberOfAudios("countUsers");
+        
+        _djPagingService.FilterVerified = false;
+        _djPagingService.FilterRecent = false;
+        _djPagingService.FilterAll = true;
+        await GetUsers.InvokeAsync($"api/user/all/30/{_djPagingService.SkipAll}");
+    }
+}

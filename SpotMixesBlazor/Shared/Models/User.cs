@@ -38,7 +38,7 @@ namespace SpotMixesBlazor.Shared.Models
 
         public string CodeVerifyEmail { get; set; }
 
-        public bool VerifiedEmail { get; set; } = false;
+        public bool VerifiedEmail { get; set; }
         
         public bool VerifiedProfile { get; set; } = false;
 

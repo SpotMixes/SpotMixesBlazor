@@ -37,7 +37,8 @@ namespace SpotMixesBlazor.Client
                 provider => provider.GetRequiredService<AuthenticationProviderJwt>());
             
             // Pagination services
-            services.AddSingleton<PaginationService>();
+            services.AddSingleton<AudioPagingService>();
+            services.AddSingleton<DjPagingService>();
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MongoDB.Bson;
@@ -23,6 +24,18 @@ namespace SpotMixesBlazor.Server.Services
 
         public async Task CreateAudio(Audio audio) => await _audiosCollection.InsertOneAsync(audio);
 
+        public async Task<bool> DeleteAudio(string id)
+        {
+            try
+            {
+                var deleteResult = await _audiosCollection.DeleteOneAsync(audio => audio.Id == id);
+                return deleteResult.DeletedCount == 1;
+            }
+            catch (Exception ex) {
+                Console.WriteLine(ex.Message);
+                return false;
+            }
+        }
 
         public async Task<long> CountAudios() => await _audiosCollection.CountDocumentsAsync(new BsonDocument());
 

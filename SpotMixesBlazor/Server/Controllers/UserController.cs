@@ -89,7 +89,51 @@ namespace SpotMixesBlazor.Server.Controllers
             await _userService.UpdateUser(user);
             return Ok("Update");
         }
+        
+        [HttpGet("countUsers")]
+        public async Task<IActionResult> CountUsers()
+        {
+            var numberOfUsers = await _userService.CountUsers();
+            return Ok(numberOfUsers);
+        }
+        
+        [HttpGet("CountVerifiedUsers")]
+        public async Task<IActionResult> CountVerifiedUsers()
+        {
+            var numberOfUsers = await _userService.CountVerifiedUsers();
+            return Ok(numberOfUsers);
+        }
 
+        [HttpGet("all/{audioPerPage:int}/{skip:int}")]
+        public async Task<ActionResult> GetAllUsers(int audioPerPage, int skip)
+        {
+            var users = await _userService.GetAllUsers(audioPerPage, skip);
+
+            if (users == null) return BadRequest("Not found");
+
+            return Ok(users);
+        }
+        
+        [HttpGet("recent/{audioPerPage:int}/{skip:int}")]
+        public async Task<ActionResult> GetRecentUsers(int audioPerPage, int skip)
+        {
+            var users = await _userService.GetRecentUsers(audioPerPage, skip);
+
+            if (users == null) return BadRequest("Not found");
+
+            return Ok(users);
+        }
+        
+        [HttpGet("verified/{audioPerPage:int}/{skip:int}")]
+        public async Task<ActionResult> GetVerifiedUsers(int audioPerPage, int skip)
+        {
+            var users = await _userService.GetVerifiedUsers(audioPerPage, skip);
+
+            if (users == null) return BadRequest("Not found");
+
+            return Ok(users);
+        }
+        
         [HttpGet("GetUserByEmail/{email}")]
         public async Task<ActionResult> GetUserByEmail(string email)
         {
@@ -116,16 +160,13 @@ namespace SpotMixesBlazor.Server.Controllers
             return Ok(user);
         }
 
-        [HttpGet("GetUserDataByUrlProfile/{urlProfile}")]
+        [HttpGet("getUserDataByUrlProfile/{urlProfile}")]
         public async Task<ActionResult> GetUserDataByUrlProfile(string urlProfile)
         {
             var user = await _userService.GetUserDataByUrlProfile(urlProfile);
 
-            if (string.IsNullOrEmpty(user.Id))
-            {
-                return BadRequest("El usuario no existe");
-            }
-            
+            if (user == null) return BadRequest("El usuario no existe");
+
             return Ok(user);
         }
     }

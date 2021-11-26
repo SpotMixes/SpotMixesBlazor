@@ -1,8 +1,10 @@
 ﻿@page "/"
 @using SpotMixesBlazor.Shared.ModelsLookup
+@using SpotMixesBlazor.Client.Helpers
 @layout MainLayout
 @inject HttpClient _httpClient
 @inject IJSRuntime _jsRuntime
+@inject AudioPagingService _paginationService
 
 <!-- BEGIN: Content-->
 <div class="app-content content ecommerce-application">
@@ -50,10 +52,10 @@
                         <div class="col-sm-12">
                             <div class="input-group input-group-merge">
                                 <input type="text" class="form-control search-product"
-                                       placeholder="Buscar mixes..." @bind="_searchText"/>
-                                <button class="input-group-text" @onclick="SearchAudios">
+                                       placeholder="Buscar mixes..." @oninput="SearchAudios"/>
+                                <span class="input-group-text">
                                     <i class="ri-search-line"></i>
-                                </button>
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -74,7 +76,10 @@
                         }
                     }
                 </section>
-                <Pagination GetAudios="GetAudios"></Pagination>
+                @if (_showPagination)
+                {
+                    <AudioPagination GetAudios="GetAudios"></AudioPagination>
+                }
             </div>
         </div>
         <div class="sidebar-detached sidebar-left">
@@ -86,7 +91,7 @@
                             <h6 class="filter-heading d-none d-lg-block">Filtros</h6>
                         </div>
                     </div>
-                    <Filters GetAudios="GetAudios"></Filters>
+                    <AudiosFilters GetAudios="GetAudios"></AudiosFilters>
                 </div>
                 <!-- Post Sidebar Ends -->
             </div>
@@ -105,8 +110,8 @@
     public Task<AuthenticationState> Authentication { get; set; }
     
     private IReadOnlyList<AudioLookup> _audios;
-    private string _searchText;
-    bool _isDj;
+    private bool _isDj;
+    private bool _showPagination = true;
 
     protected override async Task OnInitializedAsync()
     {
@@ -119,7 +124,7 @@
             _isDj = bool.Parse(isDjString);
         }
 
-        await GetAudios("api/audio/mostListened/30/1");
+        await GetAudios($"api/audio/mostListened/30/{_paginationService.SkipMostListened}");
     }
 
     private async Task GetAudios(string url)
@@ -127,12 +132,21 @@
         _audios = await _httpClient.GetFromJsonAsync<IReadOnlyList<AudioLookup>>(url);
     }
 
-    private async Task SearchAudios()
+    private async Task SearchAudios(ChangeEventArgs eventArgs)
     {
-        if (!string.IsNullOrEmpty(_searchText))
+        if (!string.IsNullOrEmpty(eventArgs.Value?.ToString()))
         {
+            _showPagination = false;
+            
+            var valueSearch = eventArgs.Value.ToString();
             _audios = await _httpClient
-                .GetFromJsonAsync<IReadOnlyList<AudioLookup>>($"api/audio/searchAudioByTitle/{_searchText}/21/1");
+                .GetFromJsonAsync<IReadOnlyList<AudioLookup>>($"api/audio/searchAudioByTitle/{valueSearch}/21/1");
+        }
+        else
+        {
+            _showPagination = true;
+            await _jsRuntime.InvokeVoidAsync("SelectRadio", "mostListenedAudios");
+            await GetAudios($"api/audio/mostListened/30/{_paginationService.SkipMostListened}");
         }
     }
 }

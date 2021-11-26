@@ -1,0 +1,17 @@
+﻿<button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteAudioModal"
+        onclick="new Audio().getDelete({id: '@AudioId', title: '@AudioTitle', numReproduction: '@AudioNumReproduction'})">
+    <i class="ri-delete-bin-7-line"></i>
+    <span>Eliminar</span>
+</button>
+
+@code {
+
+    [Parameter]
+    public string AudioId { get; set; }
+
+    [Parameter]
+    public string AudioTitle { get; set; }
+
+    [Parameter]
+    public int AudioNumReproduction { get; set; }
+}

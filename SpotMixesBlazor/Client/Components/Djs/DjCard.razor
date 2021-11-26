@@ -1,0 +1,48 @@
+﻿@using SpotMixesBlazor.Client.Helpers
+@inject DjPagingService _djPagingService
+
+<div class="col-sm-12 col-md-6 col-lg-4">
+    <div class="card card-profile">
+        <img class="img-fluid card-img-top height-150" src="@User.UrlCoverPicture" alt="@User.DisplayName" style="object-fit: cover"/>
+        <div class="card-body">
+            <div class="profile-image-wrapper">
+                <div class="profile-image">
+                    <div class="avatar">
+                        <img src="@User.UrlProfilePicture" alt="@User.DisplayName">
+                    </div>
+                </div>
+            </div>
+            <h3>@User.DisplayName</h3>
+            <h6 class="text-muted">@User.FirstName @User.LastName</h6>
+            <button class="btn btn-outline-primary btn-sm">Seguir</button>
+            @if (_djPagingService.FilterVerified)
+            {
+                @if (@User.VerifiedProfile)
+                {
+                    <button class="btn btn-outline-microsoft btn-sm ms-2">Contratar</button>
+                }
+            }
+            <hr class="mb-2">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h6 class="text-muted fw-bolder">S</h6>
+                    <h3 class="mb-0">10.3k</h3>
+                </div>
+                <div>
+                    <h6 class="text-muted fw-bolder">P</h6>
+                    <h3 class="mb-0">156</h3>
+                </div>
+                <div>
+                    <h6 class="text-muted fw-bolder">R</h6>
+                    <h3 class="mb-0">23k</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code
+{
+    [Parameter]
+    public User User { get; set; }
+}
