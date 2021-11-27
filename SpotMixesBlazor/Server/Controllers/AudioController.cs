@@ -33,6 +33,16 @@ namespace SpotMixesBlazor.Server.Controllers
             return BadRequest("400");
         }
         
+        [HttpPut]
+        public async Task<IActionResult> UpdateAudio([FromBody] Audio audio)
+        {
+            var resultUpdate = await _audioService.UpdateAudio(audio);
+            
+            if (resultUpdate) return Ok("200");
+
+            return BadRequest("400");
+        }
+        
         [HttpGet("countAudios")]
         public async Task<IActionResult> CountAudios()
         {

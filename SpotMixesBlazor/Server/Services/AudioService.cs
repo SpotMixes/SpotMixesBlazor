@@ -37,6 +37,29 @@ namespace SpotMixesBlazor.Server.Services
             }
         }
 
+        public async Task<bool> UpdateAudio(Audio audio)
+        {
+            try
+            {
+                var updateFilter = Builders<Audio>.Filter.Eq(a => a.Id, audio.Id);
+            
+                var updateDefinition = Builders<Audio>.Update
+                    .Set(a => a.UrlCover, audio.UrlCover)
+                    .Set(a => a.Title, audio.Title)
+                    .Set(a => a.Genres, audio.Genres)
+                    .Set(a => a.Description, audio.Description);
+
+                var resultUpdate = await _audiosCollection
+                    .UpdateOneAsync(updateFilter, updateDefinition);
+
+                return resultUpdate.ModifiedCount == 1;
+            }
+            catch (Exception ex) {
+                Console.WriteLine(ex.Message);
+                return false;
+            }
+        }
+
         public async Task<long> CountAudios() => await _audiosCollection.CountDocumentsAsync(new BsonDocument());
 
 

@@ -43,6 +43,7 @@ namespace SpotMixesBlazor.Server
             services.AddSingleton<SessionService>();
             services.AddSingleton<ReactionService>();
             services.AddSingleton<CommentService>();
+            services.AddSingleton<FollowerService>();
             //SignalR
             services.AddSignalR();
             services.AddResponseCompression(opts =>
