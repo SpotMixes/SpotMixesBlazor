@@ -141,5 +141,13 @@ namespace SpotMixesBlazor.Server.Services
 
             return audios.Select(audio => BsonSerializer.Deserialize<AudioLookup>(audio)).ToList();
         }
+        
+        public async Task<Audio> GetAudioByIdToUpdate(string audioId)
+        {
+            var audio = await _audiosCollection
+                    .Find(audio => audio.Id == audioId)
+                    .FirstOrDefaultAsync();
+            return audio;
+        }
     }
 }

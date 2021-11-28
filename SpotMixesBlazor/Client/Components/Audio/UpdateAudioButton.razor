@@ -1,0 +1,17 @@
+﻿@inject NavigationManager _navigationManager
+
+<button class="btn btn-warning btn-sm" @onclick="SendToEditPage">
+    <i class="ri-edit-box-line"></i>
+    <span>Editar</span>
+</button>
+
+@code {
+
+    [Parameter]
+    public string AudioId { get; set; }
+
+    private void SendToEditPage()
+    {
+        _navigationManager.NavigateTo($"audioupdate/{AudioId}");
+    }
+}

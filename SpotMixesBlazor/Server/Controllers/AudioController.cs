@@ -109,5 +109,17 @@ namespace SpotMixesBlazor.Server.Controllers
             
             return Ok(audios);
         }
+        
+        [HttpGet("getAudioByIdToUpdate/{audioId}")]
+        public async Task<ActionResult> SearchAudios(string audioId)
+        {
+            var audio = await _audioService.GetAudioByIdToUpdate(audioId);
+
+            if (audio != null) { 
+                return Ok(audio);
+            }
+
+            return BadRequest("Not found");
+        }
     }
 }

@@ -83,8 +83,8 @@
     [CascadingParameter]
     private Task<AuthenticationState> Authentication { get; set; }
     
-    string _email, _displayName, _urlProfilePicture, _urlProfile;
-    bool _isDj;
+    private string _email, _displayName, _urlProfilePicture, _urlProfile;
+    private bool _isDj;
 
     protected override async Task OnInitializedAsync()
     {

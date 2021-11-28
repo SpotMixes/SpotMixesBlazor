@@ -1,0 +1,17 @@
+﻿@inject IJSRuntime _jsRuntime
+
+<button @onclick="PlayMusic" class="btn btn-icon rounded-circle btn-primary width-50 height-50">
+    <i class="ri-play-fill"></i>
+</button>
+
+@code {
+
+    [Parameter]
+    public Audio Audio { get; set; }
+
+        
+    private async Task PlayMusic()
+    {
+        await _jsRuntime.InvokeVoidAsync("playMusic", Audio.Title, "Test", Audio.UrlAudio, Audio.UrlCover, true);
+    }
+}
