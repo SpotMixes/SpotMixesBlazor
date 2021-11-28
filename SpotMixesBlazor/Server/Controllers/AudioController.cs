@@ -121,5 +121,13 @@ namespace SpotMixesBlazor.Server.Controllers
 
             return BadRequest("Not found");
         }
+        
+        [HttpGet("GetAllAudioByUserId/{userId}")]
+        public async Task<ActionResult> GetAllAudioByUserId(string userId)
+        {
+            var audios = await _audioService.GetAllAudioByUserId(userId);
+            
+            return audios.Count > 0 ? Ok(audios) : BadRequest("Not found");
+        }
     }
 }

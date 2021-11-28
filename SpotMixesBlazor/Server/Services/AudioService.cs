@@ -149,5 +149,14 @@ namespace SpotMixesBlazor.Server.Services
                     .FirstOrDefaultAsync();
             return audio;
         }
+        
+        public async Task<IReadOnlyList<Audio>> GetAllAudioByUserId(string userId)
+        {
+            var audios = await _audiosCollection
+                .Find(audio => audio.UserId == userId)
+                .ToListAsync();
+
+            return audios ?? null;
+        }
     }
 }

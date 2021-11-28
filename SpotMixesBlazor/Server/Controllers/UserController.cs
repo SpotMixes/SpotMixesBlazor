@@ -160,6 +160,19 @@ namespace SpotMixesBlazor.Server.Controllers
             return Ok(user);
         }
 
+        [HttpGet("GetUserByUrlProfile/{urlProfile}")]
+        public async Task<ActionResult> GetUserByUrlProfile(string urlProfile)
+        {
+            var user = await _userService.GetUserByUrlProfile(urlProfile);
+
+            if (user != null)
+            {
+                return Ok(user);
+            }
+
+            return BadRequest("Usuario no encontrado");
+        }
+        
         [HttpGet("getUserDataByUrlProfile/{urlProfile}")]
         public async Task<ActionResult> GetUserDataByUrlProfile(string urlProfile)
         {

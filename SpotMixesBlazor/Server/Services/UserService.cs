@@ -115,6 +115,13 @@ namespace SpotMixesBlazor.Server.Services
             return await _usersCollection.Find(user => user.Email == email).FirstOrDefaultAsync();
         }
         
+        public async Task<User> GetUserByUrlProfile(string urlProfile)
+        {
+            var user = await _usersCollection.Find(user => user.UrlProfile == urlProfile).FirstOrDefaultAsync();
+
+            return user ?? null;
+        }
+        
         public async Task<UserLookup> GetUserDataByUrlProfile(string urlProfile)
         {
             var user = await _usersCollection

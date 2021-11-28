@@ -6,7 +6,7 @@
 @inject IJSRuntime _jsRuntime
 
 <Content>
-    @if (_userLookup == null)
+    @if (_user == null)
     {
         <p>El usuario no existe</p>
     }
@@ -18,20 +18,20 @@
                 <div class="col-12">
                     <div class="card profile-header mb-2">
                         <img class="img-fluid card-img-top height-450"
-                             src="@_userLookup.UrlCoverPicture"
-                             alt="Foto de portada @_userLookup.DisplayName"
+                             src="@_user.UrlCoverPicture"
+                             alt="Foto de portada @_user.DisplayName"
                              style="object-fit: cover"/>
                         <div class="position-relative">
                             <div class="profile-img-container d-flex align-items-center">
                                 <div class="profile-img">
                                     <img class="rounded img-fluid"
-                                         src="@_userLookup.UrlProfilePicture"
-                                         alt="Foto de perfil @_userLookup.DisplayName"
+                                         src="@_user.UrlProfilePicture"
+                                         alt="Foto de perfil @_user.DisplayName"
                                          style="object-fit: cover; height: 100%"/>
                                 </div>
                                 <div class="profile-title ms-3">
-                                    <h2 class="text-white">@_userLookup.DisplayName</h2>
-                                    @if (_userLookup.IsDj)
+                                    <h2 class="text-white">@_user.DisplayName</h2>
+                                    @if (_user.IsDj)
                                     {
                                         <p class="text-white">Dj</p>
                                     }
@@ -96,34 +96,37 @@
                     <!-- Left profile info section -->
                     <div class="col-lg-9 col-12 order-1">
                         <div class="row">
-                            @if (_userLookup.Audios != null)
+                            @if (_audios != null)
                             {
                                 @if (_urlProfileLocalStorage == UrlProfile)
                                 {
-                                    @foreach (var audio in _userLookup.Audios)
+                                    @foreach (var audio in _audios)
                                     {
                                         <DjGeneralPost
                                             Audio="audio"
-                                            UrlProfilePicture="@_userLookup.UrlProfilePicture"
-                                            DisplayName="@_userLookup.DisplayName">
+                                            UrlProfilePicture="@_user.UrlProfilePicture"
+                                            DisplayName="@_user.DisplayName">
+                                            
                                             <UpdateAudioButton AudioId="@audio.Id"></UpdateAudioButton>
+                                            
                                             <DeleteAudioButton
                                                 AudioId="@audio.Id"
                                                 AudioTitle="@audio.Title"
                                                 AudioNumReproduction="@audio.NumReproduction">
                                             </DeleteAudioButton>
+                                            
                                         </DjGeneralPost>
                                     }
                                     <DeleteAudioModal></DeleteAudioModal>
                                 }
                                 else
                                 {
-                                    @foreach (var audio in _userLookup.Audios)
+                                    @foreach (var audio in _audios)
                                     {
                                         <DjGeneralPost
                                             Audio="audio"
-                                            UrlProfilePicture="@_userLookup.UrlProfilePicture"
-                                            DisplayName="@_userLookup.DisplayName">
+                                            UrlProfilePicture="@_user.UrlProfilePicture"
+                                            DisplayName="@_user.DisplayName">
                                         </DjGeneralPost>
                                     }
                                 }
@@ -148,11 +151,11 @@
 </Content>
 
 @code {
-
     [Parameter]
     public string UrlProfile { get; set; }
 
-    private UserLookup _userLookup = new();
+    private User _user = new();
+    private IReadOnlyList<Audio> _audios; 
     private string _urlProfileLocalStorage;
 
     protected override async Task OnInitializedAsync()
@@ -163,26 +166,50 @@
 
     private async Task GetUserByUrlProfile()
     {
-        var httpResponse = await _httpClient.GetAsync($"api/user/GetUserDataByUrlProfile/{UrlProfile}");
+        var httpResponse = await _httpClient.GetAsync($"api/user/GetUserByUrlProfile/{UrlProfile}");
 
         switch (httpResponse.StatusCode)
         {
             case HttpStatusCode.OK:
-            {
-                _userLookup = await httpResponse.Content.ReadFromJsonAsync<UserLookup>();
-                break;
-            }
+                {
+                    _user = await httpResponse.Content.ReadFromJsonAsync<User>();
+                    await GetAllAudioByUserId();
+                    break;
+                }
             case HttpStatusCode.BadRequest:
-            {
-                Console.WriteLine("El usuario no existe");
-                break;
-            }
+                {
+                    Console.WriteLine("El usuario no existe");
+                    break;
+                }
             default:
-            {
-                Console.WriteLine("El servidor esta en mantenimiento");
-                break;
-            }
+                {
+                    Console.WriteLine("El servidor esta en mantenimiento");
+                    break;
+                }
         }
     }
 
+    private async Task GetAllAudioByUserId()
+    {
+        var httpResponse = await _httpClient.GetAsync($"api/audio/GetAllAudioByUserId/{_user.Id}");
+
+        switch (httpResponse.StatusCode)
+        {
+            case HttpStatusCode.OK:
+                {
+                    _audios = await httpResponse.Content.ReadFromJsonAsync<IReadOnlyList<Audio>>();
+                    break;
+                }
+            case HttpStatusCode.BadRequest:
+                {
+                    Console.WriteLine("El usuario no tiene audios");
+                    break;
+                }
+            default:
+                {
+                    Console.WriteLine("El servidor esta en mantenimiento");
+                    break;
+                }
+        }
+    }
 }
