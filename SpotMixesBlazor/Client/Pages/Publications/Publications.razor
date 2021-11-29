@@ -29,10 +29,11 @@
                                     <Authorized>
                                         @if (_isDj)
                                         {
-                                            <button class="btn btn-primary">
+                                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#InsertAudio">
                                                 <i class="ri-upload-2-fill me-1"></i>
                                                 Publicar
                                             </button>
+                                            <PostAdd></PostAdd>
                                         }
                                     </Authorized>
                                 </AuthorizeView>

@@ -69,10 +69,14 @@
                                         </ul>
                                         @if (_urlProfileLocalStorage == UrlProfile)
                                         {
-                                            <button class="btn btn-primary">
-                                                <i class="ri-edit-box-line d-block d-md-none"></i>
-                                                <span class="fw-bold d-none d-md-block">Editar</span>
-                                            </button>
+                                            @if (_user.IsDj)
+                                            {
+                                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#InsertAudio">
+                                                    <i class="ri-upload-2-fill me-1 d-block d-md-none"></i>
+                                                    Publicar
+                                                </button>
+                                                <PostAdd></PostAdd>
+                                            }
                                         }
                                         else
                                         {

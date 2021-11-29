@@ -46,7 +46,6 @@
         return claimsPrincipal.Identity is {IsAuthenticated: true};
     }
 
-
     protected override async Task OnInitializedAsync()
     {
         if (await VerifyAuthenticatedUser()) await IsReaction();

@@ -56,6 +56,10 @@
                                 <i class="ri-user-line"></i>
                                 Profile
                             </a>
+                            <a class="dropdown-item" @onclick="VerifyAccount">
+                                <i class="ri-user-line"></i>
+                                Verificar cuenta
+                            </a>
                             <div class="dropdown-divider"></div>
                             <a class="dropdown-item" href="/">
                                 <i class="ri-question-line"></i>
@@ -83,7 +87,7 @@
     [CascadingParameter]
     private Task<AuthenticationState> Authentication { get; set; }
     
-    private string _email, _displayName, _urlProfilePicture, _urlProfile;
+    private string _id, _email, _displayName, _urlProfilePicture, _urlProfile;
     private bool _isDj;
 
     protected override async Task OnInitializedAsync()
@@ -93,6 +97,7 @@
 
         if (claimsPrincipal.Identity is {IsAuthenticated: true })
         {
+            _id = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "Id");
             _email = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "Email");
             _displayName = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "DisplayName");
             var isDjString = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "IsDj");
@@ -105,7 +110,8 @@
     private async Task Logout() => await _loginService.Logout();
     private void Login() => _navigationManager.NavigateTo("/login");
     private void Register() => _navigationManager.NavigateTo("/register");
-
     private async Task Profile() =>
         await _jsRuntime.InvokeAsync<string>("window.location.replace", $"/profile/{_urlProfile}");
+    
+    private void VerifyAccount() => _navigationManager.NavigateTo($"/verificar-cuenta/{_id}");
 }

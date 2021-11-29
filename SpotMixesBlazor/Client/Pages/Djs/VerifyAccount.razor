@@ -1,0 +1,387 @@
+﻿@page "/verificar-cuenta/{UserId}"
+@using System.Net
+@using System.Net.Http.Headers
+@layout MainLayout
+@inject IJSRuntime _jsRuntime
+@inject HttpClient _httpClient
+@inject NavigationManager _navigationManager
+
+<Content>
+<section class="modern-horizontal-wizard">
+<div class="bs-stepper wizard-modern modern-wizard-example">
+
+<div class="d-none d-sm-block">
+    <div class="bs-stepper-header">
+        <div class="step" data-target="#account-details-modern" role="tab"
+             id="account-details-modern-trigger">
+            <button type="button" class="step-trigger">
+                <span class="bs-stepper-box">1</span>
+                <span class="bs-stepper-label">
+                    <span class="bs-stepper-title">Personal</span>
+                    <span class="bs-stepper-subtitle">Ingrese su información personal</span>
+                </span>
+            </button>
+        </div>
+        <div class="line">
+            <i data-feather="chevron-right" class="font-medium-2"></i>
+        </div>
+        <div class="step" data-target="#personal-info-modern" role="tab"
+             id="personal-info-modern-trigger">
+            <button type="button" class="step-trigger">
+                <span class="bs-stepper-box">2</span>
+                <span class="bs-stepper-label">
+                    <span class="bs-stepper-title">Pago</span>
+                    <span class="bs-stepper-subtitle">Ingrese su información de pago</span>
+                </span>
+            </button>
+        </div>
+        <div class="line">
+            <i data-feather="chevron-right" class="font-medium-2"></i>
+        </div>
+        <div class="step" data-target="#address-step-modern" role="tab"
+             id="address-step-modern-trigger">
+            <button type="button" class="step-trigger">
+                <span class="bs-stepper-box">3</span>
+                <span class="bs-stepper-label">
+                    <span class="bs-stepper-title">Documentos</span>
+                    <span class="bs-stepper-subtitle">Adjunte sus documentos</span>
+                </span>
+            </button>
+        </div>
+        <div class="line">
+            <i data-feather="chevron-right" class="font-medium-2"></i>
+        </div>
+        <div class="step" data-target="#social-links-modern" role="tab"
+             id="social-links-modern-trigger">
+            <button type="button" class="step-trigger">
+                <span class="bs-stepper-box">4</span>
+                <span class="bs-stepper-label">
+                    <span class="bs-stepper-title">Descripción</span>
+                    <span class="bs-stepper-subtitle">Ingrese una descripción</span>
+                </span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<EditForm Model="_user" OnValidSubmit="CreateVerifiedUser"
+          OnInvalidSubmit="MissingData" class="bs-stepper-content">
+    <DataAnnotationsValidator></DataAnnotationsValidator>
+    <!-- DATOS PERSONALES -->
+    <div id="account-details-modern" class="content" role="tabpanel"
+         aria-labelledby="account-details-modern-trigger">
+        <div class="row">
+            <div class="mb-1 col-md-4">
+                <label class="form-label">DNI</label>
+                <InputText class="form-control" maxlength="8" placeholder="Ingresa tu número de DNI"
+                           @bind-Value="_user.Dni" @oninput="GetFullName"/>
+                <div class="text-danger form-label">
+                    <ValidationMessage For="() => _user.Dni"></ValidationMessage>
+                </div>
+            </div>
+            <div class="mb-1 col-md-2">
+                <label class="form-label">Edad</label>
+                <InputNumber class="form-control" placeholder="Ingresa tu edad"
+                             @bind-Value="_user.Age"/>
+                <div class="text-danger form-label">
+                    <ValidationMessage For="() => _user.Age"></ValidationMessage>
+                </div>
+            </div>
+            <div class="mb-1 col-md-6">
+                <label class="form-label">Nombre completo</label>
+                <InputText class="form-control" @bind-Value="_user.FullName" disabled/>
+            </div>
+        </div>
+        <div class="row">
+            <div class="mb-1 col-md-6">
+                <label class="form-label">Departamento actual</label>
+                <InputText class="form-control" placeholder="Ingresa el departamento donde resides"
+                           @bind-Value="_user.Department"/>
+                <div class="text-danger form-label">
+                    <ValidationMessage For="() => _user.Department"></ValidationMessage>
+                </div>
+            </div>
+            <div class="mb-1 col-md-6">
+                <label class="form-label">Ciudad</label>
+                <InputText class="form-control" placeholder="Ingresa la ciudad donde resides"
+                           @bind-Value="_user.City"/>
+                <div class="text-danger form-label">
+                    <ValidationMessage For="() => _user.City"></ValidationMessage>
+                </div>
+            </div>
+        </div>
+        <div class="d-flex justify-content-between">
+            <button class="btn btn-outline-secondary btn-prev" disabled>
+                <i class="ri-arrow-left-s-line align-middle me-sm-25 me-0"></i>
+                <span class="align-middle d-sm-inline-block d-none">Anterior</span>
+            </button>
+            <button type="button" class="btn btn-primary btn-next">
+                <span class="align-middle d-sm-inline-block d-none">Siguiente</span>
+                <i class="ri-arrow-right-s-line align-middle ms-sm-25 ms-0"></i>
+            </button>
+        </div>
+    </div>
+    <!-- DATOS DE PAGO-->
+    <div id="personal-info-modern" class="content" role="tabpanel"
+         aria-labelledby="personal-info-modern-trigger">
+        <div class="row">
+            <div class="mb-1 col-md-6">
+                <label class="form-label">Correo de contacto</label>
+                <InputText class="form-control" placeholder="Ingresa tu correo electrónico"
+                           @bind-Value="_user.ContactEmail"/>
+                <div class="text-danger form-label">
+                    <ValidationMessage For="() => _user.ContactEmail"></ValidationMessage>
+                </div>
+            </div>
+            <div class="mb-1 col-md-6">
+                <label class="form-label">Celular de contacto</label>
+                <InputText class="form-control" maxlength="9" placeholder="Ingresa tu número de celular"
+                           @bind-Value="_user.ContactMobile"/>
+                <div class="text-danger form-label">
+                    <ValidationMessage For="() => _user.ContactMobile"></ValidationMessage>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="mb-1 col-md-3">
+                <label class="form-label">¿Cuánto te gustaría ganar por hora?</label>
+                <InputNumber class="form-control" placeholder="Ingresa el monto"
+                             @bind-Value="_user.Hourly"/>
+                <div class="text-danger form-label">
+                    <ValidationMessage For="() => _user.Hourly"></ValidationMessage>
+                </div>
+            </div>
+            <div class="mb-1 col-md-3">
+                <label class="form-label">Correo de PayPal</label>
+                <InputText class="form-control" placeholder="Ingresa tu correo de PayPal"
+                           @bind-Value="_user.EmailPayPal"/>
+                <div class="text-danger form-label">
+                    <ValidationMessage For="() => _user.EmailPayPal"></ValidationMessage>
+                </div>
+            </div>
+            <div class="mb-1 col-md-6">
+                <label class="form-check-label">¿Cuentas con tiempo para recibir contratos?</label>
+                <div class="form-check form-switch">
+                    <InputCheckbox class="form-check-input" @bind-Value="_user.AvailableTime"/>
+                </div>
+            </div>
+        </div>
+        <div class="d-flex justify-content-between">
+            <button type="button" class="btn btn-outline-secondary btn-prev">
+                <i class="ri-arrow-left-s-line align-middle me-sm-25 me-0"></i>
+                <span class="align-middle d-sm-inline-block d-none">Anterior</span>
+            </button>
+            <button type="button" class="btn btn-primary btn-next">
+                <span class="align-middle d-sm-inline-block d-none">Siguiente</span>
+                <i class="ri-arrow-right-s-line align-middle ms-sm-25 ms-0"></i>
+            </button>
+        </div>
+    </div>
+    <!-- DOCUMENTOS ADJUNTADOS-->
+    <div id="address-step-modern" class="content" role="tabpanel"
+         aria-labelledby="address-step-modern-trigger">
+        <div class="row">
+            <div class="mb-1 col-md-6">
+                <label class="form-label">Adjuntar foto frontal de tu DNI</label>
+                <InputFile class="form-control" OnChange="OnDniFrontChange"
+                           @bind-Value="_user.FrontPhotoOfDni"/>
+                <div class="text-danger form-label">
+                    <ValidationMessage For="() => _user.FrontPhotoOfDni"></ValidationMessage>
+                </div>
+            </div>
+            <div class="mb-1 col-md-6">
+                <label class="form-label">Adjuntar foto reversa de tu DNI</label>
+                <InputFile class="form-control" OnChange="OnDniReverseChange"
+                           @bind-Value="_user.ReversePhotoOfDni"/>
+                <div class="text-danger form-label">
+                    <ValidationMessage For="() => _user.ReversePhotoOfDni"></ValidationMessage>
+                </div>
+            </div>
+        </div>
+        <div class="d-flex justify-content-between">
+            <button type="button" class="btn btn-outline-secondary btn-prev">
+                <i class="ri-arrow-left-s-line align-middle me-sm-25 me-0"></i>
+                <span class="align-middle d-sm-inline-block d-none">Anterior</span>
+            </button>
+            <button type="button" class="btn btn-primary btn-next">
+                <span class="align-middle d-sm-inline-block d-none">Siguiente</span>
+                <i class="ri-arrow-right-s-line align-middle ms-sm-25 ms-0"></i>
+            </button>
+        </div>
+    </div>
+    <div id="social-links-modern" class="content" role="tabpanel"
+         aria-labelledby="social-links-modern-trigger">
+        <div class="row">
+            <div class="mb-1 col-12">
+                <label class="form-label">Describe porque deberíamos verificar tu cuenta.</label>
+                <InputTextArea type="text" class="form-control"
+                               @bind-Value="_user.RequestDescription"/>
+                <div class="text-danger form-label">
+                    <ValidationMessage For="() => _user.RequestDescription"></ValidationMessage>
+                </div>
+            </div>
+        </div>
+        <div class="d-flex justify-content-between">
+            <button type="button" class="btn btn-outline-secondary btn-prev">
+                <i class="ri-arrow-left-s-line align-middle me-sm-25 me-0"></i>
+                <span class="align-middle d-sm-inline-block d-none">Anterior</span>
+            </button>
+            @if (_verificationProcess)
+            {
+                <button class="btn btn-success" disabled="">
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    Enviando...
+                </button>
+            }
+            else
+            {
+                <button class="btn btn-success">Enviar solicitud</button>
+            }
+        </div>
+    </div>
+</EditForm>
+</div>
+</section>
+</Content>
+
+<script src="src/js/extensions/form-wizard.min.js" suppress-error="BL9992"></script>
+
+@code {
+    [Parameter]
+    public string UserId { get; set; }
+    private UserVerified _user = new();
+    private bool _verificationProcess;
+    
+    private IBrowserFile FrontImageFileDni { get; set; }
+    private IBrowserFile ReverseImageFileDni { get; set; }
+        private const long MaxImageDniSize = 2 * 1000000;
+    
+    private async Task GetFullName(ChangeEventArgs eventArgs)
+    {
+        var inputDni = eventArgs.Value?.ToString();
+
+        if (inputDni is {Length: 8 })
+        {
+            const string apiToken = "5e521be6912dfccfb613c8a4501fcb24b8dcab18a5a374d30b900ce21ec814b9";
+
+            var dniRoot = await _httpClient.GetFromJsonAsync<DniRoot>
+                ($"https://apiperu.dev/api/dni/{inputDni}?api_token={apiToken}");
+
+            if (dniRoot != null) 
+                _user.FullName = dniRoot.data.nombre_completo;
+        }
+    }
+
+    private async Task OnDniFrontChange(InputFileChangeEventArgs e)
+    {
+        if (e?.File is null) return;
+
+        if (e.File.Size > MaxImageDniSize)
+        {
+            await _jsRuntime.InvokeVoidAsync("showToast", "info",
+                "Audio", $"🙄 El archivo debe ser menor a 2 MB");
+            return;
+        }
+
+        _user.FrontPhotoOfDni = "temporaryUrl";
+        FrontImageFileDni = e.File;
+    }
+
+    private async Task OnDniReverseChange(InputFileChangeEventArgs e)
+    {
+        if (e?.File is null) return;
+
+        if (e.File.Size > MaxImageDniSize)
+        {
+            await _jsRuntime.InvokeVoidAsync("showToast", "info",
+                "Audio", $"🙄 El archivo debe ser menor a 2 MB");
+            return;
+        }
+
+        _user.ReversePhotoOfDni = "temporaryUrl";
+        ReverseImageFileDni = e.File;
+    }
+    
+    private async Task SaveFrontDniInTheCloud()
+    {
+        using var imageContent = new MultipartFormDataContent();
+        try
+        {
+            var fileContent = new StreamContent(FrontImageFileDni.OpenReadStream(MaxImageDniSize));
+            fileContent.Headers.ContentType = new MediaTypeHeaderValue(FrontImageFileDni.ContentType);
+            imageContent.Add(fileContent, "\"files\"", $"{UserId}-front-dni");
+
+            var responseImage = await _httpClient.PostAsync("api/upload/verify-account-dni", imageContent);
+
+            if (responseImage.StatusCode == HttpStatusCode.OK)
+            {
+                _user.FrontPhotoOfDni = await responseImage.Content.ReadAsStringAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
+    }
+    
+    private async Task SaveReverseDniInTheCloud()
+    {
+        using var imageContent = new MultipartFormDataContent();
+        try
+        {
+            var fileContent = new StreamContent(ReverseImageFileDni.OpenReadStream(MaxImageDniSize));
+            fileContent.Headers.ContentType = new MediaTypeHeaderValue(ReverseImageFileDni.ContentType);
+            imageContent.Add(fileContent, "\"files\"", $"{UserId}-reverse-dni");
+
+            var responseImage = await _httpClient.PostAsync("api/upload/verify-account-dni", imageContent);
+
+            if (responseImage.StatusCode == HttpStatusCode.OK)
+            {
+                _user.ReversePhotoOfDni = await responseImage.Content.ReadAsStringAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
+    }
+
+    private async Task CreateVerifiedUser()
+    {
+        _verificationProcess = true;
+
+        await SaveFrontDniInTheCloud();
+        await SaveReverseDniInTheCloud();
+
+        if (_user.FrontPhotoOfDni != "temporaryUrl" || _user.ReversePhotoOfDni != "temporaryUrl")
+        {
+            _user.UserId = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "Id");
+            var httpResponse = await _httpClient.PostAsJsonAsync("api/verifiedUser", _user);
+
+            if (httpResponse.StatusCode == HttpStatusCode.Created)
+            {
+                _verificationProcess = false;
+                await _jsRuntime.InvokeVoidAsync
+                    ("showToast", 
+                        "success", "Verificación", "😉 Genial, solicitud enviada con éxito.");
+                
+                _navigationManager.NavigateTo("/");
+            }
+        }
+        else
+        {
+            await _jsRuntime.InvokeVoidAsync("showToast", "error",
+                "Verificación", "😥 Por el momento hemos recibido muchas solicitudes, inténtelo más tarde.");
+        }
+        
+        _user = new UserVerified();
+        _verificationProcess = false;
+    }
+
+    private async Task MissingData()
+    {
+        await _jsRuntime.InvokeVoidAsync
+            ("showToast", "error", "Verificación", "🤔 Algunos datos faltan ser completados.");
+    }
+
+}

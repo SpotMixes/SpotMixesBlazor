@@ -1,0 +1,132 @@
+﻿@using System.Net
+@using Microsoft.AspNetCore.SignalR.Client
+@inject HttpClient _httpClient
+@inject IJSRuntime _jsRuntime
+@inject NavigationManager _navigationManager
+
+<div class="d-flex flex-column justify-content-between">
+    <span class="text-primary h5 mt-1">@_followers Seguidores</span>
+    <button @onclick="FollowUnFollow" class="btn btn-outline-primary btn-sm">
+        @if (_isFollower)
+        {
+            <i class="ri-user-unfollow-fill"></i>
+            <span>Dejar de seguir</span>
+        }
+        else
+        {
+            <i class="ri-user-follow-fill"></i>
+            <span>Seguir</span>
+        }
+    </button>
+</div>
+
+@code {
+
+    [Parameter]
+    public string FollowedId { get; set; }
+    private HubConnection _hubConnection;
+    private bool _isFollower;
+    private long _followers;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CountFollowers();
+        await IsFollower();
+    }
+
+    private async Task CountFollowers()
+    {
+        _followers = await _httpClient.GetFromJsonAsync<long>($"api/follower/countFollowers/{FollowedId}");
+    }
+    
+    private async Task IsFollower()
+    {
+        var followerId = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "Id");
+
+        _isFollower = await _httpClient
+            .GetFromJsonAsync<bool>($"api/follower/isFollower/{followerId}/{FollowedId}");
+    }
+
+    private async Task CreateFollower()
+    {
+        var followerId = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "Id");
+
+        var follower = new Follower
+        {
+            FollowerId = followerId,
+            FollowedId = FollowedId
+        };
+
+        var httpResponse = await _httpClient.PostAsJsonAsync("api/follower", follower);
+
+        if (httpResponse.StatusCode == HttpStatusCode.Created)
+        {
+            _isFollower = true;
+        }
+    }
+
+    private async Task DeleteFollower()
+    {
+        var followerId = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "Id");
+
+        var httpResponse = await _httpClient.DeleteAsync($"api/follower/delete/{followerId}/{FollowedId}");
+
+        if (httpResponse.StatusCode == HttpStatusCode.OK)
+        {
+            _isFollower = false;
+        }
+    }
+
+    private async Task FollowUnFollow()
+    {
+        await DisposeAsync();
+        await CreateHubConnection();
+        
+        if (_isFollower)
+        {
+            await DeleteFollower();
+            StateHasChanged();
+        }
+        else
+        {
+            await CreateFollower();
+            StateHasChanged();
+        }
+
+        await SendMessage();
+    }
+
+    
+    
+    
+    private async Task CreateHubConnection()
+    {
+        _hubConnection = new HubConnectionBuilder()
+            .WithUrl(_navigationManager.ToAbsoluteUri("/followerhub"))
+            .Build();
+
+        _hubConnection.On("ReceiveMessage", async () =>
+        {
+            await CountFollowers();
+            StateHasChanged();
+        });
+
+        await _hubConnection.StartAsync();
+    }
+
+    private async Task SendMessage()
+    {
+        Console.WriteLine("Se envio un mensaje");
+        await _hubConnection.SendAsync("SendMessage");
+    }
+
+    private bool IsConnected() => _hubConnection.State == HubConnectionState.Connected;
+
+    private async ValueTask DisposeAsync()
+    {
+        if (_hubConnection is not null)
+        {
+            await _hubConnection.DisposeAsync();
+        }
+    }
+}

@@ -44,6 +44,7 @@ namespace SpotMixesBlazor.Server
             services.AddSingleton<ReactionService>();
             services.AddSingleton<CommentService>();
             services.AddSingleton<FollowerService>();
+            services.AddSingleton<VerifiedUserService>();
             //SignalR
             services.AddSignalR();
             services.AddResponseCompression(opts =>
@@ -82,6 +83,7 @@ namespace SpotMixesBlazor.Server
                 endpoints.MapControllers();
                 endpoints.MapHub<ReactionHub>("/reactionhub");
                 endpoints.MapHub<ReactionHub>("/commenthub");
+                endpoints.MapHub<ReactionHub>("/followerhub");
                 endpoints.MapFallbackToFile("index.html");
             });
         }

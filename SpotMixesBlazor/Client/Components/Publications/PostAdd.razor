@@ -1,5 +1,6 @@
 ﻿@using System.Net.Http.Headers
 @using System.Net
+@using SpotMixesBlazor.Client.Helpers
 @inject HttpClient _httpClient
 @inject IJSRuntime _jsRuntime
 
@@ -10,7 +11,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title">Publicar audio</h4>
-                @if (!_fileUpload)
+                @if (_publishingProcess == false)
                 {
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 }
@@ -20,64 +21,58 @@
                 <div class="modal-body">
                     <div class="mb-1">
                         <label class="form-label">Título:</label>
-                        <InputText type="text" class="form-control" @bind-Value="_audio.Title"/>
+                        <InputText class="form-control" tabindex="1" autofocus
+                                   @bind-Value="_audio.Title"/>
                         <div class="text-danger form-label">
                             <ValidationMessage For="() => _audio.Title"></ValidationMessage>
                         </div>
                     </div>
                     <div class="mb-1">
                         <label class="form-label">Genero:</label>
-                        <InputSelect class="form-select" @bind-Value="_audio.Genres">
-                            <option selected></option>
-                            
-                            <option Value="Dancehall"></option>
-                            <option Value="Deep house"></option>
-                            <option Value="Disco"></option>
-                            <option Value="Dubstep"></option>
-                            <option Value="Electrónica"></option>
-                            <option Value="Hip hop y Rap"></option>
-                            <option Value="House"></option>
-                            <option Value="Latina"></option>
-                            
-                            <option Value="Techno"></option>
-                            <option Value="Trap"></option>
-                            
-                            
-                            <option Value="Triphop"></option>
-                            <option Value="Rock"></option>
-                            <option Value="Reguetón"></option>
-                            <option Value="Triphop"></option>
-                            <option Value="Triphop"></option>
-                            <option Value="Triphop"></option>
-                            <option Value="Dance y EDM"></option>
-                            <option Value="Dance y EDM"></option>
-                            <option Value="Reggae"></option>
-                            <option Value="Reggae"></option>
-                            <option Value="Reggae"></option>
+                        <InputSelect class="form-select" tabindex="2" @bind-Value="_audio.Genres">
+                            <option selected>Seleccionar...</option>
+                            @foreach (var genre in _listsHelper.MusicGenres())
+                            {
+                                <option value="@genre">@genre</option>
+                            }
                         </InputSelect>
                         <div class="text-danger form-label">
                             <ValidationMessage For="() => _audio.Genres"></ValidationMessage>
                         </div>
                     </div>
-                    <div>
+                    <div class="mb-1">
+                        <label for="textarea-counter" class="form-label">Descipción</label>
+                        <InputTextArea data-length="300" class="form-control char-textarea"
+                                       id="textarea-counter" tabinx="3"
+                                       rows="2" placeholder="Ingresa una descripción del mix"
+                                       @bind-Value="_audio.Description" style="height: 100px">
+                        </InputTextArea>
+                        <div class="text-danger form-label">
+                            <ValidationMessage For="() => _audio.Description"/>
+                        </div>
+                        <small class="textarea-counter-value float-end">
+                            <span class="char-count">0</span> / 300
+                        </small>
+                    </div>
+                    <div class="mb-1">
                         <label class="form-label">Audio: </label>
-                        <InputFile type="file" class="form-control" accept=".mp3" OnChange="OnAudioChange"
-                                   @bind-Value="_audio.UrlAudio"/>
+                        <InputFile class="form-control" tabindex="4" accept=".mp3"
+                                   OnChange="OnAudioChange" @bind-Value="_audio.UrlAudio"/>
                         <div class="text-danger form-label">
                             <ValidationMessage For="() => _audio.UrlAudio"></ValidationMessage>
                         </div>
                     </div>
-                    <div>
+                    <div class="mb-1">
                         <label class="form-label">Imagen: </label>
-                        <InputFile type="file" class="form-control" accept="image/*" OnChange="OnCoverChange"
-                                   @bind-Value="_audio.UrlCover"/>
+                        <InputFile type="file" class="form-control" tabindex="5" accept="image/*"
+                                   OnChange="OnCoverChange" @bind-Value="_audio.UrlCover"/>
                         <div class="text-danger form-label">
                             <ValidationMessage For="() => _audio.UrlAudio"></ValidationMessage>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    @if (_fileUpload)
+                    @if (_publishingProcess)
                     {
                         <button class="btn btn-outline-primary" type="button" disabled>
                             <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
@@ -86,7 +81,7 @@
                     }
                     else
                     {
-                        <button type="submit" class="btn btn-primary">Publicar</button>
+                        <button type="submit" class="btn btn-primary" tabindex="6">Publicar</button>
                     }
                 </div>
             </EditForm>
@@ -96,15 +91,18 @@
 
 @code
 {
-    [Parameter]
-    public EventCallback<string> GetAudios { get; set; }
+    // Cargar datos a la clase y vista
+    private AudioInsertData _audio = new();
+    private readonly ListsHelper _listsHelper = new();
 
-    private Audio _audio = new();
+    // Guardar informacion de los archivos seleccionados
     private IBrowserFile AudioFile { get; set; }
-        private const long MaxAudioUploadSize = 20 * 1000000;
+        private const long MaxAudioUploadSize = 100 * 1000000;
     private IBrowserFile ImageFile { get; set; }
-        private const long MaxImageUploadSize = 1 * 1000000;
-    private bool _fileUpload = false;
+        private const long MaxImageUploadSize = 2 * 1000000;
+    
+    // Indicar el proceo del la carga de audio Nunbe - DB
+    private bool _publishingProcess = false;
 
     // Selecting a file in the audio input
     private async void OnAudioChange(InputFileChangeEventArgs e)
@@ -137,63 +135,7 @@
         _audio.UrlCover = "temporaryUrl";
         ImageFile = e.File;
     }
-
-    private async Task LoadExternalUserData()
-    {
-        /*_audio.UserNickname = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "Nickname");
-        _audio.UserUrlProfilePicture = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "UrlProfilePicture");
-        */
-        
-        var email = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "Email");
-        var httpResponse = await _httpClient.GetAsync($"api/User/searchUserByEmail/{email}");
-
-        if (httpResponse.StatusCode == HttpStatusCode.OK)
-        {
-            var user = await httpResponse.Content.ReadFromJsonAsync<User>();
-            if (user != null) _audio.UserId = user.Id;
-        }
-    }
     
-    // Method to save audio information in the database and in the cloud storage
-    private async Task SaveAudio()
-    {
-        _fileUpload = true;
-
-        await LoadExternalUserData();
-        
-        if (/*string.IsNullOrEmpty(_audio.UserNickname) ||
-            string.IsNullOrEmpty(_audio.UserUrlProfilePicture) ||*/ 
-            string.IsNullOrEmpty(_audio.UserId))
-        {
-            await _jsRuntime.InvokeVoidAsync("showToast", "error",
-                "Guardar", "😪 Error al subir el audio, inténtelo mas tarde.");
-
-            _fileUpload = false;
-        }
-        else
-        {
-            await SaveAudioInTheCloud();
-            await SaveAudioCoverInTheCloud();
-            
-            if (_audio.UrlAudio == "temporaryUrl" || _audio.UrlCover == "temporaryUrl")
-            {
-                await _jsRuntime.InvokeVoidAsync("showToast", "error",
-                    "Guardar", "😪 Servidor en mantenimiento, intente más tarde.");
-                _fileUpload = false;
-            }
-            else
-            {
-                await _httpClient.PostAsJsonAsync("api/audio", _audio);
-                await GetAudios.InvokeAsync("api/audio/all/0");
-                // Clear model information
-                _audio = new Audio();
-                _fileUpload = false;
-                await _jsRuntime.InvokeVoidAsync("showToast", "success",
-                    "Guardar", "🥳 ¡Genial! Tú publicación se ha subido correctamente.");
-            }
-        }
-    }
-
     private async Task SaveAudioInTheCloud()
     {
         using var audioContent = new MultipartFormDataContent();
@@ -209,15 +151,10 @@
             {
                 _audio.UrlAudio = await responseAudio.Content.ReadAsStringAsync();
             }
-            else
-            {
-                Console.WriteLine(responseAudio.StatusCode);
-            }
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex);
-            throw;
         }
     }
 
@@ -240,9 +177,33 @@
         catch (Exception ex)
         {
             Console.WriteLine(ex);
-            throw;
         }
     }
 
-    
+    // Method to save audio information in the database and in the cloud storage
+    private async Task SaveAudio()
+    {
+        _publishingProcess = true;
+
+        await SaveAudioInTheCloud();
+        await SaveAudioCoverInTheCloud();
+
+        if (_audio.UrlAudio != "temporaryUrl" || _audio.UrlCover != "temporaryUrl")
+        {
+            _audio.UserId = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "Id");
+
+            await _httpClient.PostAsJsonAsync("api/audio", _audio);
+            await _jsRuntime.InvokeVoidAsync("showToast", "success",
+                "Guardar", "🥳 ¡Genial! Tú publicación se ha subido correctamente.");
+        }
+        else
+        {
+            await _jsRuntime.InvokeVoidAsync("showToast", "error",
+                "Guardar", "😪 Error al subir el audio, inténtelo mas tarde.");
+        }
+        
+        _audio = new AudioInsertData();
+        _publishingProcess = false;
+    }
+
 }
