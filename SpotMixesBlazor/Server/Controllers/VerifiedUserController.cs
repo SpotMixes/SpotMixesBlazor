@@ -23,5 +23,18 @@ namespace SpotMixesBlazor.Server.Controllers
             await _verifiedUserService.CreateVerifiedUser(verifiedUser);
             return Created("Created", true);
         }
+        
+        [HttpGet("GetVerifiedUserByUserId/{userId}")]
+        public async Task<IActionResult> GetContractsByContractedId(string userId)
+        {
+            var user = await _verifiedUserService.GetVerifiedUserByUserId(userId);
+            
+            if (user == null)
+            {
+                return BadRequest("No contracts found");
+            }
+
+            return Ok(user);
+        }
     }
 }

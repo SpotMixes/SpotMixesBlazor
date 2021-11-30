@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using MongoDB.Driver;
 using SpotMixesBlazor.Server.DataAccess;
 using SpotMixesBlazor.Shared.Models;
@@ -19,6 +20,21 @@ namespace SpotMixesBlazor.Server.Services
         public async Task CreateVerifiedUser(VerifiedUser verifiedUser)
         {
             await _verifiedUsersCollection.InsertOneAsync(verifiedUser);
+        }
+        
+        public async Task<VerifiedUser> GetVerifiedUserByUserId (string userId)
+        {
+            try
+            {
+                return await _verifiedUsersCollection
+                    .Find(user => user.UserId == userId)
+                    .FirstOrDefaultAsync();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return null;
+            }
         }
     }
 }

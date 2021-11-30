@@ -107,7 +107,15 @@ namespace SpotMixesBlazor.Server.Services
         
         public async Task<User> GetUserById(string id)
         {
-            return await _usersCollection.Find(user => user.Id == id).FirstOrDefaultAsync();
+            try
+            {
+                return await _usersCollection.Find(user => user.Id == id).FirstOrDefaultAsync();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return null;
+            }
         }
         
         public async Task<User> GetUserByEmail(string email)

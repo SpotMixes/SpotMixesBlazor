@@ -1,0 +1,265 @@
+﻿@page "/generar-contrato/{ContractedId}"
+@layout MainLayout
+@using System.Net
+@inject HttpClient _httpClient
+@inject IJSRuntime _jsRuntime
+
+
+<Content>
+    @if (_user == null || _userVerified == null)
+    {
+        <p>El usuario al que se quiere contratar no existe</p>
+    }
+    else
+    {
+        <!-- Basic Inputs start -->
+        <section id="basic-input">
+            <EditForm Model="_contract" OnValidSubmit="CreateContract" class="row">
+                <div class="col-xl-8 col-md-8 col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title">Generar contrato</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <DataAnnotationsValidator></DataAnnotationsValidator>
+                                <div class="col-12">
+                                    <p>
+                                        Hola 👋 @_displayName, estas a un solo paso de contratar a tú DJ favorito, llena el formulario y completa el proceso.
+                                    </p>
+                                </div>
+                                <div class="col-xl-4 col-md-6 col-12 mb-1">
+                                    <label class="form-label">DNI</label>
+                                    <InputText class="form-control" tabindex="1" autofocus
+                                               placeholder="Ingresa tu número de DNI" maxlength="8"
+                                               @bind-Value="_contract.Dni" @oninput="GetDataDni"/>
+                                    <div class="text-danger form-label">
+                                        <ValidationMessage For="() => _contract.Dni"></ValidationMessage>
+                                    </div>
+                                </div>
+                                <div class="col-xl-4 col-md-6 col-12 mb-1">
+                                    <label class="form-label">Celular de contacto</label>
+                                    <InputText class="form-control" maxlength="9" placeholder="Ingresa tu número de celular"
+                                               @bind-Value="_contract.ContactMobile"/>
+                                    <div class="text-danger form-label">
+                                        <ValidationMessage For="() => _contract.ContactMobile"></ValidationMessage>
+                                    </div>
+                                </div>
+                                <div class="col-xl-4 col-md-6 col-12 mb-1">
+                                    <label class="form-label">Correo de contacto</label>
+                                    <InputText class="form-control" placeholder="Ingresa tu correo electrónico"
+                                               @bind-Value="_contract.ContactEmail"/>
+                                    <div class="text-danger form-label">
+                                        <ValidationMessage For="() => _contract.ContactEmail"></ValidationMessage>
+                                    </div>
+                                </div>
+                                <div class="col-xl-4 col-md-6 col-12 mb-1">
+                                    <label class="form-label" for="fp-default">Fecha de evento</label>
+                                    <input type="text" id="fp-default" class="form-control flatpickr-basic"
+                                           placeholder="YYYY-MM-DD" readonly="readonly"
+                                           @bind-value="_contract.DateEvent"/>
+                                    <div class="text-danger form-label">
+                                        <ValidationMessage For="() => _contract.DateEvent"></ValidationMessage>
+                                    </div>
+                                </div>
+                                <div class="col-xl-4 col-md-6 col-12">
+                                    <label class="form-label" for="fp-time">Hora del evento</label>
+                                    <input type="text" id="fp-time" class="form-control flatpickr-time text-start flatpickr-input active"
+                                           placeholder="HH:MM" readonly="readonly"
+                                           @bind-value="_contract.TimeEvent">
+                                    <div class="text-danger form-label">
+                                        <ValidationMessage For="() => _contract.TimeEvent"></ValidationMessage>
+                                    </div>
+                                </div>
+                                <div class="col-xl-4 col-md-6 col-12 mb-1">
+                                    <label class="form-label">Duración del evento</label>
+                                    <InputNumber class="form-control" placeholder="Ingrese la duración del evento en horas"
+                                                 @bind-Value="_contract.DurationEvent"/>
+                                    <div class="text-danger form-label">
+                                        <ValidationMessage For="() => _contract.DurationEvent"></ValidationMessage>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label">Descipción del evento</label>
+                                    <InputTextArea class="form-control char-textarea" rows="3"
+                                                   placeholder="Ingrese la descripción del evento (opcional)"
+                                                   style="height: 100px" @bind-Value="_contract.DescriptionEvent"/>
+                                    <small class="textarea-counter-value float-end">500</small>
+                                    <div class="text-danger form-label">
+                                        <ValidationMessage For="() => _contract.DescriptionEvent"></ValidationMessage>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    @if (_showDataDni)
+                                    {
+                                        <p>
+                                            Ingresaste el DNI @_contract.Dni, 🤔 hemos encontrado tus datos, si no son tus datos vuelve a ingresar tú DNI.
+                                        </p>
+                                        <ul>
+                                            <li>Nombre completo: @_contract.FullName</li>
+                                            <li>Departamento: @_contract.Department</li>
+                                            <li>Ciudad: @_contract.City</li>
+                                        </ul>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-4 col-md-4 col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title">Detalles de contrato</h4>
+                        </div>
+                        <div class="card-body row">
+                            <div class="col-6">
+                                <img class="img-fluid round height-150" style="object-fit: cover;" 
+                                     src="@_user.UrlProfilePicture" alt="@_user.DisplayName">
+                            </div>
+                            <div class="col-6">
+                                <div class="">
+                                    <a class="h4">
+                                        @_user.DisplayName
+                                        <i class="ri-checkbox-circle-fill" style="color: #7C83FD;"></i>
+                                    </a>
+                                    <div class="mt-1 d-flex flex-column justify-content-between">
+                                        <p>@_userVerified.FullName</p>
+                                        <p>@_userVerified.Department</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 mt-2">
+                                <div class="row">
+                                    <div class="col-xl-8 col-12">
+                                        <label class="form-label" for="helpInputTop">
+                                            Código de descuento
+                                        </label>
+                                        <input type="text" class="form-control" id="helpInputTop"/>
+                                    </div>
+                                    <div class="col-xl-4 col-12 mt-2">
+                                        <button type="button" class="btn btn-outline-info" style="width: 100%">Aplicar</button>
+                                    </div>
+                                </div>
+                                <hr class="mt-1 mb-1">
+                                <div class="mt-2 d-flex flex-column justify-content-between">
+                                    <div class="d-flex justify-content-between">
+                                        <p>Costo por hora:</p>
+                                        <span class="h5 text-white">S/. @_userVerified.Hourly</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <p>Duración del evento:</p>
+                                        <span class="h5 text-white">@_contract.DurationEvent</span>
+                                    </div>
+                                    <hr class="mt-1 mb-1">
+                                    <div class="d-flex justify-content-between">
+                                        <p>Total: </p>
+                                        <span class="h4 text-primary" style="font-weight: bold">
+                                            @{
+                                                var total = _userVerified.Hourly * _contract.DurationEvent;
+                                                _contract.CostTotal = total;
+                                            }
+                                            S/. @_contract.CostTotal
+                                        </span>
+                                    </div>
+                                    <button class="btn btn-primary mt-2">
+                                        <img class="me-1" src="public/page/contract/icon-mercado-pago.svg" alt="Icono Mercado Pagop"
+                                             width="25" height="25">
+                                        Pagar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </EditForm>
+        </section>
+        <!-- Basic Inputs end -->
+    }
+</Content>
+
+<script src="src/js/vendors/forms/form-pickers.min.js" suppress-error="BL9992"></script>
+<script src="src/js/custom/calendar.js" suppress-error="BL9992"></script>
+
+@code {
+    [Parameter]
+    public string ContractedId { get; set; }
+
+    private readonly ContractData _contract = new();
+    private User _user = new();
+    private UserVerified _userVerified = new();
+    private string _displayName;
+    private bool _showDataDni;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        _displayName = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "DisplayName");
+
+        await GetUserById();
+        await GetVerifiedUserByUserId();
+        
+        _contract.CostPerHour = _userVerified.Hourly;
+    }
+
+    private async Task GetUserById()
+    {
+        var httpResponse = await _httpClient.GetAsync($"api/user/GetUserById/{ContractedId}");
+
+        if (httpResponse.StatusCode == HttpStatusCode.OK)
+        {
+            _user = await httpResponse.Content.ReadFromJsonAsync<User>();
+        }
+        else
+        {
+            _userVerified = null;
+        }
+    }
+    
+    private async Task GetVerifiedUserByUserId()
+    {
+        var httpResponse = await _httpClient.GetAsync
+            ($"api/verifiedUser/GetVerifiedUserByUserId/{ContractedId}");
+
+        if (httpResponse.StatusCode == HttpStatusCode.OK)
+        {
+            _userVerified = await httpResponse.Content.ReadFromJsonAsync<UserVerified>();
+        }
+        else
+        {
+            _userVerified = null;
+        }
+    }
+    
+    private async Task GetDataDni(ChangeEventArgs eventArgs)
+    {
+        var inputDni = eventArgs.Value?.ToString();
+
+        if (inputDni is {Length: 8 })
+        {
+            const string apiToken = "5e521be6912dfccfb613c8a4501fcb24b8dcab18a5a374d30b900ce21ec814b9";
+
+            var dniRoot = await _httpClient.GetFromJsonAsync<DniRoot>
+                ($"https://apiperu.dev/api/dni/{inputDni}?api_token={apiToken}");
+
+            if (dniRoot != null)
+            {
+                _showDataDni = true;
+                _contract.FullName = dniRoot.data.nombre_completo;
+                _contract.Department = dniRoot.data.departamento;
+                _contract.City = dniRoot.data.provincia;
+            }
+        }
+    }
+
+    private async Task CreateContract()
+    {
+        _contract.ContractedId = ContractedId;
+        _contract.ContractorId = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "Id");
+        
+        var httpResponse = await _httpClient.PostAsJsonAsync("api/contract", _contract);
+
+        if (httpResponse.StatusCode == HttpStatusCode.Created)
+        {
+            Console.WriteLine("Contrato creado");
+        }
+    }
+}
