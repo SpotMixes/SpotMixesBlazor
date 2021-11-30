@@ -1,9 +1,9 @@
 ﻿@page "/generar-contrato/{ContractedId}"
 @layout MainLayout
 @using System.Net
+@using SpotMixesBlazor.Shared.ModelsData
 @inject HttpClient _httpClient
 @inject IJSRuntime _jsRuntime
-
 
 <Content>
     @if (_user == null || _userVerified == null)
@@ -250,6 +250,29 @@
         }
     }
 
+    private async Task OpenPaymentGateway()
+    {
+        var preference = new PreferenceData()
+        {
+            Title = $"Contrato a {_user.DisplayName}",
+            Description = $"Contrato por {_contract.DurationEvent} horas, para el dia {@_contract.DateEvent}",
+            Quantity = _contract.DurationEvent,
+            UnitPrice = _userVerified.Hourly
+        };
+
+        var httpResponse = await _httpClient.PostAsJsonAsync("api/payment", preference);
+
+        if (httpResponse.StatusCode == HttpStatusCode.Created)
+        {
+            var preferenceId = await httpResponse.Content.ReadAsStringAsync();
+            await _jsRuntime.InvokeVoidAsync("OpenPaymentGateway", preferenceId);
+        }
+        else
+        {
+            Console.WriteLine("No se pudo crear la preferencia");
+        }
+    }
+
     private async Task CreateContract()
     {
         _contract.ContractedId = ContractedId;
@@ -260,6 +283,7 @@
         if (httpResponse.StatusCode == HttpStatusCode.Created)
         {
             Console.WriteLine("Contrato creado");
+            await OpenPaymentGateway();
         }
     }
 }
