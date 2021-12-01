@@ -9,7 +9,7 @@ namespace SpotMixesBlazor.Client.ViewModels
         public string nombres { get; set; }
         public string apellido_paterno { get; set; }
         public string apellido_materno { get; set; }
-        public int codigo_verificacion { get; set; }
+        public string codigo_verificacion { get; set; }
         public string departamento { get; set; }
         public string provincia { get; set; }
         public string distrito { get; set; }
