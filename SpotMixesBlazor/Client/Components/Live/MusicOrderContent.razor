@@ -1,0 +1,16 @@
+﻿@using SpotMixesBlazor.Shared.ModelsData
+<!-- Music order content -->
+<div class="d-flex align-items-start mb-1 mt-1">
+    <div class="profile-user-info w-100 p-1">
+        <small>
+            @Content
+        </small>
+    </div>
+</div>
+<!--/ Music order content -->
+
+@code
+{
+    [Parameter]
+    public string Content { get; set; }
+}

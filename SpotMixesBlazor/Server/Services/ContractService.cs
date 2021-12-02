@@ -31,5 +31,13 @@ namespace SpotMixesBlazor.Server.Services
             return contracts ?? null;   
         }
         
+        public async Task<Contract> GetContractsByContractId (string contractId)
+        {
+            var contract = await _contractCollection
+                .Find(contract => contract.Id == contractId)
+                .FirstOrDefaultAsync();
+            
+            return contract ?? null;   
+        }
     }
 }

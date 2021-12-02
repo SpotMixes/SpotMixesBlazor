@@ -1,0 +1,157 @@
+﻿@page "/live/{ContractId}"
+@using System.Net
+@using Microsoft.AspNetCore.SignalR.Client
+@layout MainLayout
+@attribute [Authorize]
+@inject HttpClient _httpClient
+@inject NavigationManager _navigationManager
+@inject IJSRuntime _jsRuntime
+
+<Content>
+    @if (_contract == null || _user == null)
+    {
+        <p>El contrato no existe</p>
+    }
+    else
+    {
+        <div class="row">
+
+            <div class="col-xl-8 col-md-8 col-12 d-flex justify-content-center align-items-center">
+                <audio id="audio" hidden>
+                    <source src="https://node-14.zeno.fm/mxaaspaey98uv?rj-ttl=5&amp;rj-tok=AAABfXuuxXUAH0aB7wZDDrXgsg" type="audio/mpeg">
+                </audio>
+                <div class="container-img hover15">
+                    <figure id="figureImg">
+                        <img class="img-live" style="border-radius: 50%; width: 50vh"
+                             src="@_user.UrlProfilePicture"
+                             alt="@_user.DisplayName">
+                    </figure>
+                    <div class="middle">
+                        <button id="playMusic" type="button"
+                                class="btn btn-icon btn-icon rounded-circle btn-warning" style="width: 100px; height: 100px">
+                            <i class="ri-play-fill" style="font-size: 50px"></i>
+                        </button>
+                    </div>
+                    <div class="">
+                        <p class="text-primary text-center h4">
+                            <i class="ri-signal-tower-fill"></i>
+                            En vivo - @_user.DisplayName
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-4 col-md-4 col-12 mt-1 p-1 position-relative" style="background: #283046; border-radius: 0.428rem;">
+                <div class="comment-body">
+                    @if (_musicOrder.Count > 0)
+                    {
+                        @foreach (var content in _musicOrder)
+                        {
+                            <MusicOrderContent Content="@content"></MusicOrderContent>
+                        }
+                    }
+                    else
+                    {
+                        @if (_DjId == _contract.ContractedId)
+                        {
+                            <p>👋 Hola, el contratista aun no ha solicitado pedidos.</p>
+                        }
+                        else
+                        {
+                            <p>👋 Hola, solicita tu música favorito al DJ.</p>
+                        }
+                    }
+                </div>
+                <div class="mt-5"></div>
+                <div class="position-absolute bottom-0 start-0 p-1" style="width: 100%">
+                    <div class="d-flex justify-content-between">
+                        <textarea class="form-control p-2 me-1" placeholder="Solicitar pedido musical" rows="1" @bind="_musicOrderContent">
+                        </textarea>
+                        <button type="button" class="btn btn-sm btn-outline-primary" @onclick="Send" disabled="@(!IsConnected())">
+                            <i class="ri-send-plane-fill"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</Content>
+
+<script src="src/js/custom/live.js" suppress-error="BL9992"></script>
+
+@code {
+
+    [Parameter]
+    public string ContractId { get; set; }
+
+    private HubConnection _hubConnection;
+    private List<string> _musicOrder = new();
+    private Contract _contract = new();
+    private User _user = new();
+    private string _musicOrderContent;
+    private string _DjId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _hubConnection = new HubConnectionBuilder()
+            .WithUrl(_navigationManager.ToAbsoluteUri("/musicorderhub"))
+            .Build();
+
+        _hubConnection.On<string>("ReceiveMessage", (message) =>
+        {
+            _musicOrder.Add(message);
+            StateHasChanged();
+        });
+
+        await _hubConnection.StartAsync();
+
+        await GetContractsByContractId();
+        await GetUserById();
+
+        _DjId = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "Id");
+    }
+
+    private bool IsConnected() => _hubConnection?.State == HubConnectionState.Connected;
+
+    private async Task Send()
+    {
+        if (!string.IsNullOrEmpty(_musicOrderContent))
+        {
+            if (_hubConnection is not null)
+            {
+                var content = _DjId == _contract.ContractedId ? $"DJ: {_musicOrderContent}" : $"Oyente: {_musicOrderContent}";
+                await _hubConnection.SendAsync("SendMessage", content);
+                _musicOrderContent = string.Empty;
+            }
+        }
+    }
+
+    private async Task GetContractsByContractId()
+    {
+        var httResponse = await _httpClient.GetAsync($"api/contract/getContractsByContractId/{ContractId}");
+
+        if (httResponse.StatusCode == HttpStatusCode.OK)
+        {
+            _contract = await httResponse.Content.ReadFromJsonAsync<Contract>();
+        }
+        else
+        {
+            _contract = null;
+        }
+    }
+
+    private async Task GetUserById()
+    {
+        var httResponse = await _httpClient.GetAsync($"api/user/GetUserById/{_contract.ContractedId}");
+
+        if (httResponse.StatusCode == HttpStatusCode.OK)
+        {
+            _user = await httResponse.Content.ReadFromJsonAsync<User>();
+        }
+        else
+        {
+            _contract = null;
+        }
+    }
+
+}

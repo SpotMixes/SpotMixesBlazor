@@ -87,6 +87,7 @@ namespace SpotMixesBlazor.Server
                 endpoints.MapHub<ReactionHub>("/reactionhub");
                 endpoints.MapHub<ReactionHub>("/commenthub");
                 endpoints.MapHub<ReactionHub>("/followerhub");
+                endpoints.MapHub<MusicOrderHub>("/musicorderhub");
                 endpoints.MapFallbackToFile("index.html");
             });
         }

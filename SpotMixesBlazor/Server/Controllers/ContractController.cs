@@ -35,5 +35,18 @@ namespace SpotMixesBlazor.Server.Controllers
 
             return Ok(contracts);
         }
+        
+        [HttpGet("getContractsByContractId/{contractId}")]
+        public async Task<IActionResult> GetContractsByContractId(string contractId)
+        {
+            var contract = await _contractService.GetContractsByContractId(contractId);
+            
+            if (contract == null)
+            {
+                return BadRequest("No contracts found");
+            }
+
+            return Ok(contract);
+        }
     }
 }
