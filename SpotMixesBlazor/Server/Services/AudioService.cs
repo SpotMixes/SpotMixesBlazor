@@ -59,6 +59,26 @@ namespace SpotMixesBlazor.Server.Services
                 return false;
             }
         }
+        
+        public async Task<bool> UpdateNumberOfReproductions(string audioId, int numReproduction)
+        {
+            try
+            {
+                var updateFilter = Builders<Audio>.Filter.Eq(a => a.Id, audioId);
+            
+                var updateDefinition = Builders<Audio>.Update
+                    .Set(a => a.NumReproduction, numReproduction);
+
+                var resultUpdate = await _audiosCollection
+                    .UpdateOneAsync(updateFilter, updateDefinition);
+
+                return resultUpdate.ModifiedCount == 1;
+            }
+            catch (Exception ex) {
+                Console.WriteLine(ex.Message);
+                return false;
+            }
+        }
 
         public async Task<long> CountAudios() => await _audiosCollection.CountDocumentsAsync(new BsonDocument());
 
@@ -154,6 +174,26 @@ namespace SpotMixesBlazor.Server.Services
         {
             var audios = await _audiosCollection
                 .Find(audio => audio.UserId == userId)
+                .ToListAsync();
+
+            return audios ?? null;
+        }
+        
+        public async Task<IReadOnlyList<Audio>> GetMostListenedAudioByUserId(string userId)
+        {
+            var audios = await _audiosCollection
+                .Find(audio => audio.UserId == userId)
+                .SortByDescending(audio => audio.NumReproduction)
+                .ToListAsync();
+
+            return audios ?? null;
+        }
+        
+        public async Task<IReadOnlyList<Audio>> GetRecentAudioByUserId(string userId)
+        {
+            var audios = await _audiosCollection
+                .Find(audio => audio.UserId == userId)
+                .SortByDescending(audio => audio.CreatedAt)
                 .ToListAsync();
 
             return audios ?? null;

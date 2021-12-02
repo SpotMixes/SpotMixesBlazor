@@ -3,7 +3,9 @@
         <Found Context="routeData">
             <AuthorizeRouteView RouteData="@routeData">
                 <NotAuthorized>
-                    <NotAuthorizerCustom/>
+                    <LayoutView Layout="@typeof(AuthenticationLayout)">
+                        <NotAuthorizerCustom/>
+                    </LayoutView>
                 </NotAuthorized>
             </AuthorizeRouteView>
         </Found>

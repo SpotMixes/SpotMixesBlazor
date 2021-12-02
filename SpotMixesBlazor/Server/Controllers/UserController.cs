@@ -182,5 +182,16 @@ namespace SpotMixesBlazor.Server.Controllers
 
             return Ok(user);
         }
+        
+        [HttpGet("SearchUserByDisplayName/{textSearch}")]
+        public async Task<ActionResult> SearchUserByDisplayName(string textSearch)
+        {
+            var users = await _userService.SearchUserByDisplayName(textSearch);
+
+            if (users == null) 
+                return BadRequest("El usuario no existe");
+
+            return Ok(users);
+        }
     }
 }

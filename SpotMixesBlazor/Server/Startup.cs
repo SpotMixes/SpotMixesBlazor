@@ -47,6 +47,7 @@ namespace SpotMixesBlazor.Server
             services.AddSingleton<VerifiedUserService>();
             services.AddSingleton<ContractService>();
             services.AddSingleton<PaymentService>();
+            services.AddSingleton<PlaylistServices>();
             //SignalR
             services.AddSignalR();
             services.AddResponseCompression(opts =>

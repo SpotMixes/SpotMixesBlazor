@@ -53,7 +53,7 @@ namespace SpotMixesBlazor.Server.Services
                 return FirebaseEmpty;
             }
         }
-        
+
         public async Task CreateUser(User user)
         {
             await _usersCollection.InsertOneAsync(user);
@@ -63,48 +63,48 @@ namespace SpotMixesBlazor.Server.Services
         {
             await _usersCollection.ReplaceOneAsync(u => u.Id == user.Id, user);
         }
-        
-        public async Task<long> CountUsers() => 
+
+        public async Task<long> CountUsers() =>
             await _usersCollection.CountDocumentsAsync(new BsonDocument());
 
-        public async Task<long> CountVerifiedUsers() => 
+        public async Task<long> CountVerifiedUsers() =>
             await _usersCollection.CountDocumentsAsync(user => user.VerifiedProfile == true);
 
         public async Task<IReadOnlyList<User>> GetAllUsers(int userPerPage, int page)
         {
             var users = await _usersCollection
-                .Find(user => true)
+                .Find(user => user.IsDj == true)
                 .Skip((page - 1) * userPerPage)
                 .Limit(userPerPage)
                 .ToListAsync();
-            
+
             return users;
         }
-        
+
         public async Task<IReadOnlyList<User>> GetRecentUsers(int userPerPage, int page)
         {
             var users = await _usersCollection
-                .Find(user => true)
+                .Find(user => user.IsDj == true)
                 .SortByDescending(user => user.CreatedAt)
                 .Skip((page - 1) * userPerPage)
                 .Limit(userPerPage)
                 .ToListAsync();
-            
+
             return users;
         }
 
         public async Task<IReadOnlyList<User>> GetVerifiedUsers(int userPerPage, int page)
         {
             var users = await _usersCollection
-                .Find(user => user.VerifiedProfile == true)
+                .Find(user => user.VerifiedProfile == true && user.IsDj == true)
                 .SortByDescending(user => user.CreatedAt)
                 .Skip((page - 1) * userPerPage)
                 .Limit(userPerPage)
                 .ToListAsync();
-            
+
             return users;
         }
-        
+
         public async Task<User> GetUserById(string id)
         {
             try
@@ -117,19 +117,19 @@ namespace SpotMixesBlazor.Server.Services
                 return null;
             }
         }
-        
+
         public async Task<User> GetUserByEmail(string email)
         {
             return await _usersCollection.Find(user => user.Email == email).FirstOrDefaultAsync();
         }
-        
+
         public async Task<User> GetUserByUrlProfile(string urlProfile)
         {
             var user = await _usersCollection.Find(user => user.UrlProfile == urlProfile).FirstOrDefaultAsync();
 
             return user ?? null;
         }
-        
+
         public async Task<UserLookup> GetUserDataByUrlProfile(string urlProfile)
         {
             var user = await _usersCollection
@@ -138,9 +138,24 @@ namespace SpotMixesBlazor.Server.Services
                 .Lookup("Audios", "_id", "UserId", "Audios")
                 .FirstOrDefaultAsync();
 
-            if (user == null) return null;
+            return user == null ? null : BsonSerializer.Deserialize<UserLookup>(user);
+        }
 
-            return BsonSerializer.Deserialize<UserLookup>(user);
+        public async Task<IReadOnlyList<User>> SearchUserByDisplayName(string textSearch)
+        {
+            var regularExpression = new BsonRegularExpression(textSearch, "/@/i");
+
+            var users = await _usersCollection
+                .Find(
+                    Builders<User>.Filter.And
+                    (
+                        Builders<User>.Filter.Regex(user => user.DisplayName, regularExpression),
+                        Builders<User>.Filter.Eq(user => user.IsDj, true)
+                    ))
+                .SortByDescending(user => user.CreatedAt)
+                .ToListAsync();
+
+            return users ?? null;
         }
     }
 }

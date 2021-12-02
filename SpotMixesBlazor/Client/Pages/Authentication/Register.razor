@@ -1,4 +1,4 @@
-﻿@page "/Register"
+﻿@page "/registrar"
 @layout AuthenticationLayout
 @using System.Net
 @using IpInfo
@@ -133,7 +133,7 @@
                     };
 
                     await _httpClient.PostAsJsonAsync("/api/session", session);
-                    _navigationManager.NavigateTo($"/VerifyEmail/{_claims.UserId}");
+                    _navigationManager.NavigateTo($"/verificar-correo/{_claims.UserId}");
                 }
                 _registrationProcess = false;
                 break;

@@ -12,13 +12,13 @@
                     </div>
                 </div>
             </div>
-            <h3>@User.DisplayName</h3>
+            <a href="perfil/@User.UrlProfile" class="text-primary h3">@User.DisplayName</a>
             <h6 class="text-muted">@User.FirstName @User.LastName</h6>
             <FollowerButton FollowedId="@User.Id"></FollowerButton>
-            @if (_djPagingService.FilterVerified)
+            @if (User.VerifiedProfile && _djPagingService.FilterVerified)
             {
                 <hr class="mb-2">
-                <button class="btn btn-outline-microsoft btn-sm w-100">Contratar</button>
+                <a href="generar-contrato/@User.Id" class="btn btn-outline-microsoft btn-sm w-100">Contratar</a>
             }
         </div>
     </div>

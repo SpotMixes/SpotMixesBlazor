@@ -1,17 +1,19 @@
 ﻿@using SpotMixesBlazor.Shared.ModelsLookup
 <div class="d-flex align-items-start mb-1 mt-1">
     <div class="avatar mt-25 me-75">
-        @foreach(var user in Comment.User)
+        @foreach (var user in Comment.User)
         {
-         <img src="@user.UrlProfilePicture" alt="@user.DisplayName - SpotMixes" height="34" width="34"/>
+            <a href="perfil/@user.UrlProfile">
+                <img src="@user.UrlProfilePicture" alt="@user.DisplayName - SpotMixes" height="34" width="34"/>
+            </a>
         }
     </div>
     <div class="profile-user-info w-100 p-1">
         <div class="d-flex align-items-center justify-content-between">
             @foreach (var user in Comment.User)
-           {
+            {
                 <h6 class="mb-0">@user.DisplayName</h6>
-           }
+            }
             <p>@Comment.CreatedAt</p>
         </div>
         <small>
@@ -21,6 +23,8 @@
 </div>
 
 @code {
+
     [Parameter]
     public CommentLookup Comment { get; set; }
+
 }

@@ -1,8 +1,9 @@
-﻿@page "/Djs"
+﻿@page "/djs"
+@page "/artistas"
 @attribute [Authorize]
 @layout MainLayout
 @inject HttpClient _httpClient
-@inject IJSRuntime _jsRuntime
+@inject NavigationManager _navigationManager
 
 <!-- BEGIN: Content-->
 <div class="app-content content ecommerce-application">
@@ -39,7 +40,7 @@
                         <div class="col-sm-12">
                             <div class="input-group input-group-merge">
                                 <input type="text" class="form-control search-product"
-                                       placeholder="Buscar Djs..."/>
+                                       placeholder="Buscar Djs por nombre..." @oninput="SearchDjs"/>
                                 <span class="input-group-text">
                                     <i class="ri-search-line"></i>
                                 </span>
@@ -63,7 +64,10 @@
                         }
                     }
                 </section>
-                <DjPagination GetUsers="GetUsers"></DjPagination>
+                @if (_showPagination)
+                {
+                    <DjPagination GetUsers="GetUsers"></DjPagination>
+                }
             </div>
         </div>
         <div class="sidebar-detached sidebar-left">
@@ -90,15 +94,35 @@
 
 @code {
     private IReadOnlyList<User> _users;
-    
+    private bool _showPagination = true;
+
     protected override async Task OnInitializedAsync()
     {
         await GetUsers("api/user/verified/30/1");
     }
-    
+
     private async Task GetUsers(string url)
     {
         _users = await _httpClient.GetFromJsonAsync<IReadOnlyList<User>>(url);
     }
- 
+
+    private async Task SearchDjs(ChangeEventArgs eventArgs)
+    {
+        var valueSearch = eventArgs.Value?.ToString();
+        
+        if (string.IsNullOrEmpty(valueSearch))
+        {
+            _showPagination = true;
+            _navigationManager.NavigateTo("/djs", true);
+        }
+        else
+        {
+            _showPagination = false;
+            if (valueSearch.Length > 3)
+            {
+                await GetUsers($"api/user/SearchUserByDisplayName/{valueSearch}");
+            }
+        }
+    }
+
 }

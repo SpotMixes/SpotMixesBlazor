@@ -1,5 +1,8 @@
 ﻿@using SpotMixesBlazor.Shared.ModelsLookup
+@using SpotMixesBlazor.Shared.ModelsData
+@using System.Net
 @inject IJSRuntime _jsRuntime
+@inject HttpClient _httpClient
 
 <div class="col-sm-12 col-md-6 col-lg-4">
     <div class="has-items-overlay playlist">
@@ -31,7 +34,7 @@
                             </li>
                         </ul>
                         <div class="text-center mt-6">
-                            <a href="/audiodetails/@Audio.Id" class="text-white h4">@Audio.Title</a>
+                            <a href="/detalles-audio/@Audio.Id" class="text-white h4">@Audio.Title</a>
                             <br>
                             <span>@Audio.Genres</span>
                         </div>
@@ -68,8 +71,44 @@
     [Parameter]
     public AudioLookup Audio { get; set; }
 
+    private async Task<bool> IsPlaylist()
+    {
+        var userId = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "Id");
+
+        return await _httpClient
+            .GetFromJsonAsync<bool>($"api/Playlist/IsPlaylist/{Audio.Id}/{userId}");
+    }
+    
     private async Task PlayMusic()
     {
         await _jsRuntime.InvokeVoidAsync("playMusic", Audio.Title, "Test", Audio.UrlAudio, Audio.UrlCover, true);
+
+        var isPlaying = await IsPlaylist();
+
+        if (isPlaying == false)
+        {
+            await CreatePlaylist();
+            
+            var audio = new AudioNumReproduction{Id = Audio.Id};
+            var httpResponse = await _httpClient.PutAsJsonAsync("api/audio/updateNumberOfReproductions", audio);
+
+            if (httpResponse.StatusCode == HttpStatusCode.OK)
+            {
+                Audio.NumReproduction++;
+            }
+        }
+    }
+
+    private async Task CreatePlaylist()
+    {
+        var userId = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "Id");
+
+        var playlist = new Playlist
+        {
+            AudioId = Audio.Id,
+            UserId = userId
+        };
+        
+        await _httpClient.PostAsJsonAsync("api/playlist", playlist);
     }
 }

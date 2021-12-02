@@ -1,4 +1,4 @@
-﻿@page "/AudioUpdate/{AudioId}"
+﻿@page "/actualizar-audio/{AudioId}"
 @using SpotMixesBlazor.Client.Helpers
 @using System.Net.Http.Headers
 @using System.Net
@@ -214,7 +214,7 @@
                 var urlProfile = await _jsRuntime
                     .InvokeAsync<string>("localStorage.getItem", "UrlProfile");
 
-                _navigationManager.NavigateTo($"/profile/{urlProfile}");
+                _navigationManager.NavigateTo($"/perfil/{urlProfile}");
             }
             else
             {

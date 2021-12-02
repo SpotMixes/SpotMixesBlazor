@@ -1,5 +1,6 @@
 ﻿@page "/generar-contrato/{ContractedId}"
 @layout MainLayout
+@attribute [Authorize]
 @using System.Net
 @using SpotMixesBlazor.Shared.ModelsData
 @inject HttpClient _httpClient
@@ -10,7 +11,7 @@
     {
         <p>El usuario al que se quiere contratar no existe</p>
     }
-    else
+    else if (_user.VerifiedProfile)
     {
         <!-- Basic Inputs start -->
         <section id="basic-input">
@@ -113,7 +114,7 @@
                         </div>
                         <div class="card-body row">
                             <div class="col-6">
-                                <img class="img-fluid round height-150" style="object-fit: cover;" 
+                                <img class="img-fluid round height-150" style="object-fit: cover;"
                                      src="@_user.UrlProfilePicture" alt="@_user.DisplayName">
                             </div>
                             <div class="col-6">
@@ -174,11 +175,14 @@
             </EditForm>
         </section>
         <!-- Basic Inputs end -->
+        <script src="src/js/vendors/forms/form-pickers.min.js" suppress-error="BL9992"></script>
+        <script src="src/js/custom/calendar.js" suppress-error="BL9992"></script>
+    }
+    else
+    {
+        <p>El usuario no esta verificado...</p>
     }
 </Content>
-
-<script src="src/js/vendors/forms/form-pickers.min.js" suppress-error="BL9992"></script>
-<script src="src/js/custom/calendar.js" suppress-error="BL9992"></script>
 
 @code {
     [Parameter]
@@ -189,15 +193,13 @@
     private UserVerified _userVerified = new();
     private string _displayName;
     private bool _showDataDni;
-    
+
     protected override async Task OnInitializedAsync()
     {
         _displayName = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "DisplayName");
 
         await GetUserById();
         await GetVerifiedUserByUserId();
-        
-        _contract.CostPerHour = _userVerified.Hourly;
     }
 
     private async Task GetUserById()
@@ -213,7 +215,7 @@
             _userVerified = null;
         }
     }
-    
+
     private async Task GetVerifiedUserByUserId()
     {
         var httpResponse = await _httpClient.GetAsync
@@ -222,13 +224,15 @@
         if (httpResponse.StatusCode == HttpStatusCode.OK)
         {
             _userVerified = await httpResponse.Content.ReadFromJsonAsync<UserVerified>();
+            if (_userVerified != null) 
+                _contract.CostPerHour = _userVerified.Hourly;
         }
         else
         {
             _userVerified = null;
         }
     }
-    
+
     private async Task GetDataDni(ChangeEventArgs eventArgs)
     {
         var inputDni = eventArgs.Value?.ToString();
@@ -277,7 +281,7 @@
     {
         _contract.ContractedId = ContractedId;
         _contract.ContractorId = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "Id");
-        
+
         var httpResponse = await _httpClient.PostAsJsonAsync("api/contract", _contract);
 
         if (httpResponse.StatusCode == HttpStatusCode.Created)

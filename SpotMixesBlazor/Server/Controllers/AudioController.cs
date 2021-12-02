@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SpotMixesBlazor.Server.Services;
 using SpotMixesBlazor.Shared.Models;
+using SpotMixesBlazor.Shared.ModelsData;
 
 namespace SpotMixesBlazor.Server.Controllers
 {
@@ -41,6 +42,20 @@ namespace SpotMixesBlazor.Server.Controllers
             if (resultUpdate) return Ok("200");
 
             return BadRequest("400");
+        }
+        
+        [HttpPut("updateNumberOfReproductions")]
+        public async Task<IActionResult> UpdateNumberOfReproductions([FromBody] AudioNumReproduction audioNumReproduction)
+        {
+            var audio = await _audioService.GetAudioByIdToUpdate(audioNumReproduction.Id);
+            audio.NumReproduction++;
+            
+            var resultUpdate = await _audioService.UpdateNumberOfReproductions(audio.Id, audio.NumReproduction);
+            
+            if (resultUpdate) 
+                return Ok(audio.NumReproduction);
+
+            return BadRequest("No se pudo actualizar el numero de reproducciones");
         }
         
         [HttpGet("countAudios")]
@@ -126,6 +141,22 @@ namespace SpotMixesBlazor.Server.Controllers
         public async Task<ActionResult> GetAllAudioByUserId(string userId)
         {
             var audios = await _audioService.GetAllAudioByUserId(userId);
+            
+            return audios.Count > 0 ? Ok(audios) : BadRequest("Not found");
+        }
+        
+        [HttpGet("GetMostListenedAudioByUserId/{userId}")]
+        public async Task<ActionResult> GetMostListenedAudioByUserId(string userId)
+        {
+            var audios = await _audioService.GetMostListenedAudioByUserId(userId);
+            
+            return audios.Count > 0 ? Ok(audios) : BadRequest("Not found");
+        }
+        
+        [HttpGet("GetRecentAudioByUserId/{userId}")]
+        public async Task<ActionResult> GetRecentAudioByUserId(string userId)
+        {
+            var audios = await _audioService.GetRecentAudioByUserId(userId);
             
             return audios.Count > 0 ? Ok(audios) : BadRequest("Not found");
         }

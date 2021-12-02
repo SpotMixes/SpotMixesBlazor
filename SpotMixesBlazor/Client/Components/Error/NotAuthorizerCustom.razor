@@ -1,11 +1,32 @@
-﻿@inject NavigationManager _navigationManager
-@inject IJSRuntime _jsRuntime
+﻿@inject IJSRuntime _jsRuntime
+
+<!-- Not authorized-->
+<div class="misc-wrapper">
+    <a class="brand-logo" href="index.html">
+        <img src="" alt="">
+    </a>
+    <div class="misc-inner p-2 p-sm-3">
+        <div class="w-100 text-center">
+            <h2 class="mb-1">¡No estás autorizado! 🔐</h2>
+            <p class="mb-2">
+                Esta sección está disponible únicamente para usuarios registrados,
+                accede a más funciones <a href="/registrar">registrándote</a> totalmente gratis,
+                si ya poses una cuenta <a href="/iniciar-sesion">inicia sesión</a>.
+            </p>
+            <a class="btn btn-primary mb-1 btn-sm-block" href="/">
+                Regresar al inicio
+            </a>
+            <img class="img-fluid" src="public/page/simple/not-authorized-dark.svg"
+                 alt="Not authorized page"/>
+        </div>
+    </div>
+</div>
+<!-- / Not authorized-->
 
 @code
 {
     protected override async Task OnInitializedAsync()
     {
-        _navigationManager.NavigateTo("/");
-        await _jsRuntime.InvokeVoidAsync("showToast", "info", "Error", $"🤨 Esta sección está disponible únicamente para usuarios registrados");
+        await _jsRuntime.InvokeVoidAsync("includeCss", "src/css/pages/page-misc.min.css", "page-misc");
     }
 }
