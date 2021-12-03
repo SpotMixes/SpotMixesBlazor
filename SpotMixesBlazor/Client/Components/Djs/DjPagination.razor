@@ -55,6 +55,27 @@
         return numberOfAudios / 30;
     }
 
+    private async Task PrevPage()
+    {
+        if (_djPagingService.FilterVerified)
+        {
+            _djPagingService.SkipVerified--;
+            await GetUsers.InvokeAsync($"api/user/verified/30/{_djPagingService.SkipVerified}");   
+        }
+        else if (_djPagingService.FilterRecent)
+        {
+            _djPagingService.SkipRecent--;
+            await GetUsers.InvokeAsync($"api/user/recent/30/{_djPagingService.SkipRecent}");
+        }
+        else if (_djPagingService.FilterAll)
+        {
+            _djPagingService.SkipAll--;
+            await GetUsers.InvokeAsync($"api/user/all/30/{_djPagingService.SkipAll}");
+        }
+
+        await _jsRuntime.InvokeVoidAsync("window.scroll", "1", "0");
+    }
+    
     private async Task NexPage()
     {
         if (_djPagingService.FilterVerified)
@@ -75,5 +96,4 @@
 
         await _jsRuntime.InvokeVoidAsync("window.scroll", "1", "0");
     }
-
 }
