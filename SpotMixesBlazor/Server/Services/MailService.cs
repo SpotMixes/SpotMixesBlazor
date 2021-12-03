@@ -37,8 +37,7 @@ namespace SpotMixesBlazor.Server.Services
             email.Body = builder.ToMessageBody();    
             
             using var smtp = new SmtpClient();
-            smtp.CheckCertificateRevocation = false;
-            await smtp.ConnectAsync(_mailSettings.Host, _mailSettings.Port, SecureSocketOptions.StartTls);
+            await smtp.ConnectAsync(_mailSettings.Host, _mailSettings.Port, SecureSocketOptions.SslOnConnect);
             await smtp.AuthenticateAsync(_mailSettings.Mail, _mailSettings.Password);
             await smtp.SendAsync(email);
             await smtp.DisconnectAsync(true);

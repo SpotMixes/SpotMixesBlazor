@@ -28,9 +28,9 @@ namespace SpotMixesBlazor.Server.Services
                 },
                 BackUrls = new PreferenceBackUrlsRequest
                 {
-                    Success = "https://localhost:5001/success",
-                    Failure = "https://localhost:5001/failure",
-                    Pending = "https://localhost:5001/pending"
+                    Success = "https://spotmixes.com/success",
+                    Failure = "https://spotmixes.com/failure",
+                    Pending = "https://spotmixes.com/pending"
                 },
                 AutoReturn = "approved"
             };
