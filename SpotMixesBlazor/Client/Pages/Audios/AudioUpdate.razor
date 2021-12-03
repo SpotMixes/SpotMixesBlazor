@@ -20,7 +20,9 @@
                             <h4 class="card-title">Editar audio</h4>
                         </div>
                         <div class="card-body">
-                            <EditForm Model="_audio" OnValidSubmit="UpdateAudio"  class="row">
+                            <EditForm Model="_audio" OnValidSubmit="UpdateAudio" class="row">
+                                <DataAnnotationsValidator></DataAnnotationsValidator>
+
                                 <div class="col-xl-4 col-md-6 col-12">
                                     <div class="d-flex justify-content-center">
                                         <img class="img-fluid round" style="object-fit: cover; width: 400px; height: 400px;"
@@ -38,7 +40,6 @@
                                 </div>
                                 <div class="col-xl-8 col-md-6 col-12">
                                     <div class="d-flex flex-column justify-content-between">
-                                        <DataAnnotationsValidator></DataAnnotationsValidator>
                                         <div class="mb-1">
                                             <label for="updateAudioTitle" class="form-label">Título</label>
                                             <InputText class="form-control" id="updateAudioTitle"
@@ -58,7 +59,7 @@
                                                 {
                                                     @if (genre == _audio.Genres)
                                                     {
-                                                        <option selected value="@genre">@genre</option>    
+                                                        <option selected value="@genre">@genre</option>
                                                     }
                                                     else
                                                     {
@@ -100,8 +101,9 @@
                                             @if (_updateProcess)
                                             {
                                                 <button class="btn btn-warning" tabindex="5" disabled>
-                                                    <span class="spinner-border spinner-border-sm" role="status" 
-                                                          aria-hidden="true"></span>
+                                                    <span class="spinner-border spinner-border-sm" role="status"
+                                                          aria-hidden="true">
+                                                    </span>
                                                     Guardando...
                                                 </button>
                                             }
@@ -130,13 +132,13 @@
 {
     [Parameter]
     public string AudioId { get; set; }
-    
+
     private AudioUpdateData _audio = new();
     private readonly ListsHelper _listsHelper = new();
-    
+
     private IBrowserFile ImageFile { get; set; }
         private const long MaxImageUploadSize = 2 * 1000000;
-    
+
     private string _urlCover;
     private bool _isDj;
     private bool _updateProcess;
@@ -155,7 +157,7 @@
         _audio = await _httpClient
             .GetFromJsonAsync<AudioUpdateData>($"api/audio/getAudioByIdToUpdate/{AudioId}");
     }
-    
+
     private async Task OnCoverChange(InputFileChangeEventArgs e)
     {
         if (e?.File is null) return;
@@ -170,7 +172,7 @@
         _audio.UrlCover = "temporaryUrl";
         ImageFile = e.File;
     }
-    
+
     private async Task SaveAudioCoverInTheCloud()
     {
         using var imageContent = new MultipartFormDataContent();
@@ -196,7 +198,7 @@
     private async Task UpdateAudio()
     {
         _updateProcess = true;
-        
+
         if (_audio.UrlCover == "temporaryUrl") await SaveAudioCoverInTheCloud();
 
         if (_audio.UrlCover != "temporaryUrl")
@@ -207,10 +209,10 @@
             if (response.StatusCode == HttpStatusCode.OK)
             {
                 _updateProcess = false;
-                
+
                 await _jsRuntime.InvokeVoidAsync("showToast", "success",
                     "Actualizar", "🥳 ¡Genial! Tú publicación se ha actualizado correctamente.");
-                
+
                 var urlProfile = await _jsRuntime
                     .InvokeAsync<string>("localStorage.getItem", "UrlProfile");
 
@@ -219,7 +221,7 @@
             else
             {
                 _updateProcess = false;
-                
+
                 await _jsRuntime.InvokeVoidAsync("showToast", "error",
                     "Actualizar", "😪 Error al actualizar el audio, inténtelo mas tarde.");
             }

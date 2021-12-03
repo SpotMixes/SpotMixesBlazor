@@ -1,0 +1,319 @@
+﻿@page "/ajustes-cuenta/{UserId}"
+@using System.Net
+@using System.Net.Http.Headers
+@attribute [Authorize]
+@layout MainLayout
+@inject IJSRuntime _jsRuntime
+@inject HttpClient _httpClient
+@inject NavigationManager _navigationManager
+
+<Content>
+    @if (_user == null)
+    {
+        <p>No existe el usuario</p>
+    }
+    else if (_userIdLocalStorage == UserId)
+    {
+        <div class="row">
+            <div class="col-12">
+                <EditForm Model="_user" OnValidSubmit="UpdateUser" class="card">
+                    <DataAnnotationsValidator></DataAnnotationsValidator>
+
+                    <div class="card-header border-bottom">
+                        <h4 class="card-title">Editar Perfil</h4>
+                    </div>
+                    <div class="card-body py-2 my-25">
+                        <div class="row">
+                            <div class="col-6">
+                                <a href="#" class="me-25">
+                                    <img src="@_urlProfilePicture" class="uploadedAvatar rounded me-50"
+                                         alt="@_user.DisplayName" height="100" width="100"/>
+                                </a>
+                                <div class="mt-75">
+                                    <label class="form-label">Cambiar foto de perfil</label>
+                                    <InputFile class="form-control" tabindex="1" accept="image/*"
+                                               OnChange="OnProfilePictureChange" @bind-Value="_user.UrlProfilePicture">
+                                    </InputFile>
+                                    <div class="text-danger form-label">
+                                        <ValidationMessage For="() => _user.UrlProfilePicture"/>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-6">
+                                <a href="#" class="me-25" style="width: 100%">
+                                    <img src="@_urlCoverPicture" class="uploadedAvatar rounded me-50"
+                                         alt="@_user.DisplayName" height="100" style="width: inherit; object-fit: cover"/>
+                                </a>
+                                <div class="mt-75">
+                                    <label class="form-label">Cambiar foto de portada</label>
+                                    <InputFile class="form-control" tabindex="2" accept="image/*"
+                                               OnChange="OnCoverPictureChange" @bind-Value="_user.UrlCoverPicture"/>
+                                    <div class="text-danger form-label">
+                                        <ValidationMessage For="() => _user.UrlCoverPicture"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-2 pt-50">
+                            <div class="row">
+                                <div class="col-12 col-sm-6 mb-1">
+                                    <label class="form-label">Nombre visible</label>
+                                    <InputText class="form-control" placeholder="Ingresa tu nombre visible"
+                                               tabindex="3" @bind-Value="_user.DisplayName"/>
+                                    <div class="text-danger form-label">
+                                        <ValidationMessage For="() => _user.DisplayName"/>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-sm-6 mb-1">
+                                    <label class="form-label">Url de perfil</label>
+                                    <InputText class="form-control" placeholder="Ingresa tu URL de perfil"
+                                               tabindex="4" @bind-Value="_user.UrlProfile"/>
+                                    <div class="text-danger form-label">
+                                        <ValidationMessage For="() => _user.UrlProfile"/>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-sm-6 mb-1">
+                                    <label class="form-label">Nombre(s)</label>
+                                    <InputText class="form-control" placeholder="Ingresa tu nombre(s)"
+                                               tabindex="5" @bind-Value="_user.FirstName"/>
+                                </div>
+                                <div class="col-12 col-sm-6 mb-1">
+                                    <label class="form-label">Apellidos</label>
+                                    <InputText class="form-control" placeholder="Ingresa tus apellidos completos"
+                                               tabindex="6" @bind-Value="_user.LastName"/>
+                                </div>
+                                <div class="col-12 col-sm-6 mb-1">
+                                    <label class="form-label">Ciudad</label>
+                                    <InputText class="form-control" placeholder="Ingresa tu ciudad actual"
+                                               tabindex="7" @bind-Value="_user.City"/>
+                                </div>
+                                <div class="col-12 col-sm-6 mb-1">
+                                    <label class="form-label">Pais</label>
+                                    <InputText class="form-control" placeholder="Ingresa tu país actual"
+                                               tabindex="8" @bind-Value="_user.Country"/>
+                                </div>
+                                <div class="col-12 mb-1">
+                                    <label class="form-label">Biografía</label>
+                                    <InputTextArea class="form-control char-textarea" placeholder="Ingresa tu biografía"
+                                                   rows="3" tabin="9" @bind-Value="_user.Biography"/>
+                                    <div class="text-danger form-label">
+                                        <ValidationMessage For="() => _user.Biography"/>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <button type="submit" class="btn btn-primary mt-1 me-1">Actualizar datos</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </EditForm>
+
+                <!-- deactivate account  -->
+                <div class="card">
+                    <div class="card-header border-bottom">
+                        <h4 class="card-title">Eliminar cuenta</h4>
+                    </div>
+                    <div class="card-body py-2 my-25">
+                        <div class="alert alert-warning">
+                            <h4 class="alert-heading">¿Está seguro de que desea eliminar su cuenta?</h4>
+                            <div class="alert-body fw-normal">
+                                😥 Una vez que elimine su cuenta, no hay vuelta atrás. Se perderá toda la información relacionada a su cuenta, no podrá usar la misma dirección de correo electrónico para volverse a registrar.
+                            </div>
+                        </div>
+
+                        <form id="formAccountDeactivation" class="validate-form" onsubmit="return false">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="accountActivation" id="accountActivation" data-msg="Please confirm you want to delete account"/>
+                                <label class="form-check-label font-small-3" for="accountActivation">
+                                    Confirmo la desactivación de mi cuenta
+                                </label>
+                            </div>
+                            <div>
+                                <button type="submit" class="btn btn-danger deactivate-account mt-1">Deactivate Account</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <!--/ profile -->
+            </div>
+        </div>
+    }
+    else
+    {
+        <p>No eres dueño de la cuenta, no puedes editarla</p>
+    }
+</Content>
+
+@code
+{
+    [Parameter]
+    public string UserId { get; set; }
+
+    private UserUpdate? _user = new();
+    private string _userIdLocalStorage = "";
+    private IBrowserFile ImageCoverPictureFile { get; set; }
+    private IBrowserFile ImageProfilePictureFile { get; set; }
+        private const long MaxImageUploadSize = 2 * 1000000;
+    private string _urlProfilePicture = "";
+    private string _urlCoverPicture = "";
+    private bool _updateProcess;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _userIdLocalStorage = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "Id");
+
+        if (_userIdLocalStorage == UserId)
+        {
+            await GetUserById();
+            _urlProfilePicture = _user.UrlProfilePicture;
+            _urlCoverPicture = _user.UrlCoverPicture;
+        }
+    }
+
+    private async Task GetUserById()
+    {
+        var httpResponse = await _httpClient.GetAsync($"api/user/GetUserById/{UserId}");
+
+        if (httpResponse.StatusCode == HttpStatusCode.OK)
+        {
+            _user = await httpResponse.Content.ReadFromJsonAsync<UserUpdate>();
+        }
+        else
+        {
+            _user = null;
+        }
+    }
+
+    private async Task<bool> GetUserByUrlProfile()
+    {
+        var urlProfile = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "UrlProfile");
+
+        if (urlProfile == _user?.UrlProfile.Trim())
+        {
+            return false;
+        }
+
+        var httpResponse = await _httpClient.GetAsync($"api/user/GetUserByUrlProfile/{_user?.UrlProfile.Trim()}");
+        return httpResponse.StatusCode == HttpStatusCode.OK;
+    }
+
+    private async Task OnProfilePictureChange(InputFileChangeEventArgs e)
+    {
+        if (e?.File is null) return;
+
+        if (e.File.Size > MaxImageUploadSize)
+        {
+            await _jsRuntime.InvokeVoidAsync("showToast", "info",
+                "Cover", $"🙄 El archivo debe ser menor a 2 MB");
+            return;
+        }
+
+        _user.UrlProfilePicture = "temporaryUrl";
+        ImageProfilePictureFile = e.File;
+    }
+
+    private async Task OnCoverPictureChange(InputFileChangeEventArgs e)
+    {
+        if (e?.File is null) return;
+
+        if (e.File.Size > MaxImageUploadSize)
+        {
+            await _jsRuntime.InvokeVoidAsync("showToast", "info",
+                "Cover", $"🙄 El archivo debe ser menor a 2 MB");
+            return;
+        }
+
+        _user.UrlCoverPicture = "temporaryUrl";
+        ImageCoverPictureFile = e.File;
+    }
+
+    private async Task SaveProfilePictureInTheCloud()
+    {
+        using var imageContent = new MultipartFormDataContent();
+        try
+        {
+            var fileContent = new StreamContent(ImageProfilePictureFile.OpenReadStream(MaxImageUploadSize));
+            fileContent.Headers.ContentType = new MediaTypeHeaderValue(ImageProfilePictureFile.ContentType);
+            imageContent.Add(fileContent, "\"files\"", $"{UserId}-profile-picture");
+
+            var responseImage = await _httpClient.PostAsync("api/upload/user-picture", imageContent);
+
+            if (responseImage.StatusCode == HttpStatusCode.OK)
+            {
+                _user.UrlProfilePicture = await responseImage.Content.ReadAsStringAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
+    }
+
+    private async Task SaveCoverPictureInTheCloud()
+    {
+        using var imageContent = new MultipartFormDataContent();
+        try
+        {
+            var fileContent = new StreamContent(ImageCoverPictureFile.OpenReadStream(MaxImageUploadSize));
+            fileContent.Headers.ContentType = new MediaTypeHeaderValue(ImageCoverPictureFile.ContentType);
+            imageContent.Add(fileContent, "\"files\"", $"{UserId}-cover-picture");
+
+            var responseImage = await _httpClient.PostAsync("api/upload/user-picture", imageContent);
+
+            if (responseImage.StatusCode == HttpStatusCode.OK)
+            {
+                _user.UrlCoverPicture = await responseImage.Content.ReadAsStringAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
+    }
+
+    private async Task UpdateUser()
+    {
+        _updateProcess = true;
+        var isUrlProfileExist = await GetUserByUrlProfile();
+
+        if (isUrlProfileExist)
+        {
+            await _jsRuntime.InvokeVoidAsync("showToast", "error",
+                "Actualizar", "😪 Error al actualizar, la URL de perfil ya existe.");
+        }
+        else
+        {
+            if (_user.UrlProfilePicture == "temporaryUrl") await SaveProfilePictureInTheCloud();
+            if (_user.UrlCoverPicture == "temporaryUrl") await SaveCoverPictureInTheCloud();
+
+            if (_user.UrlProfilePicture != "temporaryUrl" && _user.UrlCoverPicture != "temporaryUrl")
+            {
+                var httpResponse = await _httpClient.PutAsJsonAsync($"api/user/{UserId}", _user);
+                if (httpResponse.StatusCode == HttpStatusCode.OK)
+                {
+                    await _jsRuntime.InvokeAsync<string>("localStorage.setItem", "UrlProfile", _user.UrlProfile);
+
+                    var urlProfile = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "UrlProfile");
+                    _navigationManager.NavigateTo($"perfil/{urlProfile}", true);
+                    
+                    await _jsRuntime.InvokeVoidAsync("showToast", "success",
+                        "Actualizar", "🥳 ¡Genial! Tus datos se han actualizado correctamente.");
+                }
+                else
+                {
+                    await _jsRuntime.InvokeVoidAsync("showToast", "error",
+                        "Actualizar", "😪 Error al actualizar, inténtelo mas tarde.");
+                }
+            }
+            else
+            {
+                await _jsRuntime.InvokeVoidAsync("showToast", "error",
+                    "Actualizar", "😪 Servidor en mantenimiento, intente más tarde.");
+            }
+
+            _updateProcess = false;
+        }
+    }
+}

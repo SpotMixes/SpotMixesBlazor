@@ -63,6 +63,10 @@
                                     Verificar cuenta
                                 </a>   
                             }
+                            <a class="dropdown-item" @onclick="Settings">
+                                <i class="ri-user-settings-fill"></i>
+                                Ajustes
+                            </a>
                             <div class="dropdown-divider"></div>
                             <a class="dropdown-item" href="/">
                                 <i class="ri-question-line"></i>
@@ -113,6 +117,7 @@
     private async Task Logout() => await _loginService.Logout();
     private void Login() => _navigationManager.NavigateTo("/iniciar-sesion");
     private void Register() => _navigationManager.NavigateTo("/registrar");
-    private void Profile() => _navigationManager.NavigateTo($"/perfil/{_urlProfile}");
+    private void Profile() => _navigationManager.NavigateTo($"/perfil/{_urlProfile}", true);
     private void VerifyAccount() => _navigationManager.NavigateTo($"/verificar-cuenta/{_id}");
+    private void Settings() => _navigationManager.NavigateTo($"/ajustes-cuenta/{_id}", true);
 }
