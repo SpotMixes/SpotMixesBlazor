@@ -71,7 +71,7 @@
                             {
                                 <button class="btn btn-outline-primary" tabindex="2" disabled>
                                     <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                                    Commentando...
+                                    Comentando...
                                 </button>
                             }
                             else
@@ -142,7 +142,7 @@
     // Cargar información de audio
         await GetAudioById();
         await NumberOfComments();
-        await _jsRuntime.InvokeVoidAsync("loadWaveSurfer", $"{_audioLookup.UrlAudio}");
+        await _jsRuntime.InvokeVoidAsync("loadWaveSurfer", "https://res.cloudinary.com/kiulcode/video/upload/v1637596120/SpotMixes/AudioData/Tokyo_Machine_-_SLASH_NCS_Release_j1yerb.mp3");
     // Cargar comentarios
         await GetAllComments();
     }

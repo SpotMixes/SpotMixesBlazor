@@ -60,7 +60,7 @@
                             <div class="row">
                                 <div class="col-12 col-sm-6 mb-1">
                                     <label class="form-label">Nombre visible</label>
-                                    <InputText class="form-control" placeholder="Ingresa tu nombre visible"
+                                    <InputText class="form-control" placeholder="Ingresa tu nombre visible" AutoFocus
                                                tabindex="3" @bind-Value="_user.DisplayName"/>
                                     <div class="text-danger form-label">
                                         <ValidationMessage For="() => _user.DisplayName"/>
@@ -97,14 +97,24 @@
                                 <div class="col-12 mb-1">
                                     <label class="form-label">Biografía</label>
                                     <InputTextArea class="form-control char-textarea" placeholder="Ingresa tu biografía"
-                                                   rows="3" tabin="9" @bind-Value="_user.Biography"/>
+                                                   rows="3" tabindex="9" @bind-Value="_user.Biography"/>
                                     <div class="text-danger form-label">
                                         <ValidationMessage For="() => _user.Biography"/>
                                     </div>
                                 </div>
-                                <div class="col-12">
-                                    <button type="submit" class="btn btn-primary mt-1 me-1">Actualizar datos</button>
-                                </div>
+                                @if (_updateProcess)
+                                {
+                                    <button class="btn btn-outline-primary" disabled>
+                                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                        Actualizando...
+                                    </button>
+                                }
+                                else
+                                {
+                                    <div class="col-12">
+                                        <button type="submit"  tabindex="10" class="btn btn-primary mt-1 me-1">Actualizar datos</button>
+                                    </div>
+                                }
                             </div>
                         </div>
                     </div>

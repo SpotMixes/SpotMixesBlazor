@@ -1,0 +1,27 @@
+﻿@page "/pago-fallido"
+@layout AuthenticationLayout
+@inject IJSRuntime _jsRuntime
+
+<div class="misc-wrapper">
+    <a class="brand-logo" href="/">
+        <img src="public/brand/SpotMixes-Logo-TypographyOnRight.svg" alt="Logo SpotMixes" style="height: 28px;"/>
+    </a>
+    <div class="misc-inner p-2 p-sm-3">
+        <div class="w-100 text-center">
+            <h2 class="mb-1">!Pago fallido! 👎</h2>
+            <p class="mb-2">😪 No fue posible completar la transacción. Inténtalo de nuevo mas tarde.</p>
+            <a class="btn btn-primary mb-2 btn-sm-block" href="/">
+                Regresar al inicio
+            </a>
+            <img class="img-fluid" src="public/page/simple/err-pay.svg" alt="exit"/>
+        </div>
+    </div>
+</div>
+
+@code
+{
+    protected override async Task OnInitializedAsync()
+    {
+        await _jsRuntime.InvokeVoidAsync("includeCss", "src/css/pages/page-misc.min.css", "page-misc");
+    }
+}

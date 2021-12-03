@@ -1,0 +1,31 @@
+﻿@page "/pago-exitoso"
+@layout AuthenticationLayout
+@inject IJSRuntime _jsRuntime
+
+<div class="misc-wrapper">
+    <a class="brand-logo" href="/">
+        <img src="public/brand/SpotMixes-Logo-TypographyOnRight.svg" alt="Logo SpotMixes" style="height: 28px;"/>
+    </a>
+    <div class="misc-inner p-2 p-sm-3">
+        <div class="w-100 text-center">
+            <h2 class="mb-1">!Pago exitoso!👍</h2>
+            <p class="mb-2">
+                🥳 ¡Genial! Su pago se ha procesado exitosamente.
+                En menos de 72 horas, recibirá un correo electrónico con los
+                credenciales para unirse al streaming con el DJ contratado. Muchísimas gracias.
+            </p>
+            <a class="btn btn-primary mb-2 btn-sm-block" href="/">
+                Regresar al inicio
+            </a>
+        </div>
+        <img class="img-fluid" src="public/page/simple/payment.svg" alt="Pago exitoso SpotMixes"/>
+    </div>
+</div>
+
+@code
+{
+    protected override async Task OnInitializedAsync()
+    {
+        await _jsRuntime.InvokeVoidAsync("includeCss", "src/css/pages/page-misc.min.css", "page-misc");
+    }
+}

@@ -81,7 +81,7 @@
     
     private async Task PlayMusic()
     {
-        await _jsRuntime.InvokeVoidAsync("playMusic", Audio.Title, "Test", Audio.UrlAudio, Audio.UrlCover, true);
+        await _jsRuntime.InvokeVoidAsync("playMusic", Audio.Title, "SpotMixes", Audio.UrlAudio, Audio.UrlCover, true);
 
         var isPlaying = await IsPlaylist();
 

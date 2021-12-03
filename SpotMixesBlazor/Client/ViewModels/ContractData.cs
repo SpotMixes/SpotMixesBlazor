@@ -15,10 +15,6 @@ namespace SpotMixesBlazor.Client.ViewModels
 
         public string FullName { get; set; }
 
-        public string Department { get; set; }
-
-        public string City { get; set; }
-
         [Required(ErrorMessage = "⚠️ Campo requerido")]
         [Phone(ErrorMessage = "⚠️ No es un telefono valido")]
         [MinLength(8, ErrorMessage = "⚠️ El número debe tener 9 dígitos")]

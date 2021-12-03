@@ -28,9 +28,9 @@ namespace SpotMixesBlazor.Server.Services
                 },
                 BackUrls = new PreferenceBackUrlsRequest
                 {
-                    Success = "https://spotmixes.com/success",
-                    Failure = "https://spotmixes.com/failure",
-                    Pending = "https://spotmixes.com/pending"
+                    Success = "https://spotmixes.com/pago-exitoso",
+                    Failure = "https://spotmixes.com/pago-fallido",
+                    Pending = "https://spotmixes.com/pago-pendiente"
                 },
                 AutoReturn = "approved"
             };

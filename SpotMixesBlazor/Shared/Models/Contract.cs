@@ -20,10 +20,6 @@ namespace SpotMixesBlazor.Shared.Models
 
         public string FullName { get; set; }
 
-        public string Department { get; set; }
-
-        public string City { get; set; }
-        
         public string ContactMobile { get; set; }
         
         public string ContactEmail { get; set; }

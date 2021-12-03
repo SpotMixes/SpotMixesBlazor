@@ -1,9 +1,9 @@
 {
   "name": "SpotMixesBlazor",
-  "short_name": "SpotMixesBlazor",
+  "short_name": "Spot Mixes",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#ffffff",
+  "background_color": "#161d31",
   "theme_color": "#03173d",
   "prefer_related_applications": false,
   "icons": [

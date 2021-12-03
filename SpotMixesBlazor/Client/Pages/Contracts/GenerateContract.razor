@@ -98,8 +98,6 @@
                                         </p>
                                         <ul>
                                             <li>Nombre completo: @_contract.FullName</li>
-                                            <li>Departamento: @_contract.Department</li>
-                                            <li>Ciudad: @_contract.City</li>
                                         </ul>
                                     }
                                 </div>
@@ -239,17 +237,15 @@
 
         if (inputDni is {Length: 8 })
         {
-            const string apiToken = "5e521be6912dfccfb613c8a4501fcb24b8dcab18a5a374d30b900ce21ec814b9";
+            const string apiToken = "a9510648b494969c7e93a60dd6951db09b818a70a87af39bd301c72dfacfd3d3";
 
             var dniRoot = await _httpClient.GetFromJsonAsync<DniRoot>
                 ($"https://apiperu.dev/api/dni/{inputDni}?api_token={apiToken}");
-
+            
             if (dniRoot != null)
             {
                 _showDataDni = true;
                 _contract.FullName = dniRoot.data.nombre_completo;
-                _contract.Department = dniRoot.data.departamento;
-                _contract.City = dniRoot.data.provincia;
             }
         }
     }
